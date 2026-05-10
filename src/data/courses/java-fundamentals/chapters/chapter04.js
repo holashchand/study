@@ -214,7 +214,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nPrimitives: Copy of VALUE\n─────────────────────────\nmain():\n    n = 5\n    │\n    └─► doubleIt(n)\n           │ copy\n           x = 5 ✗ (separate variable, changing x ≠ affecting n)\n\nObjects: Copy of REFERENCE\n──────────────────────────\nmain():\n    list ──┐\n           │ copy of reference\n    addToList(list)\n           │ reference\n           └──────► [ArrayList object in memory]\n                     ▲\n                     │ same object! (modifications affect it)\n\nmain():\n    list ──┐\n           │ copy of reference\n    replaceList(list)\n           │ reassignment\n           └──► new ArrayList() ← doesn't affect main's list\n      "
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph PBV[\"Primitives — Pass by VALUE\"]\n    direction TB\n    M1[\"main: n = 5\"] -->|\"copies value\"| F1[\"doubleIt: x = 5<br/>x becomes 10<br/>n stays 5 ✓\"]\n  end\n  subgraph PBR[\"Objects — Pass by REFERENCE (copy of ref)\"]\n    direction TB\n    M2[\"main: list\"] -->|\"copy of ref\"| HEAP[\"Heap: ArrayList<br/>shared object\"]\n    F2[\"addToList: ref\"] -->|\"same ref\"| HEAP\n  end\n  style PBV fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style PBR fill:#dcfce7,stroke:#166534,color:#14532d\n  style HEAP fill:#fef9c3,stroke:#854d0e"
       },
       {
         "type": "heading",
@@ -403,7 +404,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nfactorial(4)\n  → return 4 * factorial(3)\n      → return 3 * factorial(2)\n          → return 2 * factorial(1)\n              → return 1 [BASE CASE]\n              ← returns 1\n          ← returns 2 * 1 = 2\n      ← returns 3 * 2 = 6\n  ← returns 4 * 6 = 24\n\nResult: 24\n      "
+        "format": "mermaid",
+        "content": "flowchart TD\n  F4[\"factorial(4)<br/>wants 4 × factorial(3)\"] -->|calls| F3[\"factorial(3)<br/>wants 3 × factorial(2)\"]\n  F3 -->|calls| F2[\"factorial(2)<br/>wants 2 × factorial(1)\"]\n  F2 -->|calls| F1[\"factorial(1)<br/>BASE CASE → returns 1\"]\n  F1 -->|\"returns 1\"| R2[\"2 × 1 = 2\"]\n  R2 -->|\"returns 2\"| R3[\"3 × 2 = 6\"]\n  R3 -->|\"returns 6\"| R4[\"4 × 6 = 24 ✓\"]\n  style F1 fill:#dcfce7,stroke:#166534\n  style R4 fill:#dbeafe,stroke:#1d4ed8"
       },
       {
         "type": "heading",
@@ -524,7 +526,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nint[] arr = {10, 20, 30, 40, 50};\n\nStack:           Heap:\n┌─────────────┐  ┌────────────────────────┐\n│ arr         │  │ Array object           │\n│ ────────────┼─→│ length=5, elementType=int\n└─────────────┘  │                        │\n                 │ [0]  [1]  [2]  [3]  [4]\n                 │ 10   20   30   40   50\n                 └────────────────────────┘\n      "
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph Stack[\"Stack Memory\"]\n    VAR[\"arr<br/>reference\"]\n  end\n  subgraph Heap[\"Heap Memory\"]\n    OBJ[\"int[] Object<br/>length = 5<br/>[0]=10  [1]=20  [2]=30  [3]=40  [4]=50\"]\n  end\n  VAR -->|\"points to\"| OBJ\n  style Stack fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style Heap fill:#dcfce7,stroke:#166534,color:#14532d\n  style OBJ fill:#fef9c3,stroke:#854d0e"
       },
       {
         "type": "heading",

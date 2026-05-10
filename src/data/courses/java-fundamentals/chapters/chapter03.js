@@ -364,7 +364,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n    ┌──────────────────┐\n    │  initialization  │\n    └────────┬─────────┘\n             ▼\n    ┌────────────────┐\n    │  condition?    │──NO──► exit loop\n    └────────┬───────┘\n             │YES\n             ▼\n    ┌────────────────┐\n    │     body       │\n    └────────┬───────┘\n             ▼\n    ┌────────────────┐\n    │    update      │\n    └────────┬───────┘\n             └──────────────► condition?\n      "
+        "format": "mermaid",
+        "content": "flowchart TD\n  START([Start]) --> INIT[\"initialization<br/>e.g. int i = 0\"]\n  INIT --> COND{\"condition?<br/>e.g. i < n\"}\n  COND -->|YES| BODY[\"loop body<br/>execute code\"]\n  BODY --> UPDATE[\"update<br/>e.g. i++\"]\n  UPDATE --> COND\n  COND -->|NO| EXIT([Exit Loop])\n  style START fill:#dbeafe,stroke:#1d4ed8\n  style EXIT fill:#fce7f3,stroke:#9d174d\n  style COND fill:#fef9c3,stroke:#854d0e\n  style BODY fill:#dcfce7,stroke:#166534\n  style UPDATE fill:#f3e8ff,stroke:#6d28d9"
       },
       {
         "type": "heading",
@@ -459,7 +460,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n    ┌────────────────┐\n    │  condition?    │──NO──► exit loop\n    └────────┬───────┘\n             │YES\n             ▼\n    ┌────────────────┐\n    │     body       │\n    └────────┬───────┘\n             └──────────────► condition?\n      "
+        "format": "mermaid",
+        "content": "flowchart TD\n  START([Start]) --> COND{\"condition?\"}\n  COND -->|YES| BODY[\"loop body<br/>execute code\"]\n  BODY --> COND\n  COND -->|NO| EXIT([Exit Loop])\n  style START fill:#dbeafe,stroke:#1d4ed8\n  style EXIT fill:#fce7f3,stroke:#9d174d\n  style COND fill:#fef9c3,stroke:#854d0e\n  style BODY fill:#dcfce7,stroke:#166534"
       },
       {
         "type": "heading",
@@ -544,7 +546,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n    ┌────────────────┐\n    │     body       │\n    └────────┬───────┘\n             ▼\n    ┌────────────────┐\n    │  condition?    │──NO──► exit loop\n    └────────┬───────┘\n             │YES\n             └──────────────► body\n      "
+        "format": "mermaid",
+        "content": "flowchart TD\n  START([Start]) --> BODY[\"loop body<br/>always runs at least once!\"]\n  BODY --> COND{\"condition?\"}\n  COND -->|YES| BODY\n  COND -->|NO| EXIT([Exit Loop])\n  style START fill:#dbeafe,stroke:#1d4ed8\n  style EXIT fill:#fce7f3,stroke:#9d174d\n  style COND fill:#fef9c3,stroke:#854d0e\n  style BODY fill:#dcfce7,stroke:#166534"
       },
       {
         "type": "heading",
@@ -1090,7 +1093,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nNeed to make a decision?\n│\n├─ Single condition?\n│  └─ if / else\n│\n├─ Multiple conditions on same variable?\n│  └─ switch (traditional) or switch expression\n│\n├─ Need loops?\n│  │\n│  ├─ Known iteration count?\n│  │  └─ for loop or for-each loop\n│  │\n│  ├─ Unknown iteration count?\n│  │  ├─ Body must run at least once?\n│  │  │  └─ do-while\n│  │  └─ Body may not run?\n│  │     └─ while\n│  │\n│  └─ Need to skip/exit?\n│     ├─ Skip iteration → continue\n│     ├─ Exit innermost loop → break\n│     └─ Exit outer loop → labeled break\n│\n├─ Pattern matching?\n│  └─ switch expression with type/guarded patterns (Java 21+)\n│\n└─ Exit method early?\n   └─ return\n      "
+        "format": "mermaid",
+        "content": "flowchart TD\n  START[\"Need control flow?\"] --> D1{\"What type?\"}\n  D1 -->|\"Single condition\"| IFELSE[\"if / else\"]\n  D1 -->|\"Multiple on same var\"| SWITCH[\"switch / switch expression\"]\n  D1 -->|\"Loops needed\"| LOOP{\"Known iterations?\"}\n  LOOP -->|\"Yes\"| FOR[\"for / for-each loop\"]\n  LOOP -->|\"No\"| D2{\"Runs at least once?\"}\n  D2 -->|\"Yes\"| DOWHILE[\"do-while\"]\n  D2 -->|\"No\"| WHILE[\"while\"]\n  D1 -->|\"Pattern matching\"| SPAT[\"switch expression<br/>Java 21+ patterns\"]\n  D1 -->|\"Early exit\"| RETURN[\"return\"]\n  style IFELSE fill:#dbeafe,stroke:#1d4ed8\n  style SWITCH fill:#f3e8ff,stroke:#6d28d9\n  style FOR fill:#dcfce7,stroke:#166534\n  style DOWHILE fill:#fef9c3,stroke:#854d0e\n  style WHILE fill:#fce7f3,stroke:#9d174d\n  style SPAT fill:#e0f2fe,stroke:#0369a1\n  style RETURN fill:#fff7ed,stroke:#c2410c"
       },
       {
         "type": "heading",

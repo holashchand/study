@@ -30,7 +30,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n┌─────────────────────────────────────────────────────────┐\n│ STACK                       HEAP                         │\n├─────────────────────────────────────────────────────────┤\n│                                                         │\n│  car1 ──────┐                ┌──────────────────────┐  │\n│             │                │ Car object (car1)    │  │\n│             │────reference───┤ color=\"red\"          │  │\n│             │                │ brand=\"Ferrari\"      │  │\n│             │                │ speed=150            │  │\n│             │                └──────────────────────┘  │\n│                                                         │\n│  car2 ──────┐                ┌──────────────────────┐  │\n│             │                │ Car object (car2)    │  │\n│             │────reference───┤ color=\"blue\"         │  │\n│                              │ brand=\"Tesla\"        │  │\n│                              │ speed=100            │  │\n│                              └──────────────────────┘  │\n│                                                         │\n└─────────────────────────────────────────────────────────┘\n\nKEY: Variables (car1, car2) live on STACK with references.\n     Objects live on HEAP with actual data.\n"
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph Stack[\"Stack Memory\"]\n    direction TB\n    V1[\"car1 (reference)\"]\n    V2[\"car2 (reference)\"]\n  end\n  subgraph Heap[\"Heap Memory\"]\n    direction TB\n    O1[\"Car Object — car1<br/>color=red<br/>brand=Ferrari, speed=150\"]\n    O2[\"Car Object — car2<br/>color=blue<br/>brand=Tesla, speed=100\"]\n  end\n  V1 -->|\"reference\"| O1\n  V2 -->|\"reference\"| O2\n  style Stack fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style Heap fill:#dcfce7,stroke:#166534,color:#14532d\n  style O1 fill:#fef9c3,stroke:#854d0e\n  style O2 fill:#fce7f3,stroke:#9d174d"
       },
       {
         "type": "heading",
@@ -90,7 +91,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nInstance Fields              Static Fields\n──────────────────────────────────────────────\nu1.name = \"Alice\"            User.totalUsers = 3\nu2.name = \"Bob\"              (SAME for all users)\nu3.name = \"Charlie\"\n(SEPARATE for each)\n\n┌────────────────┐           ┌──────────────┐\n│ u1 object      │           │  Class User  │\n│ name = \"Alice\" │           │ totalUsers=3 │\n└────────────────┘           └──────────────┘\n┌────────────────┐\n│ u2 object      │  Each object points to same static field\n│ name = \"Bob\"   │\n└────────────────┘\n┌────────────────┐\n│ u3 object      │\n│ name= \"Charlie\"│\n└────────────────┘\n"
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph Heap[\"Heap — Instance Objects\"]\n    direction TB\n    U1[\"u1: name = Alice\"]\n    U2[\"u2: name = Bob\"]\n    U3[\"u3: name = Charlie\"]\n  end\n  subgraph ClassArea[\"Class Area — Static (Shared)\"]\n    TOTAL[\"User.totalUsers = 3<br/>shared by ALL instances\"]\n  end\n  U1 -->|\"references static\"| TOTAL\n  U2 -->|\"references static\"| TOTAL\n  U3 -->|\"references static\"| TOTAL\n  style Heap fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style ClassArea fill:#dcfce7,stroke:#166534,color:#14532d\n  style TOTAL fill:#fef9c3,stroke:#854d0e"
       },
       {
         "type": "heading",
@@ -307,7 +309,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n┌─────────────────────────────────────────────────────────────┐\n│                   PACKAGE: com.shop                         │\n│  ┌──────────────────────────────────────────────────────┐   │\n│  │  class Product {                                     │   │\n│  │    private    String sku;        ← only Product     │   │\n│  │    (default)  int stockLevel;    ← Warehouse OK    │   │\n│  │    protected  void reorder();    ← Warehouse OK    │   │\n│  │    public     double getPrice(); ← everyone OK     │   │\n│  │  }                                                  │   │\n│  │  class Warehouse { /* can access default, protected */ } │\n│  └──────────────────────────────────────────────────────┘   │\n└─────────────────────────────────────────────────────────────┘\n\n┌─────────────────────────────────────────────────────────────┐\n│              PACKAGE: com.shop.delivery                      │\n│  ┌──────────────────────────────────────────────────────┐   │\n│  │  class DeliveryDriver extends Product {              │   │\n│  │    can access: protected, public (not private)      │   │\n│  │  }                                                  │   │\n│  │  class DeliveryHelper {                             │   │\n│  │    can access: public only (not even protected)    │   │\n│  │  }                                                  │   │\n│  └──────────────────────────────────────────────────────┘   │\n└─────────────────────────────────────────────────────────────┘\n\n┌─────────────────────────────────────────────────────────────┐\n│           PACKAGE: com.customer                              │\n│  ┌──────────────────────────────────────────────────────┐   │\n│  │  class Customer {                                    │   │\n│  │    can access: public only (not even protected)    │   │\n│  │  }                                                  │   │\n│  └──────────────────────────────────────────────────────┘   │\n└─────────────────────────────────────────────────────────────┘\n"
+        "format": "mermaid",
+        "content": "graph TD\n  subgraph com.shop[\"📦 com.shop\"]\n    PROD[\"class Product<br/>private sku — only Product<br/>default stockLevel — Warehouse OK<br/>protected reorder() — Warehouse OK<br/>public getPrice() — everyone\"]\n    WH[\"class Warehouse<br/>accesses: default, protected, public\"]\n  end\n  subgraph delivery[\"📦 com.shop.delivery\"]\n    DD[\"class DeliveryDriver extends Product<br/>accesses: protected, public\"]\n    DH[\"class DeliveryHelper<br/>accesses: public only\"]\n  end\n  subgraph customer[\"📦 com.customer\"]\n    CUST[\"class Customer<br/>accesses: public only\"]\n  end\n  style com.shop fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style delivery fill:#dcfce7,stroke:#166534,color:#14532d\n  style customer fill:#fce7f3,stroke:#9d174d,color:#4a044e"
       },
       {
         "type": "list",
@@ -407,7 +410,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n                    Animal\n                   /      \\\\\n                 Dog      Cat\n               /   \\\\       |\n         GoldenR  Poodle  Persian\n\nGoldenRetriever inherits from Dog,\nwhich inherits from Animal.\nAll inherit: eat(), sleep()\n\nDog adds: bark()\nGoldenRetriever adds: fetch()\n"
+        "format": "mermaid",
+        "content": "graph TD\n  Animal[\"🐾 Animal<br/>eat() · sleep()\"] --> Dog[\"🐕 Dog<br/>+bark()\"]\n  Animal --> Cat[\"🐈 Cat<br/>+meow()\"]\n  Dog --> GR[\"GoldenRetriever<br/>+fetch()\"]\n  Dog --> PD[\"Poodle\"]\n  Cat --> PS[\"Persian\"]\n  style Animal fill:#dbeafe,stroke:#1d4ed8\n  style Dog fill:#dcfce7,stroke:#166534\n  style Cat fill:#fce7f3,stroke:#9d174d\n  style GR fill:#f3e8ff,stroke:#6d28d9\n  style PD fill:#f3e8ff,stroke:#6d28d9\n  style PS fill:#fef9c3,stroke:#854d0e"
       },
       {
         "type": "heading",
@@ -630,7 +634,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n┌──────────────────────────────────────────────────────┐\n│ Compile Time:                                        │\n│   Animal ref = new Dog();                           │\n│   ref.makeSound();                                  │\n│   Compiler: \"Animal has makeSound(), allow it\"      │\n└──────────────────────────────────────────────────────┘\n\n┌──────────────────────────────────────────────────────┐\n│ Runtime:                                             │\n│   ref points to Dog object on heap                  │\n│   ↓                                                  │\n│   JVM checks: actual type is Dog                    │\n│   ↓                                                  │\n│   JVM calls Dog.makeSound()                         │\n│   ↓                                                  │\n│   Outputs: \"Woof!\"                                  │\n└──────────────────────────────────────────────────────┘\n\nPOLYMORPHISM: Same reference, different behavior based on actual object type\n"
+        "format": "mermaid",
+        "content": "sequenceDiagram\n  participant Code\n  participant Compiler\n  participant JVM\n  participant Dog as Dog Object\n\n  Code->>Compiler: Animal ref = new Dog()\n  Code->>Compiler: ref.makeSound()\n  Compiler-->>Code: ✓ Animal has makeSound(), allowed\n\n  note over JVM,Dog: At Runtime\n  JVM->>JVM: ref points to Dog object on heap\n  JVM->>JVM: Actual type = Dog\n  JVM->>Dog: Dog.makeSound()\n  Dog-->>Code: Woof! — polymorphism!"
       },
       {
         "type": "heading",

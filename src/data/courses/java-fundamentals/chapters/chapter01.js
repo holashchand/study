@@ -72,7 +72,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "┌─────────────────────────────────────────┐\n│              JDK (Java Development Kit) │\n│  ┌───────────────────────────────────┐  │\n│  │     JRE (Java Runtime Environment)│  │\n│  │  ┌─────────────────────────────┐  │  │\n│  │  │  JVM (Java Virtual Machine) │  │  │\n│  │  │   Executes .class bytecode  │  │  │\n│  │  │   Platform-specific binary  │  │  │\n│  │  └─────────────────────────────┘  │  │\n│  │  + Java Class Libraries (stdlib)   │  │\n│  │  + Runtime Environment             │  │\n│  └───────────────────────────────────┘  │\n│  + javac (compiler)                     │\n│  + javadoc (documentation generator)    │\n│  + jdb (debugger)                       │\n│  + jshell (REPL)                        │\n│  + Other development tools              │\n└─────────────────────────────────────────┘"
+        "format": "mermaid",
+        "content": "graph TD\n  subgraph JDK[\"☕ JDK — Java Development Kit\"]\n    subgraph JRE[\"JRE — Java Runtime Environment\"]\n      subgraph JVM[\"⚡ JVM — Java Virtual Machine\"]\n        BYTE[\"Executes .class bytecode<br/>JIT Compiler → Native Code\"]\n      end\n      LIBS[\"Java Class Libraries<br/>java.lang · java.util · java.io\"]\n    end\n    DEV[\"javac · javadoc<br/>jdb · jshell\"]\n  end\n  style JDK fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style JRE fill:#dcfce7,stroke:#166534,color:#14532d\n  style JVM fill:#fef9c3,stroke:#854d0e,color:#713f12"
       },
       {
         "type": "heading",
@@ -131,7 +132,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "┌──────────────┐       ┌────────────┐       ┌─────────────────┐\n│ .java source │─ ──→ │ .class     │─ ──→ │ JVM JIT         │\n│    file      │ javac │ bytecode   │ java │ Compiler        │\n│              │       │ (portable) │      │ ↓               │\n└──────────────┘       └────────────┘      │ Native machine  │\n                                           │ code (fast!)    │\n                                           └─────────────────┘"
+        "format": "mermaid",
+        "content": "flowchart LR\n  A[\"📄 .java<br/>Source File\"] -->|\"javac compiler\"| B[\"📦 .class<br/>Bytecode<br/>platform-independent\"]\n  B -->|\"java command\"| C[\"⚡ JVM<br/>JIT Compiler\"]\n  C --> D[\"🖥️ Native Machine Code<br/>runs on your CPU\"]\n  style A fill:#dbeafe,stroke:#1d4ed8\n  style B fill:#f3e8ff,stroke:#6d28d9\n  style C fill:#fef9c3,stroke:#854d0e\n  style D fill:#dcfce7,stroke:#166534"
       },
       {
         "type": "heading",
@@ -450,7 +452,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "┌──────────────────┐\n│  HelloWorld.java │  (Human-readable source code)\n│   (Source file)  │\n└────────┬─────────┘\n         │ javac compiler\n         ↓\n┌──────────────────┐\n│ HelloWorld.class │  (Bytecode — platform-independent)\n│   (.class file)  │\n└────────┬─────────┘\n         │ java command\n         ↓\n┌──────────────────┐\n│      JVM         │  (Interprets bytecode + JIT compiles to native code)\n│  (Runtime)       │\n└────────┬─────────┘\n         │\n         ↓\n┌──────────────────┐\n│  Program Output  │  (Results on screen/file)</code>"
+        "format": "mermaid",
+        "content": "flowchart TD\n  A[\"📄 HelloWorld.java<br/>Human-readable source code\"] -->|\"javac — type-checks and compiles\"| B[\"📦 HelloWorld.class<br/>Bytecode — platform-independent\"]\n  B -->|\"java — loads into JVM\"| C[\"⚡ JVM Runtime<br/>Bytecode verifier + JIT compiler\"]\n  C --> D[\"📊 Program Output<br/>Hello, World!\"]\n  style A fill:#dbeafe,stroke:#1d4ed8\n  style B fill:#f3e8ff,stroke:#6d28d9\n  style C fill:#fef9c3,stroke:#854d0e\n  style D fill:#dcfce7,stroke:#166534"
       },
       {
         "type": "heading",
@@ -557,7 +560,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "src/\n└── com/                           ← First level of package\n    └── example/                    ← Second level\n        └── utils/                  ← Third level\n            └── StringHelper.java   ← package com.example.utils;"
+        "format": "mermaid",
+        "content": "graph LR\n  SRC[\"📁 src/\"] --> COM[\"📁 com/<br/>1st package level\"]\n  COM --> EX[\"📁 example/<br/>2nd package level\"]\n  EX --> UTILS[\"📁 utils/<br/>3rd package level\"]\n  UTILS --> FILE[\"📄 StringHelper.java<br/>package com.example.utils\"]\n  style SRC fill:#dbeafe,stroke:#1d4ed8\n  style COM fill:#e0f2fe,stroke:#0369a1\n  style EX fill:#f0fdf4,stroke:#166534\n  style UTILS fill:#fef9c3,stroke:#854d0e\n  style FILE fill:#dcfce7,stroke:#166534"
       },
       {
         "type": "heading",

@@ -15,7 +15,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "                    Throwable\n                   /         \\\\\n               Error        Exception\n              /    \\\\        /        \\\\\n      OutOfMemory StackOverflow  RuntimeException  (checked exceptions)\n                              /    |    \\\\\n              NullPointerException  ArithmeticException  ClassCastException\n              ArrayIndexOutOfBoundsException  NumberFormatException\n              IllegalArgumentException  IllegalStateException  ..."
+        "format": "mermaid",
+        "content": "graph TD\n  Throwable[\"Throwable\"] --> Error[\"Error<br/>unrecoverable JVM errors\"]\n  Throwable --> Exception[\"Exception\"]\n  Error --> OOM[\"OutOfMemoryError\"]\n  Error --> SOE[\"StackOverflowError\"]\n  Exception --> RE[\"RuntimeException<br/>unchecked — optional catch\"]\n  Exception --> Checked[\"Checked Exceptions<br/>must catch or declare\"]\n  RE --> NPE[\"NullPointerException\"]\n  RE --> AE[\"ArithmeticException\"]\n  RE --> CCE[\"ClassCastException\"]\n  RE --> AIOBE[\"ArrayIndexOutOfBoundsException\"]\n  Checked --> IOE[\"IOException\"]\n  Checked --> SQL[\"SQLException\"]\n  Checked --> PE[\"ParseException\"]\n  style Throwable fill:#dbeafe,stroke:#1d4ed8\n  style Error fill:#fee2e2,stroke:#dc2626\n  style Exception fill:#fef9c3,stroke:#854d0e\n  style RE fill:#fff7ed,stroke:#c2410c\n  style Checked fill:#dcfce7,stroke:#166534"
       },
       {
         "type": "list",

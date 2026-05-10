@@ -16,7 +16,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nProcess A                    Process B\n┌─────────────────────┐      ┌─────────────────────┐\n│  Memory (isolated)  │      │  Memory (isolated)  │\n│  Thread 1           │      │  Thread 1           │\n│  Thread 2           │      │                     │\n│  Thread 3           │      │                     │\n│  (shared heap)      │      │                     │\n└─────────────────────┘      └─────────────────────┘\n      "
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph PA[\"Process A — isolated memory\"]\n    direction TB\n    T1A[\"Thread 1\"]\n    T2A[\"Thread 2\"]\n    T3A[\"Thread 3\"]\n    HA[\"Shared Heap Memory\"]\n    T1A --> HA\n    T2A --> HA\n    T3A --> HA\n  end\n  subgraph PB[\"Process B — isolated memory\"]\n    direction TB\n    T1B[\"Thread 1\"]\n    HB[\"Heap Memory\"]\n    T1B --> HB\n  end\n  style PA fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style PB fill:#dcfce7,stroke:#166534,color:#14532d\n  style HA fill:#fef9c3,stroke:#854d0e\n  style HB fill:#fef9c3,stroke:#854d0e"
       },
       {
         "type": "list",
@@ -50,7 +51,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\n            start()\nNEW ───────────────► RUNNABLE ◄──────────────────┐\n                         │                        │\n                    scheduled by OS               │\n                         ▼                        │\n                      RUNNING ───────────────────►│ done\n                         │                        │\n          ┌──────────────┴──────────────┐         │\n          ▼                             ▼         ▼\n       BLOCKED                      WAITING    TERMINATED\n    (waiting for lock)           (sleep/join/wait)\n          │                             │\n          └─────── lock acquired ───────┘\n                   or notified/woken\n      "
+        "format": "mermaid",
+        "content": "stateDiagram-v2\n  [*] --> NEW : new Thread()\n  NEW --> RUNNABLE : start()\n  RUNNABLE --> RUNNING : scheduled by OS\n  RUNNING --> RUNNABLE : preempted / yield()\n  RUNNING --> BLOCKED : waiting for monitor lock\n  RUNNING --> WAITING : sleep() / join() / wait()\n  BLOCKED --> RUNNABLE : lock acquired\n  WAITING --> RUNNABLE : notified / woken up\n  RUNNING --> TERMINATED : run() completes\n  TERMINATED --> [*]"
       },
       {
         "type": "list",
@@ -214,7 +216,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nTimeline of race condition:\n\nThread 1:   read count=5    modify (add 1)    write count=6\n                                      ▼\nThread 2:              read count=5    modify (add 1)    write count=6\n                                                     ▼\nResult: Both threads write 6, but should be 7\n        The increment from Thread 1 is lost!\n      "
+        "format": "mermaid",
+        "content": "sequenceDiagram\n  participant T1 as Thread 1\n  participant MEM as Shared Memory (count=5)\n  participant T2 as Thread 2\n\n  T1->>MEM: read count = 5\n  T2->>MEM: read count = 5\n  T1->>T1: compute 5 + 1 = 6\n  T2->>T2: compute 5 + 1 = 6\n  T1->>MEM: write count = 6\n  T2->>MEM: write count = 6\n  note over MEM: Should be 7, got 6!<br/>Thread 1 increment LOST!"
       },
       {
         "type": "heading",
@@ -381,7 +384,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nThread A (consumer):        Thread B (producer):\nwhile (isEmpty) {\n    wait() ────────► (waiting)                  ┐\n                                    produce()   │\n                                    notifyAll() ──► WOKEN UP\n                    (another thread consumed)\nitem = poll()       ◄──── ITEM IS GONE!\n\nSolution: loop (while) ensures we recheck condition\n      "
+        "format": "mermaid",
+        "content": "sequenceDiagram\n  participant A as Thread A (Consumer)\n  participant Buffer\n  participant B as Thread B (Producer)\n\n  A->>Buffer: check isEmpty() → true\n  A->>A: wait() — releases lock, sleeps\n  B->>Buffer: produce(item)\n  B->>A: notifyAll()\n  A->>A: wake up, recheck while(isEmpty)\n  A->>Buffer: poll() — item consumed ✓\n  note over A: Use while, not if!<br/>Guards against spurious wakeups"
       }
     ]
   },
@@ -477,7 +481,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nCompare-and-Swap (CAS) — atomic operation:\n\nCurrent value: 5\n\nThread A:                   Thread B:\nread (expect=5)             read (expect=5)\n  ▼                           ▼\nCAS(expect=5, new=10)       CAS(expect=5, new=15)\n  ├─ Is current == 5?  YES\n  └─ Set current = 10        ├─ Is current == 10?  NO\n                              └─ Fail, retry or return false\n\nResult: No lost update, both threads see consistent state\n      "
+        "format": "mermaid",
+        "content": "sequenceDiagram\n  participant TA as Thread A\n  participant MEM as Memory (value=5)\n  participant TB as Thread B\n\n  TA->>MEM: read (expect = 5)\n  TB->>MEM: read (expect = 5)\n  TA->>MEM: CAS(expect=5, new=10) — SUCCESS ✓\n  note over MEM: value is now 10\n  TB->>MEM: CAS(expect=5, new=15) — FAIL ✗ (current=10)\n  TB->>TB: retry with updated expect=10\n  note over TA,TB: No lost updates — lock-free safety!"
       }
     ]
   },
@@ -761,7 +766,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nPlatform threads (1:1 with OS):\nOS Thread 1 ── Java Thread ── 1 MB stack\nOS Thread 2 ── Java Thread ── 1 MB stack\nOS Thread 3 ── Java Thread ── 1 MB stack\n(Context switches are expensive)\n\nVirtual threads (many:many with OS):\nOS Thread 1 ─┬─ VT1 (unmounted when blocked)\n             ├─ VT2 (running)\n             └─ VT3 (mounted)\nOS Thread 2 ─┬─ VT4 (running)\n             └─ VT5 (unmounted when blocked)\n\nResult: 1000x fewer OS threads, millions of virtual threads possible\n      "
+        "format": "mermaid",
+        "content": "flowchart TD\n  subgraph Platform[\"Platform Threads — 1:1 with OS (expensive)\"]\n    direction LR\n    OS1[\"OS Thread 1<br/>1 MB stack\"] --- JT1[\"Java Thread 1\"]\n    OS2[\"OS Thread 2<br/>1 MB stack\"] --- JT2[\"Java Thread 2\"]\n    OS3[\"OS Thread 3<br/>1 MB stack\"] --- JT3[\"Java Thread 3\"]\n  end\n  subgraph Virtual[\"Virtual Threads — many:1 with OS — Java 21+ (cheap)\"]\n    direction LR\n    VOS1[\"OS Thread 1\"] --> VT1[\"VT1 running\"]\n    VOS1 --> VT2[\"VT2 unmounted\"]\n    VOS1 --> VT3[\"VT3 mounted\"]\n    VOS2[\"OS Thread 2\"] --> VT4[\"VT4 running\"]\n    VOS2 --> VT5[\"VT5 unmounted\"]\n  end\n  style Platform fill:#fee2e2,stroke:#dc2626,color:#7f1d1d\n  style Virtual fill:#dcfce7,stroke:#166534,color:#14532d"
       },
       {
         "type": "heading",
@@ -918,7 +924,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\nDeadlock timeline:\n\nTime 1:  T1 acquires lock1    T2 acquires lock2\n         ├─ wants lock2\n         │\nTime 2:  T1 BLOCKED           T2 wants lock1\n         ├─ (waiting for lock2)   ├─ BLOCKED\n         │                        │ (waiting for lock1)\n         │\n         ▼ STUCK FOREVER ◄───────┘\n\nT1 holds lock1, wants lock2\nT2 holds lock2, wants lock1\nResult: Neither can proceed — DEADLOCK!\n      "
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph T1[\"Thread 1\"]\n    H1[\"holds lock1\"] -->|\"wants\"| W1[\"lock2 — BLOCKED\"]\n  end\n  subgraph T2[\"Thread 2\"]\n    H2[\"holds lock2\"] -->|\"wants\"| W2[\"lock1 — BLOCKED\"]\n  end\n  W1 -.->|\"lock2 held by T2\"| H2\n  W2 -.->|\"lock1 held by T1\"| H1\n  DEAD[\"💀 DEADLOCK<br/>Neither thread can proceed\"] \n  W1 --- DEAD\n  W2 --- DEAD\n  style T1 fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style T2 fill:#f3e8ff,stroke:#6d28d9,color:#3b0764\n  style DEAD fill:#fee2e2,stroke:#dc2626,color:#7f1d1d"
       },
       {
         "type": "heading",

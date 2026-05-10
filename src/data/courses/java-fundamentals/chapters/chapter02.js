@@ -377,7 +377,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "byte → short → int → long → float → double\n              ↑\n             char"
+        "format": "mermaid",
+        "content": "flowchart LR\n  CHAR[\"char<br/>16-bit unsigned\"] --> INT\n  BYTE[\"byte<br/>8-bit\"] --> SHORT[\"short<br/>16-bit\"]\n  SHORT --> INT[\"int<br/>32-bit\"]\n  INT --> LONG[\"long<br/>64-bit\"]\n  LONG --> FLOAT[\"float<br/>32-bit fp\"]\n  FLOAT --> DOUBLE[\"double<br/>64-bit fp\"]\n  style BYTE fill:#dbeafe,stroke:#1d4ed8\n  style SHORT fill:#e0f2fe,stroke:#0369a1\n  style INT fill:#dcfce7,stroke:#166534\n  style LONG fill:#fef9c3,stroke:#854d0e\n  style FLOAT fill:#fce7f3,stroke:#9d174d\n  style DOUBLE fill:#f3e8ff,stroke:#6d28d9\n  style CHAR fill:#fff7ed,stroke:#c2410c"
       },
       {
         "type": "heading",

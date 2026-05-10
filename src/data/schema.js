@@ -9,7 +9,10 @@
  * { type: 'paragraph', text: string }   // supports **bold**, `code`, _italic_ inline
  * { type: 'list', ordered: boolean, items: string[] }
  * { type: 'code', language: string, code: string, filename?: string, highlightLines?: number[] }
- * { type: 'diagram', content: string, label?: string }
+ * { type: 'diagram', content: string, label?: string, format?: 'mermaid'|'plantuml' }
+ *   format omitted → ASCII art (legacy)
+ *   format 'mermaid' → rendered client-side with Mermaid.js
+ *   format 'plantuml' → rendered via Kroki.io (https://kroki.io)
  * { type: 'table', headers: string[], rows: string[][] }
  * { type: 'callout', variant: 'note'|'tip'|'warning'|'important', title?: string, text: string }
  * { type: 'badge', text: string, variant: 'lts'|'preview'|'new'|'default' }

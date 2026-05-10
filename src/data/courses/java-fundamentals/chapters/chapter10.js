@@ -50,7 +50,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "\njava.base (always implicitly required)\n    │\n    ├── java.sql\n    │   ├── JDBC drivers\n    │   └── Connection, Statement, etc\n    │\n    ├── java.xml\n    │   ├── SAX, DOM, StAX parsing\n    │   └── (transitive from com.myapp)\n    │\n    └── com.myapp (our module)\n        ├── exports com.myapp.api\n        ├── opens   com.myapp.model\n        └── uses    com.myapp.spi.Plugin\n            │\n            ├─→ provides com.myapp.impl.DefaultPlugin\n            └─→ provides com.myapp.impl.AdvancedPlugin\n      "
+        "format": "mermaid",
+        "content": "graph TD\n  BASE[\"java.base<br/>always implicitly required\"] --> SQL[\"java.sql<br/>JDBC drivers<br/>Connection, Statement\"]\n  BASE --> XML[\"java.xml<br/>SAX, DOM, StAX parsing\"]\n  BASE --> APP[\"com.myapp<br/>exports com.myapp.api<br/>opens com.myapp.model\"]\n  XML --> APP\n  SQL --> APP\n  APP --> P1[\"DefaultPlugin<br/>provides Plugin SPI\"]\n  APP --> P2[\"AdvancedPlugin<br/>provides Plugin SPI\"]\n  style BASE fill:#dbeafe,stroke:#1d4ed8\n  style SQL fill:#e0f2fe,stroke:#0369a1\n  style XML fill:#e0f2fe,stroke:#0369a1\n  style APP fill:#dcfce7,stroke:#166534\n  style P1 fill:#f3e8ff,stroke:#6d28d9\n  style P2 fill:#f3e8ff,stroke:#6d28d9"
       },
       {
         "type": "heading",

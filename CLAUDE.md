@@ -10,6 +10,7 @@ A React-based educational platform for hosting structured course content. Built 
 - **Styling:** Tailwind CSS v4, shadcn UI components
 - **Code:** Vite (build tool), Lucide icons
 - **Syntax highlighting:** react-syntax-highlighter with Prism
+- **Diagrams:** Mermaid.js (client-side), PlantUML via Kroki.io (server-side)
 - **Utilities:** clsx, class-variance-authority, tailwind-merge
 
 ## Running the Project
@@ -112,6 +113,23 @@ All chapter content is structured as an array of **blocks** with a `type` field.
 - shadcn components provide accessible, styled primitives
 - Tailwind CSS for utility-first styling with semantic tokens
 - No component library lock-in (components are just files)
+
+### Diagram Block — Mermaid & PlantUML Support
+The `diagram` block type supports three formats via the optional `format` field:
+
+- **No `format` (default):** ASCII art rendered in a `<pre>` tag (legacy)
+- **`format: 'mermaid'`:** Rendered client-side using Mermaid.js. Respects dark/light theme. Component: `src/components/content/MermaidDiagram.jsx`
+- **`format: 'plantuml'`:** Rendered server-side via [Kroki.io](https://kroki.io). Component: `src/components/content/PlantUMLDiagram.jsx`
+
+All 28 diagrams across Java Fundamentals chapters have been converted to Mermaid.
+
+```javascript
+// Mermaid flowchart example
+{ type: 'diagram', format: 'mermaid', content: 'flowchart LR\n  A["Source"] --> B["Output"]', label: 'Optional label' }
+
+// PlantUML example
+{ type: 'diagram', format: 'plantuml', content: '@startuml\nAlice -> Bob: Hello\n@enduml' }
+```
 
 ### HtmlBlock Fallback
 The `html` block type supports raw HTML for legacy content or edge cases, but new courses should use structured blocks. See `src/components/content/blocks/HtmlBlock.jsx`.

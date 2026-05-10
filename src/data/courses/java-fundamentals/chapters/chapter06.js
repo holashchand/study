@@ -421,7 +421,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "                    Iterable\n                       │\n                  Collection\n                 /    |    \\\\\n               List  Set   Queue\n               │      │      │\n          ArrayList HashSet ArrayDeque\n          LinkedList LinkedHashSet PriorityQueue\n          Vector   TreeSet  LinkedList\n          Stack\n\n         Map (separate hierarchy)\n        /    |     \\\\\n     HashMap LinkedHashMap TreeMap\n     Hashtable ConcurrentHashMap WeakHashMap"
+        "format": "mermaid",
+        "content": "graph TD\n  Iterable --> Collection\n  Collection --> List\n  Collection --> Set\n  Collection --> Queue\n  List --> ArrayList\n  List --> LinkedList\n  List --> Vector\n  Vector --> Stack\n  LinkedList --> Queue\n  Set --> HashSet\n  Set --> LinkedHashSet\n  Set --> TreeSet\n  Queue --> ArrayDeque\n  Queue --> PriorityQueue\n  MapH[\"Map (separate hierarchy)\"] --> HashMap\n  MapH --> LinkedHashMap\n  MapH --> TreeMap\n  MapH --> ConcurrentHashMap\n  style Iterable fill:#dbeafe,stroke:#1d4ed8\n  style Collection fill:#e0f2fe,stroke:#0369a1\n  style List fill:#dcfce7,stroke:#166534\n  style Set fill:#f3e8ff,stroke:#6d28d9\n  style Queue fill:#fef9c3,stroke:#854d0e\n  style MapH fill:#fce7f3,stroke:#9d174d"
       },
       {
         "type": "heading",

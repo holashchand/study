@@ -345,7 +345,8 @@ export const sections = [
       },
       {
         "type": "diagram",
-        "content": "┌─────────────────────────────────────────────────────────────────┐\n│                        STREAM PIPELINE                          │\n└─────────────────────────────────────────────────────────────────┘\n\nSOURCE                INTERMEDIATE OPS (lazy)      TERMINAL OP (executes)\n  ▼                             ▼                           ▼\n┌──────┐    ┌────────────────────────────────┐    ┌──────────────┐\n│List/ │    │ filter() ─→ map() ─→ sorted()  │    │ collect() or │\n│Array │───▶│ (no execution yet)              │───▶│ forEach()    │\n│Stream│    │                                │    │ (now runs!)  │\n└──────┘    └────────────────────────────────┘    └──────────────┘\n             Stream<T>                          Result value\n"
+        "format": "mermaid",
+        "content": "flowchart LR\n  subgraph Source[\"SOURCE\"]\n    S[\"List / Array<br/>Stream.of()\"]\n  end\n  subgraph Intermediate[\"INTERMEDIATE OPS — lazy, no execution yet\"]\n    direction LR\n    F[\"filter()\"] --> M[\"map()\"] --> SORT[\"sorted()\"]\n  end\n  subgraph Terminal[\"TERMINAL OP — triggers all execution\"]\n    T[\"collect()<br/>forEach()<br/>reduce()\"]\n  end\n  Source --> Intermediate --> Terminal\n  style Source fill:#dbeafe,stroke:#1d4ed8,color:#1e3a5f\n  style Intermediate fill:#fef9c3,stroke:#854d0e,color:#713f12\n  style Terminal fill:#dcfce7,stroke:#166534,color:#14532d"
       },
       {
         "type": "heading",
