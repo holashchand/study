@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1 — Java Foundations | Java Fundamentals</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <span>Start</span>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter02-data-types-operators.html">Chapter 2 →</a>
+  </nav>
+  <article>
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 1</div>
+      <h1 class="chapter-title">Java Foundations &amp; Environment Setup</h1>
+      <p class="chapter-subtitle">JVM, JDK, compilation pipeline, packages, your first program</p>
+    </div>
+
+    <nav class="toc">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#what-is-java">What is Java?</a></li>
+        <li><a href="#jre-jdk-jvm">JRE vs JDK vs JVM</a></li>
+        <li><a href="#jit-compilation">JIT Compilation</a></li>
+        <li><a href="#java-versions">Java Versions Timeline</a></li>
+        <li><a href="#installing-jdk">Installing the JDK</a></li>
+        <li><a href="#hello-world">Hello World — First Program</a></li>
+        <li><a href="#compilation-model">Compilation Model</a></li>
+        <li><a href="#package-system">Package System</a></li>
+        <li><a href="#import-statements">Import Statements</a></li>
+        <li><a href="#comments">Comments &amp; Documentation</a></li>
+        <li><a href="#jshell">JShell — Interactive REPL</a></li>
+        <li><a href="#single-file-programs">Single-File Programs</a></li>
+        <li><a href="#command-line-args">Command-Line Arguments</a></li>
+      </ol>
+    </nav>
+
+    <section id="what-is-java">
+      <h2>1. What is Java?</h2>
+
+      <p class="syntax-label">History</p>
+      <ul>
+        <li><strong>1995:</strong> James Gosling and team at Sun Microsystems created Java</li>
+        <li><strong>Philosophy:</strong> "Write Once, Run Anywhere" (WORA) — compile once, run on any platform</li>
+        <li><strong>Design goals:</strong> Platform independence, simplicity, security, robustness, network-centric</li>
+      </ul>
+
+      <p class="syntax-label">Java Today</p>
+      <ul>
+        <li><strong>#1 enterprise language:</strong> Used in 90% of Fortune 500 companies</li>
+        <li><strong>Android development:</strong> Official language for Android apps</li>
+        <li><strong>Frameworks:</strong> Spring, Hibernate, Apache Kafka, Apache Spark</li>
+        <li><strong>Scalability:</strong> Powers Netflix, Twitter, LinkedIn, Google services</li>
+      </ul>
+
+      <p class="syntax-label">Key Design Goals</p>
+      <ul>
+        <li><strong>Platform-independent:</strong> Bytecode runs on JVM, not CPU-specific</li>
+        <li><strong>Object-oriented:</strong> Everything is an object (except primitives)</li>
+        <li><strong>Secure:</strong> Type-safe, no direct memory access, runtime checks</li>
+        <li><strong>Robust:</strong> Exception handling, garbage collection, automatic memory management</li>
+        <li><strong>Simple:</strong> Familiar C/C++ syntax but simpler, no pointers</li>
+      </ul>
+    </section>
+
+    <section id="jre-jdk-jvm">
+      <h2>2. JRE vs JDK vs JVM</h2>
+
+      <p class="syntax-label">Architecture Diagram</p>
+      <pre class="diagram">┌─────────────────────────────────────────┐
+│              JDK (Java Development Kit) │
+│  ┌───────────────────────────────────┐  │
+│  │     JRE (Java Runtime Environment)│  │
+│  │  ┌─────────────────────────────┐  │  │
+│  │  │  JVM (Java Virtual Machine) │  │  │
+│  │  │   Executes .class bytecode  │  │  │
+│  │  │   Platform-specific binary  │  │  │
+│  │  └─────────────────────────────┘  │  │
+│  │  + Java Class Libraries (stdlib)   │  │
+│  │  + Runtime Environment             │  │
+│  └───────────────────────────────────┘  │
+│  + javac (compiler)                     │
+│  + javadoc (documentation generator)    │
+│  + jdb (debugger)                       │
+│  + jshell (REPL)                        │
+│  + Other development tools              │
+└─────────────────────────────────────────┘</pre>
+
+      <p class="syntax-label">The Three Components</p>
+
+      <div class="note">
+        <strong>JVM (Java Virtual Machine)</strong>
+        <ul>
+          <li>Abstract computing machine that runs bytecode (.class files)</li>
+          <li>Platform-specific implementation (Windows JVM ≠ Linux JVM)</li>
+          <li>Responsible for Just-In-Time (JIT) compilation to native code</li>
+          <li>Provides memory management and garbage collection</li>
+          <li>Isolates Java code from hardware/OS details</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>JRE (Java Runtime Environment)</strong>
+        <ul>
+          <li>JVM + Java Standard Library (java.lang, java.util, java.io, etc.)</li>
+          <li>Needed to <strong>run</strong> Java programs</li>
+          <li>Does NOT include compiler (javac) or other dev tools</li>
+          <li>Lightweight; can be distributed to end users</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>JDK (Java Development Kit)</strong>
+        <ul>
+          <li>JRE + compiler + tools for development</li>
+          <li>Includes: javac, javadoc, jdb, jshell, and more</li>
+          <li>Needed to <strong>develop</strong> Java programs</li>
+          <li>Larger download; typically only needed on developer machines</li>
+        </ul>
+      </div>
+
+      <p class="syntax-label">What You Install</p>
+      <pre><code class="language-bash"># Check JDK installation
+java -version        # Shows JRE/JVM version
+javac -version       # Shows compiler version (JDK only)</code></pre>
+
+      <div class="important">
+        <strong>For this course:</strong> Install the JDK. The JDK includes everything (JVM + JRE + tools).
+      </div>
+    </section>
+
+    <section id="jit-compilation">
+      <h2>3. JIT Compilation</h2>
+
+      <p class="syntax-label">Compilation Pipeline</p>
+      <pre class="diagram">┌──────────────┐       ┌────────────┐       ┌─────────────────┐
+│ .java source │─ ──→ │ .class     │─ ──→ │ JVM JIT         │
+│    file      │ javac │ bytecode   │ java │ Compiler        │
+│              │       │ (portable) │      │ ↓               │
+└──────────────┘       └────────────┘      │ Native machine  │
+                                           │ code (fast!)    │
+                                           └─────────────────┘</pre>
+
+      <p class="syntax-label">Key Concepts</p>
+      <ul>
+        <li><strong>Intermediate compilation (javac):</strong> Source code → platform-independent bytecode</li>
+        <li><strong>JIT (Just-In-Time):</strong> JVM compiles hot bytecode paths to native machine code during execution — makes Java fast</li>
+        <li><strong>Trade-off:</strong> First run is slower (JIT warm-up), but subsequent runs are very fast</li>
+      </ul>
+
+      <p class="syntax-label">Example Execution Path</p>
+      <pre><code class="language-bash"># Step 1: Compile
+javac HelloWorld.java    # Creates HelloWorld.class (bytecode)
+
+# Step 2: Run (JVM starts)
+java HelloWorld          # JVM loads .class, JIT compiles frequently-run methods to native code</code></pre>
+
+      <div class="tip">
+        <strong>Why JIT is clever:</strong> The JVM profiles which methods run most often. Those hot paths are compiled to native machine code by JIT. Cold code stays as bytecode. This hybrid approach gives you portability + speed.
+      </div>
+    </section>
+
+    <section id="java-versions">
+      <h2>4. Java Versions Timeline</h2>
+
+      <p class="syntax-label">Complete Version History</p>
+      <table class="version-table">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Year</th>
+            <th>Key Features</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1.0</td>
+            <td>1996</td>
+            <td>Initial release, applets, AWT</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>1.2</td>
+            <td>1998</td>
+            <td>Swing, Collections Framework, JIT</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>5 (1.5)</td>
+            <td>2004</td>
+            <td>Generics, annotations, enums, for-each loop, varargs</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>2006</td>
+            <td>Scripting support, improved performance</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>2011</td>
+            <td>Try-with-resources, diamond operator, string in switch</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>8 <span class="badge lts">LTS</span></td>
+            <td>2014</td>
+            <td>Lambda expressions, streams, functional programming, default methods</td>
+            <td>Supported until 2030</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>2017</td>
+            <td>Modules (JPMS), jshell, private interface methods</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>2018</td>
+            <td>Local variable type inference (var keyword)</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>11 <span class="badge lts">LTS</span></td>
+            <td>2018</td>
+            <td>Single-file programs, http client, var in lambdas</td>
+            <td>Supported until 2026</td>
+          </tr>
+          <tr>
+            <td>12–13</td>
+            <td>2019</td>
+            <td>Switch expressions (preview), text blocks (preview)</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>14–16</td>
+            <td>2020–2021</td>
+            <td>Records (preview), sealed classes, pattern matching (preview)</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>17 <span class="badge lts">LTS</span></td>
+            <td>2021</td>
+            <td>Sealed classes, strong encapsulation, pattern matching</td>
+            <td>Supported until 2029</td>
+          </tr>
+          <tr>
+            <td>18–20</td>
+            <td>2022–2023</td>
+            <td>Virtual threads (preview), switch pattern matching</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>21 <span class="badge lts">LTS</span></td>
+            <td>2023</td>
+            <td>Virtual threads, pattern matching (final), record patterns</td>
+            <td>Supported until 2031</td>
+          </tr>
+          <tr>
+            <td>22–24</td>
+            <td>2024–2025</td>
+            <td>Additional preview features, optimizations</td>
+            <td>Obsolete</td>
+          </tr>
+          <tr>
+            <td>25 <span class="badge lts">LTS</span></td>
+            <td>2025</td>
+            <td>TBD (next LTS release)</td>
+            <td>Current LTS</td>
+          </tr>
+          <tr>
+            <td>26</td>
+            <td>2026</td>
+            <td>Current release</td>
+            <td>Current</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="important">
+        <strong>LTS Versions (Long-Term Support):</strong> Java 8, 11, 17, 21, 25. These receive security updates for 5+ years. Use LTS versions for production.
+      </div>
+
+      <div class="note">
+        <strong>Non-LTS versions:</strong> Released every 6 months, supported for only 6 months. Use for experimentation and learning new features.
+      </div>
+    </section>
+
+    <section id="installing-jdk">
+      <h2>5. Installing the JDK</h2>
+
+      <p class="syntax-label">Popular JDK Distributions</p>
+      <ul>
+        <li><strong>Adoptium (OpenJDK):</strong> Free, open-source, no licensing — <code>adoptium.net</code></li>
+        <li><strong>Oracle JDK:</strong> Official, commercial support available — <code>oracle.com/java/</code></li>
+        <li><strong>Amazon Corretto:</strong> Free, AWS-supported, optimized — <code>aws.amazon.com/corretto/</code></li>
+        <li><strong>GraalVM:</strong> Advanced optimizations, polyglot support — <code>graalvm.org</code></li>
+      </ul>
+
+      <p class="syntax-label">Installation Steps (Linux/Mac)</p>
+      <pre><code class="language-bash"># 1. Download OpenJDK 21 from adoptium.net or install via package manager
+
+# macOS (Homebrew)
+brew install openjdk@21
+
+# Ubuntu/Debian
+sudo apt update
+sudo apt install openjdk-21-jdk
+
+# 2. Verify installation
+java -version
+javac -version</code></pre>
+
+      <p class="syntax-label">Installation Steps (Windows)</p>
+      <pre><code class="language-bash"># 1. Download installer from adoptium.net
+# 2. Run installer, select installation directory (e.g., C:\jdk-21)
+# 3. Verify in Command Prompt:
+java -version
+javac -version</code></pre>
+
+      <p class="syntax-label">Set JAVA_HOME Environment Variable</p>
+      <pre><code class="language-bash"># Linux/Mac — add to ~/.bash_profile or ~/.zshrc
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Reload shell
+source ~/.bash_profile
+
+# Verify
+echo $JAVA_HOME
+java -version</code></pre>
+
+      <pre><code class="language-bash"># Windows — set environment variables
+# Control Panel → System → Advanced system settings → Environment Variables
+# New system variable:
+#   Variable name: JAVA_HOME
+#   Variable value: C:\jdk-21
+
+# Add to PATH:
+#   Edit PATH → New → %JAVA_HOME%\bin
+
+# Verify in new Command Prompt:
+java -version
+javac -version</code></pre>
+
+      <div class="tip">
+        <strong>Recommended for this course:</strong> Install Java 21 LTS (latest LTS) or Java 11 LTS (stable, widely used).
+      </div>
+    </section>
+
+    <section id="hello-world">
+      <h2>6. Hello World — First Program</h2>
+
+      <p class="syntax-label">Complete HelloWorld.java with Inline Explanations</p>
+      <pre><code class="language-java">// HelloWorld.java — File name MUST match the public class name
+
+public class HelloWorld {      // public = accessible anywhere; class = template for objects
+    public static void main(String[] args) {  // Entry point — JVM calls this first
+        // public    = accessible by JVM launcher
+        // static    = belongs to the class, no instance needed to call it
+        // void      = method returns nothing
+        // main      = special name — JVM looks for this signature
+        // String[]  = array of text (command-line arguments)
+        // args      = array name (could be any name, but main is the standard name)
+
+        System.out.println("Hello, World!");
+        // System    = built-in class from java.lang package
+        // out       = static PrintStream field (object that writes to console)
+        // println() = method that prints text and moves to new line
+    }
+}
+</code></pre>
+
+      <p class="syntax-label">Compile and Run</p>
+      <pre><code class="language-bash"># Compile: converts .java source to .class bytecode
+javac HelloWorld.java
+# Output: HelloWorld.class created
+
+# Run: JVM executes the bytecode
+java HelloWorld
+# Output: Hello, World!</code></pre>
+
+      <p class="syntax-label">Common Beginner Mistakes</p>
+      <pre><code class="language-java">// WRONG — file is named Main.java, class is named HelloWorld
+// This will cause: error: class HelloWorld is public, should be declared in a file named HelloWorld.java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
+}
+
+// CORRECT — file name matches public class name
+// File: HelloWorld.java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
+}</code></pre>
+
+      <pre><code class="language-java">// WRONG — wrong main signature (compiler won't find entry point)
+public class HelloWorld {
+    public static void main() {  // Missing String[] args parameter
+        System.out.println("Hello");
+    }
+}
+// Running java HelloWorld fails: Error: Could not find or load main class
+
+// CORRECT — exact signature required by JVM
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello");
+    }
+}</code></pre>
+
+      <p class="syntax-label">More Complex Example</p>
+      <pre><code class="language-java">public class Greeting {
+    public static void main(String[] args) {
+        String name = "Alice";
+        int age = 25;
+        double height = 5.7;
+
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Height: " + height);
+
+        System.out.println("In 10 years, age will be: " + (age + 10));
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">javac Greeting.java
+java Greeting
+# Output:
+# Name: Alice
+# Age: 25
+# Height: 5.7
+# In 10 years, age will be: 35</code></pre>
+    </section>
+
+    <section id="compilation-model">
+      <h2>7. Compilation Model</h2>
+
+      <p class="syntax-label">Source-to-Execution Flow</p>
+      <pre class="diagram">┌──────────────────┐
+│  HelloWorld.java │  (Human-readable source code)
+│   (Source file)  │
+└────────┬─────────┘
+         │ javac compiler
+         ↓
+┌──────────────────┐
+│ HelloWorld.class │  (Bytecode — platform-independent)
+│   (.class file)  │
+└────────┬─────────┘
+         │ java command
+         ↓
+┌──────────────────┐
+│      JVM         │  (Interprets bytecode + JIT compiles to native code)
+│  (Runtime)       │
+└────────┬─────────┘
+         │
+         ↓
+┌──────────────────┐
+│  Program Output  │  (Results on screen/file)</code></pre>
+
+      <p class="syntax-label">Step-by-Step Process</p>
+
+      <div class="note">
+        <strong>Step 1: Compile</strong>
+        <ul>
+          <li>javac reads HelloWorld.java</li>
+          <li>Checks syntax and types</li>
+          <li>Produces HelloWorld.class (bytecode)</li>
+          <li>Does NOT produce native executable</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>Step 2: Run</strong>
+        <ul>
+          <li>java command loads HelloWorld.class into memory</li>
+          <li>JVM verifies bytecode is safe</li>
+          <li>JIT compiler translates hot code paths to native machine code</li>
+          <li>Program executes on your CPU</li>
+        </ul>
+      </div>
+
+      <p class="syntax-label">Example: Compile Error</p>
+      <pre><code class="language-java">public class Bad {
+    public static void main(String[] args) {
+        int x = "hello";  // ERROR: cannot assign String to int
+        System.out.println(x);
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">javac Bad.java
+# Error: incompatible types: String cannot be converted to int
+# javac STOPS here, no .class file created</code></pre>
+
+      <p class="syntax-label">Example: Runtime Error</p>
+      <pre><code class="language-java">public class Runtime {
+    public static void main(String[] args) {
+        int[] arr = new int[5];
+        System.out.println(arr[10]);  // Index 10 doesn't exist (array is size 5)
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">javac Runtime.java  # Compiles fine
+java Runtime        # Crashes at runtime
+# Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 10 out of bounds for length 5</code></pre>
+
+      <div class="warning">
+        <strong>Compile-time vs Runtime:</strong> Java is statically typed, so many errors are caught by javac. But logic errors, division by zero, array bounds — these happen at runtime. Always test your code!
+      </div>
+
+      <p class="syntax-label">The .class File</p>
+      <pre><code class="language-bash"># After javac, you get bytecode
+javac HelloWorld.java
+
+# Look at it (binary, not human readable)
+ls -la HelloWorld.class
+# -rw-r--r-- 1 user user 427 May 10 12:34 HelloWorld.class
+
+# You can't read it directly, but tools can inspect it
+javap -c HelloWorld  # Shows the bytecode instructions</code></pre>
+    </section>
+
+    <section id="package-system">
+      <h2>8. Package System</h2>
+
+      <p class="syntax-label">Packages Organize Code</p>
+      <ul>
+        <li><strong>Package:</strong> Namespace for grouping related classes</li>
+        <li><strong>Convention:</strong> Reverse domain name: <code>com.company.project.feature</code></li>
+        <li><strong>Purpose:</strong> Avoid name collisions, organize large projects, control access (package-private)</li>
+      </ul>
+
+      <p class="syntax-label">Package Declaration Syntax</p>
+      <pre><code class="language-java">package com.example.utils;  // Must be FIRST statement in file (before any imports)
+
+public class StringHelper {
+    public static String reverse(String s) {
+        return new StringBuilder(s).reverse().toString();
+    }
+}
+</code></pre>
+
+      <p class="syntax-label">Directory Structure Must Match Package Name</p>
+      <pre class="diagram">src/
+└── com/                           ← First level of package
+    └── example/                    ← Second level
+        └── utils/                  ← Third level
+            └── StringHelper.java   ← package com.example.utils;</pre>
+
+      <p class="syntax-label">File Path vs Package Name</p>
+      <pre><code class="language-bash"># File location: src/com/example/utils/StringHelper.java
+# Package inside file: package com.example.utils;
+# Class name: StringHelper
+# Fully qualified name: com.example.utils.StringHelper
+
+# To compile from project root:
+javac src/com/example/utils/StringHelper.java
+
+# To run (won't work without proper setup):
+java com.example.utils.StringHelper</code></pre>
+
+      <p class="syntax-label">Real-World Example</p>
+      <pre><code class="language-java">// File: src/com/myapp/user/User.java
+package com.myapp.user;
+
+public class User {
+    private String name;
+    private int age;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+</code></pre>
+
+      <pre><code class="language-java">// File: src/com/myapp/main/App.java
+package com.myapp.main;
+
+import com.myapp.user.User;  // Import from another package
+
+public class App {
+    public static void main(String[] args) {
+        User u = new User("Bob", 30);
+        System.out.println(u.getName());
+    }
+}
+</code></pre>
+
+      <p class="syntax-label">Compiling Multi-Package Project</p>
+      <pre><code class="language-bash"># From project root, compile all source files
+javac src/com/myapp/user/User.java src/com/myapp/main/App.java
+
+# Or compile all Java files in src/
+javac src/com/myapp/**/*.java
+
+# To run (classpath must include src/)
+java -cp src com.myapp.main.App
+# Output: Bob</code></pre>
+
+      <p class="syntax-label">Default Package (No Package Declaration)</p>
+      <pre><code class="language-java">// NO package statement — belongs to default package
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Default package");
+    }
+}
+</code></pre>
+
+      <div class="warning">
+        <strong>Avoid default package:</strong> It works for tiny programs, but doesn't scale. Always use packages in real code. Default package can't be imported by other packages.
+      </div>
+    </section>
+
+    <section id="import-statements">
+      <h2>9. Import Statements</h2>
+
+      <p class="syntax-label">Three Types of Imports</p>
+
+      <div class="note">
+        <strong>Single-Type Import (Specific)</strong>
+        <ul>
+          <li>Import one specific class from a package</li>
+          <li>Recommended: Clear what you're using</li>
+          <li>Example: <code>import java.util.ArrayList;</code></li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>On-Demand Import (Wildcard)</strong>
+        <ul>
+          <li>Import all public classes from a package</li>
+          <li>Not recommended: Unclear dependencies, potential name collisions</li>
+          <li>Example: <code>import java.util.*;</code></li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <strong>Static Import</strong>
+        <ul>
+          <li>Import static members (methods, constants) from a class</li>
+          <li>Use sparingly: Can reduce readability if overused</li>
+          <li>Example: <code>import static java.lang.Math.PI;</code></li>
+        </ul>
+      </div>
+
+      <p class="syntax-label">Single-Type Import Example</p>
+      <pre><code class="language-java">import java.util.ArrayList;      // Specific class
+
+public class ListDemo {
+    public static void main(String[] args) {
+        ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();  // Can use short name
+        list.add("Apple");
+        list.add("Banana");
+        System.out.println(list);
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">javac ListDemo.java
+java ListDemo
+# Output: [Apple, Banana]</code></pre>
+
+      <p class="syntax-label">On-Demand Import Example</p>
+      <pre><code class="language-java">import java.util.*;  // All classes from java.util
+
+public class MapDemo {
+    public static void main(String[] args) {
+        HashMap&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+        ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+        // Can use HashMap, ArrayList, etc. without prefixing
+    }
+}
+</code></pre>
+
+      <div class="warning">
+        <strong>Wildcard imports hide dependencies:</strong> A reader can't easily see what classes you're using. Use single-type imports for clarity (IDEs can auto-add them).
+      </div>
+
+      <p class="syntax-label">Static Import Example</p>
+      <pre><code class="language-java">import static java.lang.Math.PI;      // Import constant
+import static java.lang.Math.sqrt;    // Import method
+
+public class MathDemo {
+    public static void main(String[] args) {
+        double radius = 5;
+        double area = PI * radius * radius;
+        System.out.println("Area: " + area);
+        System.out.println("sqrt(16) = " + sqrt(16));
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">javac MathDemo.java
+java MathDemo
+# Output:
+# Area: 78.53981633974483
+# sqrt(16) = 4.0</code></pre>
+
+      <p class="syntax-label">Auto-Imported Packages</p>
+      <ul>
+        <li><strong>java.lang:</strong> ALWAYS imported automatically (String, System, Math, Object, etc.)</li>
+        <li>You never write <code>import java.lang.String;</code> — it's always available</li>
+        <li>All other packages require explicit import</li>
+      </ul>
+
+      <pre><code class="language-java">// String is from java.lang, no import needed
+public class NoImport {
+    public static void main(String[] args) {
+        String s = "Hello";            // String is available
+        System.out.println(s);         // System is available
+        Math.sqrt(16);                 // Math is available
+        // These are java.lang classes — no import required
+    }
+}
+</code></pre>
+
+      <p class="syntax-label">Import Statement Rules</p>
+      <ul>
+        <li>All imports must come AFTER package declaration (if any)</li>
+        <li>All imports must come BEFORE class declaration</li>
+        <li>Import order: typically organize alphabetically (tools do this automatically)</li>
+        <li>Duplicate imports are ignored</li>
+        <li>Name collision: If two packages have same class name, use fully qualified name</li>
+      </ul>
+
+      <pre><code class="language-java">package com.example;
+
+import java.util.List;         // Single-type imports first
+import java.util.ArrayList;
+import java.io.*;              // On-demand if necessary
+import static java.lang.Math.*;
+
+public class ImportOrder {
+    // Class definition
+}
+</code></pre>
+
+      <p class="syntax-label">Name Collision Example</p>
+      <pre><code class="language-java">// Both java.util and java.sql have Date class
+import java.util.Date;         // Imports java.util.Date
+
+public class DateDemo {
+    public static void main(String[] args) {
+        Date d1 = new Date();              // Uses java.util.Date
+        java.sql.Date d2 = new java.sql.Date(0);  // Fully qualified for java.sql.Date
+    }
+}
+</code></pre>
+    </section>
+
+    <section id="comments">
+      <h2>10. Comments &amp; Documentation</h2>
+
+      <p class="syntax-label">Single-Line Comments</p>
+      <pre><code class="language-java">// This is a single-line comment
+int x = 5;  // Can appear after code too
+
+// Comments are ignored by compiler
+// Use them to explain WHY, not WHAT
+// (code already shows WHAT)</code></pre>
+
+      <p class="syntax-label">Multi-Line Comments</p>
+      <pre><code class="language-java">/* This is a multi-line comment.
+   It can span multiple lines.
+   Useful for longer explanations. */
+
+/*
+ * Common style: align asterisks
+ * for readability.
+ *
+ * Can have blank lines inside.
+ */</code></pre>
+
+      <p class="syntax-label">Javadoc Comments</p>
+      <pre><code class="language-java">/**
+ * Calculates the sum of two integers.
+ *
+ * Javadoc uses /** to start and has special tags.
+ * This generates HTML documentation from your code.
+ *
+ * @param a the first number
+ * @param b the second number
+ * @return the sum of a and b
+ * @since 1.0
+ * @author John Doe
+ */
+public static int add(int a, int b) {
+    return a + b;
+}
+</code></pre>
+
+      <p class="syntax-label">Common Javadoc Tags</p>
+      <ul>
+        <li><code>@param</code> — describes a method parameter</li>
+        <li><code>@return</code> — describes the return value</li>
+        <li><code>@throws</code> — describes exceptions the method can throw</li>
+        <li><code>@author</code> — author name</li>
+        <li><code>@since</code> — version when added</li>
+        <li><code>@deprecated</code> — marks class/method as outdated</li>
+      </ul>
+
+      <p class="syntax-label">Complete Javadoc Example</p>
+      <pre><code class="language-java">/**
+ * Calculator utility for basic arithmetic.
+ *
+ * &lt;p&gt;Provides static methods for common operations.
+ * All methods accept integer inputs.&lt;/p&gt;
+ *
+ * @author Alice Smith
+ * @since 1.0
+ * @version 1.2
+ */
+public class Calculator {
+
+    /**
+     * Multiplies two integers.
+     *
+     * @param x the first number
+     * @param y the second number
+     * @return the product x * y
+     * @throws IllegalArgumentException if either number is negative
+     * @since 1.0
+     */
+    public static int multiply(int x, int y) {
+        if (x < 0 || y < 0) {
+            throw new IllegalArgumentException("Numbers must be non-negative");
+        }
+        return x * y;
+    }
+
+    /**
+     * Checks if a number is prime.
+     *
+     * @param n the number to check
+     * @return true if n is prime, false otherwise
+     * @since 1.1
+     */
+    public static boolean isPrime(int n) {
+        if (n < 2) return false;
+        for (int i = 2; i * i <= n; i++) {
+            if (n % i == 0) return false;
+        }
+        return true;
+    }
+}
+</code></pre>
+
+      <p class="syntax-label">Generate Javadoc HTML</p>
+      <pre><code class="language-bash"># javadoc reads all .java files and generates HTML documentation
+javadoc Calculator.java
+
+# Output: creates doc/ directory with HTML files
+# Open doc/index.html in browser to see generated docs</code></pre>
+
+      <p class="syntax-label">Comment Best Practices</p>
+      <ul>
+        <li><strong>Comments explain WHY, not WHAT:</strong> Code shows what it does, comments explain reasoning</li>
+        <li><strong>Avoid obvious comments:</strong> Don't write <code>x++; // increment x</code></li>
+        <li><strong>Use Javadoc for public APIs:</strong> Every public class and method needs Javadoc</li>
+        <li><strong>Keep comments updated:</strong> Outdated comments are worse than no comments</li>
+      </ul>
+
+      <div class="tip">
+        <strong>Good comment examples:</strong>
+        <ul>
+          <li><code>// HACK: Workaround for bug in legacy system</code></li>
+          <li><code>// Performance optimization: cache result to avoid O(n²) lookup</code></li>
+          <li><code>// Expected format: YYYY-MM-DD (ISO 8601)</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="jshell">
+      <h2>11. JShell — Interactive REPL <span class="badge">Java 9+</span></h2>
+
+      <p class="syntax-label">What is JShell?</p>
+      <ul>
+        <li><strong>REPL:</strong> Read-Eval-Print Loop — interactive shell</li>
+        <li><strong>No boilerplate:</strong> No need for class or main method</li>
+        <li><strong>Instant feedback:</strong> Write expressions and see results immediately</li>
+        <li><strong>Learning tool:</strong> Perfect for testing Java syntax and APIs</li>
+      </ul>
+
+      <p class="syntax-label">Launching JShell</p>
+      <pre><code class="language-bash">jshell
+# Welcome to JShell -- Version 21.0.1
+# For an introduction type: /help intro</code></pre>
+
+      <p class="syntax-label">Interactive Examples</p>
+      <pre><code class="language-bash">jshell> int x = 5
+x ==> 5
+
+jshell> x * 2
+$1 ==> 10
+
+jshell> "Hello".toUpperCase()
+$2 ==> "HELLO"
+
+jshell> int[] arr = {1, 2, 3, 4, 5}
+arr ==> int[5] { 1, 2, 3, 4, 5 }
+
+jshell> for (int num : arr) System.out.println(num);
+1
+2
+3
+4
+5
+
+jshell> import java.util.ArrayList;
+
+jshell> var list = new ArrayList&lt;String&gt;()
+list ==> []
+
+jshell> list.add("Java")
+$6 ==> true
+
+jshell> list
+list ==> [Java]</code></pre>
+
+      <p class="syntax-label">JShell Commands</p>
+      <ul>
+        <li><code>/exit</code> — quit JShell</li>
+        <li><code>/vars</code> — list all variables you've created</li>
+        <li><code>/methods</code> — list all methods you've defined</li>
+        <li><code>/list</code> — show history of entries</li>
+        <li><code>/help</code> — show help</li>
+        <li><code>/clear</code> — clear all variables and methods</li>
+      </ul>
+
+      <p class="syntax-label">Testing Code in JShell</p>
+      <pre><code class="language-bash">jshell> /vars
+|    int x = 5
+|    int[] arr = int[5] { 1, 2, 3, 4, 5 }
+|    ArrayList&lt;String&gt; list = [Java]
+
+jshell> /list
+   1 : int x = 5;
+   2 : x * 2
+   3 : "Hello".toUpperCase()
+   4 : int[] arr = {1, 2, 3, 4, 5};
+   5 : for (int num : arr) System.out.println(num);
+   6 : import java.util.ArrayList;
+   7 : var list = new ArrayList&lt;String&gt;();
+   8 : list.add("Java");
+   9 : list
+
+jshell> /exit
+|  Goodbye</code></pre>
+
+      <p class="syntax-label">Defining Methods in JShell</p>
+      <pre><code class="language-bash">jshell> int add(int a, int b) {
+   ...>   return a + b;
+   ...> }
+|  created method add(int,int)
+
+jshell> add(3, 7)
+$10 ==> 10
+
+jshell> /methods
+|    int add(int,int)
+
+jshell> String greet(String name) {
+   ...>   return "Hello, " + name;
+   ...> }
+|  created method greet(String)
+
+jshell> greet("Alice")
+$11 ==> "Hello, Alice"</code></pre>
+
+      <div class="tip">
+        <strong>JShell is great for:</strong> Testing library functions, exploring APIs, quick math calculations, learning syntax. Not for building full applications.
+      </div>
+    </section>
+
+    <section id="single-file-programs">
+      <h2>12. Single-File Programs <span class="badge">Java 11+</span></h2>
+
+      <p class="syntax-label">No Compilation Needed</p>
+      <ul>
+        <li><strong>java command:</strong> Can run .java files directly (no javac needed)</li>
+        <li><strong>Automatic compilation:</strong> JVM compiles on the fly</li>
+        <li><strong>Use case:</strong> Scripts, one-off programs, small utilities</li>
+        <li><strong>Limitation:</strong> Only works if file contains a single top-level public class</li>
+      </ul>
+
+      <p class="syntax-label">Traditional Way (Still Works)</p>
+      <pre><code class="language-bash"># Step 1: Compile
+javac HelloWorld.java
+
+# Step 2: Run
+java HelloWorld</code></pre>
+
+      <p class="syntax-label">New Way (Java 11+)</p>
+      <pre><code class="language-bash"># Single command — no separate compile step
+java HelloWorld.java</code></pre>
+
+      <p class="syntax-label">Example: Single-File Script</p>
+      <pre><code class="language-java">// File: Temperature.java
+// Run: java Temperature.java 100 F
+// No separate javac step needed
+
+public class Temperature {
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: java Temperature.java &lt;value&gt; &lt;C|F&gt;");
+            return;
+        }
+
+        double temp = Double.parseDouble(args[0]);
+        String unit = args[1].toUpperCase();
+
+        if (unit.equals("C")) {
+            double fahrenheit = (temp * 9/5) + 32;
+            System.out.println(temp + "°C = " + fahrenheit + "°F");
+        } else if (unit.equals("F")) {
+            double celsius = (temp - 32) * 5/9;
+            System.out.println(temp + "°F = " + celsius + "°C");
+        } else {
+            System.out.println("Unknown unit: " + unit);
+        }
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">java Temperature.java 32 C
+# Output: 32.0°C = 89.6°F
+
+java Temperature.java 98.6 F
+# Output: 98.6°F = 37.0°C</code></pre>
+
+      <div class="note">
+        <strong>When to use single-file mode:</strong> Scripts, quick tests, learning. For real projects, use packages and multiple files (traditional compilation model).
+      </div>
+    </section>
+
+    <section id="command-line-args">
+      <h2>13. Command-Line Arguments</h2>
+
+      <p class="syntax-label">Accessing Arguments via main(String[] args)</p>
+      <pre><code class="language-java">public class Arguments {
+    public static void main(String[] args) {
+        // args is an array of Strings from command line
+
+        System.out.println("Total arguments: " + args.length);
+
+        // Print all arguments
+        for (int i = 0; i < args.length; i++) {
+            System.out.println("Argument " + i + ": " + args[i]);
+        }
+    }
+}
+</code></pre>
+
+      <p class="syntax-label">Running with Arguments</p>
+      <pre><code class="language-bash">javac Arguments.java
+java Arguments hello world 123
+# Output:
+# Total arguments: 3
+# Argument 0: hello
+# Argument 1: world
+# Argument 2: 123</code></pre>
+
+      <p class="syntax-label">Using Enhanced for Loop</p>
+      <pre><code class="language-java">public class PrintArgs {
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("No arguments provided");
+            return;
+        }
+
+        System.out.println("Arguments:");
+        for (String arg : args) {
+            System.out.println("  - " + arg);
+        }
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">java PrintArgs apple banana cherry
+# Output:
+# Arguments:
+#   - apple
+#   - banana
+#   - cherry</code></pre>
+
+      <p class="syntax-label">Real-World Example: Sum Calculator</p>
+      <pre><code class="language-java">public class Sum {
+    public static void main(String[] args) {
+        if (args.length == 0) {
+            System.out.println("Usage: java Sum &lt;number1&gt; &lt;number2&gt; ...");
+            return;
+        }
+
+        int total = 0;
+
+        for (String arg : args) {
+            try {
+                int num = Integer.parseInt(arg);  // Convert String to int
+                total += num;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: '" + arg + "' is not a valid integer");
+            }
+        }
+
+        System.out.println("Sum: " + total);
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">java Sum 10 20 30
+# Output: Sum: 60
+
+java Sum 5 abc 10
+# Output:
+# Error: 'abc' is not a valid integer
+# Sum: 15</code></pre>
+
+      <p class="syntax-label">Command-Line with Spaces and Quotes</p>
+      <pre><code class="language-bash"># Single argument with spaces must be quoted
+java PrintArgs "hello world" test
+# Output:
+# Arguments:
+#   - hello world
+#   - test
+
+# Without quotes, it's two arguments
+java PrintArgs hello world test
+# Output:
+# Arguments:
+#   - hello
+#   - world
+#   - test</code></pre>
+
+      <p class="syntax-label">Example: Greeting Program</p>
+      <pre><code class="language-java">public class Greeting {
+    public static void main(String[] args) {
+        String name = (args.length > 0) ? args[0] : "World";
+        String greeting = (args.length > 1) ? args[1] : "Hello";
+
+        System.out.println(greeting + ", " + name + "!");
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">java Greeting
+# Output: Hello, World!
+
+java Greeting Alice
+# Output: Hello, Alice!
+
+java Greeting Bob "Hi there"
+# Output: Hi there, Bob!</code></pre>
+
+      <div class="tip">
+        <strong>Best practice:</strong> Always check args.length before accessing array elements to avoid ArrayIndexOutOfBoundsException.
+      </div>
+
+      <p class="syntax-label">Converting Arguments to Other Types</p>
+      <pre><code class="language-java">public class TypeConversion {
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: java TypeConversion &lt;int&gt; &lt;double&gt;");
+            return;
+        }
+
+        // String to int
+        int count = Integer.parseInt(args[0]);
+
+        // String to double
+        double price = Double.parseDouble(args[1]);
+
+        // String to boolean
+        boolean flag = Boolean.parseBoolean(args.length > 2 ? args[2] : "false");
+
+        System.out.println("Count: " + count + " (int)");
+        System.out.println("Price: " + price + " (double)");
+        System.out.println("Flag: " + flag + " (boolean)");
+        System.out.println("Total: " + (count * price));
+    }
+}
+</code></pre>
+
+      <pre><code class="language-bash">java TypeConversion 5 9.99 true
+# Output:
+# Count: 5 (int)
+# Price: 9.99 (double)
+# Flag: true (boolean)
+# Total: 49.95</code></pre>
+    </section>
+
+    <section id="summary">
+      <h2>Summary</h2>
+
+      <p class="syntax-label">Key Takeaways</p>
+      <ul>
+        <li><strong>JVM makes Java portable:</strong> Compile once (.class), run anywhere</li>
+        <li><strong>JIT compilation:</strong> Bytecode → native code during execution = speed + portability</li>
+        <li><strong>JDK is what you install:</strong> It includes JRE, JVM, and compiler</li>
+        <li><strong>Packages organize code:</strong> Use reverse domain naming (com.example.feature)</li>
+        <li><strong>main(String[] args):</strong> Exact signature required as entry point</li>
+        <li><strong>Comments matter:</strong> Javadoc generates documentation automatically</li>
+        <li><strong>JShell for learning:</strong> Test code instantly without boilerplate</li>
+        <li><strong>Single-file programs (Java 11+):</strong> java file.java — no javac needed</li>
+      </ul>
+
+      <p class="syntax-label">Common Errors Checklist</p>
+      <ul>
+        <li><code>class X is public, should be declared in a file named X.java</code> → File name must match public class name</li>
+        <li><code>Could not find or load main class</code> → main signature is wrong, or file/package path is incorrect</li>
+        <li><code>cannot find symbol</code> → Missing import or typo in class/method name</li>
+        <li><code>incompatible types</code> → Type mismatch (String assigned to int, etc.)</li>
+        <li><code>No class definition found</code> → Forgot to compile, or .class file not in classpath</li>
+      </ul>
+
+      <div class="important">
+        <strong>Next chapter:</strong> Data types, operators, and control flow. You'll write code that actually does something!
+      </div>
+    </section>
+
+  </article>
+  <nav class="bottom-nav">
+    <span>Start</span>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter02-data-types-operators.html">Chapter 2 →</a>
+  </nav>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

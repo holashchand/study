@@ -1,0 +1,2990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 5 — OOP | Java Fundamentals</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="chapter04-methods-arrays.html">← Chapter 4</a>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter06-collections-apis.html">Chapter 6 →</a>
+  </nav>
+  <article>
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 5</div>
+      <h1 class="chapter-title">Object-Oriented Programming</h1>
+      <p class="chapter-subtitle">Classes, inheritance, polymorphism, interfaces, sealed classes, records, enums</p>
+    </div>
+
+    <nav class="chapter-toc">
+      <h2>In This Chapter</h2>
+      <ol>
+        <li><a href="#classes-objects">Classes and Objects</a></li>
+        <li><a href="#fields">Fields: Instance vs Static</a></li>
+        <li><a href="#constructors">Constructors</a></li>
+        <li><a href="#this-keyword">The this Keyword</a></li>
+        <li><a href="#access-modifiers">Access Modifiers</a></li>
+        <li><a href="#encapsulation">Encapsulation</a></li>
+        <li><a href="#inheritance">Inheritance</a></li>
+        <li><a href="#super-keyword">The super Keyword</a></li>
+        <li><a href="#method-overriding">Method Overriding</a></li>
+        <li><a href="#polymorphism">Polymorphism</a></li>
+        <li><a href="#object-casting">Object Casting</a></li>
+        <li><a href="#object-class">Object Class Methods</a></li>
+        <li><a href="#abstract-classes">Abstract Classes</a></li>
+        <li><a href="#interfaces">Interfaces</a></li>
+        <li><a href="#functional-interfaces">Functional Interfaces</a></li>
+        <li><a href="#sealed-classes">Sealed Classes</a></li>
+        <li><a href="#records">Records</a></li>
+        <li><a href="#enums">Enums</a></li>
+        <li><a href="#nested-classes">Nested Classes</a></li>
+        <li><a href="#final-keyword">final Keyword</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. CLASSES AND OBJECTS -->
+    <section id="classes-objects">
+      <h2>1. Classes and Objects</h2>
+
+      <p class="tip">A <strong>class</strong> is a blueprint or template. An <strong>object</strong> is an instance created from that blueprint.</p>
+
+      <h3>Complete Class Example</h3>
+      <pre><code class="language-java">class Car {
+    // Fields (data)
+    String color;
+    String brand;
+    int speed;
+
+    // Constructor (initializes objects)
+    Car(String color, String brand, int speed) {
+        this.color = color;
+        this.brand = brand;
+        this.speed = speed;
+    }
+
+    // Methods (behavior)
+    void accelerate(int amount) {
+        speed += amount;
+        System.out.println(brand + " accelerates to " + speed + " km/h");
+    }
+
+    void brake(int amount) {
+        speed = Math.max(0, speed - amount);
+        System.out.println(brand + " brakes to " + speed + " km/h");
+    }
+
+    void displayInfo() {
+        System.out.println(brand + " (" + color + ") at " + speed + " km/h");
+    }
+}
+
+// Creating objects with new
+Car car1 = new Car("red", "Ferrari", 0);
+Car car2 = new Car("blue", "Tesla", 0);
+
+car1.accelerate(150);      // red Ferrari accelerates to 150 km/h
+car1.displayInfo();        // Ferrari (red) at 150 km/h
+car2.accelerate(100);      // blue Tesla accelerates to 100 km/h
+car2.displayInfo();        // Tesla (blue) at 100 km/h</code></pre>
+
+      <h3>Memory Layout: Stack vs Heap</h3>
+      <pre class="diagram">
+┌─────────────────────────────────────────────────────────┐
+│ STACK                       HEAP                         │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  car1 ──────┐                ┌──────────────────────┐  │
+│             │                │ Car object (car1)    │  │
+│             │────reference───┤ color="red"          │  │
+│             │                │ brand="Ferrari"      │  │
+│             │                │ speed=150            │  │
+│             │                └──────────────────────┘  │
+│                                                         │
+│  car2 ──────┐                ┌──────────────────────┐  │
+│             │                │ Car object (car2)    │  │
+│             │────reference───┤ color="blue"         │  │
+│                              │ brand="Tesla"        │  │
+│                              │ speed=100            │  │
+│                              └──────────────────────┘  │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+
+KEY: Variables (car1, car2) live on STACK with references.
+     Objects live on HEAP with actual data.
+</pre>
+
+      <h3>Multiple Objects from Same Class</h3>
+      <pre><code class="language-java">// Each object is independent
+Car c1 = new Car("red", "Ferrari", 0);
+Car c2 = new Car("blue", "Tesla", 0);
+Car c3 = new Car("red", "Ferrari", 0);
+
+c1.accelerate(100);
+c2.accelerate(80);
+c3.accelerate(120);
+
+System.out.println(c1.speed);  // 100 — independent of c2, c3
+System.out.println(c2.speed);  // 80  — c2 has its own state
+System.out.println(c3.speed);  // 120 — c3 has its own state
+
+// c1 and c3 have SAME color and brand but are DIFFERENT objects
+System.out.println(c1 == c3);  // false — different objects on heap
+System.out.println(c1.color.equals(c3.color));  // true — same value</code></pre>
+
+      <ul class="bullet-list">
+        <li>Class = template defining structure and behavior</li>
+        <li>Object = instance with its own state (field values)</li>
+        <li>Variables store references; objects live on heap</li>
+        <li>Multiple objects can have same field values but different identity</li>
+      </ul>
+    </section>
+
+    <!-- 2. FIELDS: INSTANCE VS STATIC -->
+    <section id="fields">
+      <h2>2. Fields: Instance vs Static</h2>
+
+      <h3>Instance Fields: Each Object Has Its Own Copy</h3>
+      <pre><code class="language-java">class BankAccount {
+    String accountHolder;
+    double balance;  // instance field — each account has separate balance
+
+    BankAccount(String holder, double initialBalance) {
+        this.accountHolder = holder;
+        this.balance = initialBalance;
+    }
+
+    void withdraw(double amount) {
+        balance -= amount;
+    }
+}
+
+// Three objects, three separate balance values
+BankAccount acc1 = new BankAccount("Alice", 1000);
+BankAccount acc2 = new BankAccount("Bob", 500);
+BankAccount acc3 = new BankAccount("Charlie", 2000);
+
+acc1.withdraw(100);
+acc2.withdraw(50);
+acc3.withdraw(200);
+
+System.out.println(acc1.balance);  // 900   — acc1's own balance
+System.out.println(acc2.balance);  // 450   — acc2's separate balance
+System.out.println(acc3.balance);  // 1800  — acc3's independent balance</code></pre>
+
+      <h3>Static Fields: Shared Across All Instances</h3>
+      <pre><code class="language-java">class User {
+    String name;
+    static int totalUsers = 0;  // SHARED by all User objects
+
+    User(String name) {
+        this.name = name;
+        totalUsers++;  // increment shared counter
+    }
+}
+
+User u1 = new User("Alice");
+System.out.println(User.totalUsers);  // 1 — class variable, accessed via class name
+
+User u2 = new User("Bob");
+System.out.println(User.totalUsers);  // 2 — still same field, now incremented
+
+User u3 = new User("Charlie");
+System.out.println(User.totalUsers);  // 3
+
+// All objects see the SAME totalUsers
+System.out.println(u1.totalUsers);  // 3 — same shared value
+System.out.println(u2.totalUsers);  // 3 — same shared value
+System.out.println(u3.totalUsers);  // 3 — same shared value</code></pre>
+
+      <h3>Instance vs Static Comparison</h3>
+      <pre class="diagram">
+Instance Fields              Static Fields
+──────────────────────────────────────────────
+u1.name = "Alice"            User.totalUsers = 3
+u2.name = "Bob"              (SAME for all users)
+u3.name = "Charlie"
+(SEPARATE for each)
+
+┌────────────────┐           ┌──────────────┐
+│ u1 object      │           │  Class User  │
+│ name = "Alice" │           │ totalUsers=3 │
+└────────────────┘           └──────────────┘
+┌────────────────┐
+│ u2 object      │  Each object points to same static field
+│ name = "Bob"   │
+└────────────────┘
+┌────────────────┐
+│ u3 object      │
+│ name= "Charlie"│
+└────────────────┘
+</pre>
+
+      <h3>Instance Initializer Blocks</h3>
+      <pre><code class="language-java">class Widget {
+    int id;
+    List<String> logs;
+
+    // Instance initializer block — runs BEFORE constructor
+    {
+        logs = new ArrayList<>();
+        logs.add("Widget initialized");
+    }
+
+    Widget(int id) {
+        this.id = id;
+        logs.add("Constructor called for id=" + id);
+    }
+}
+
+Widget w = new Widget(1);
+// logs contains:
+// ["Widget initialized", "Constructor called for id=1"]</code></pre>
+
+      <h3>Static Initializer Blocks</h3>
+      <pre><code class="language-java">class Constants {
+    static final int[] PRIMES;
+
+    // Static initializer — runs ONCE when class loads
+    static {
+        PRIMES = new int[]{2, 3, 5, 7, 11, 13};
+        System.out.println("Constants class loaded, primes initialized");
+    }
+}
+
+// When Constants class first referenced:
+Constants c;  // prints: "Constants class loaded..."</code></pre>
+
+      <ul class="bullet-list">
+        <li>Instance fields: separate value per object</li>
+        <li>Static fields: one shared value for entire class</li>
+        <li>Instance initializers run before constructor for each object</li>
+        <li>Static initializers run once when class loads</li>
+      </ul>
+    </section>
+
+    <!-- 3. CONSTRUCTORS -->
+    <section id="constructors">
+      <h2>3. Constructors</h2>
+
+      <h3>Default Constructor</h3>
+      <pre><code class="language-java">class Point {
+    int x;
+    int y;
+    // If no constructor defined, Java generates default constructor
+    // Point() { }  — auto-generated, does nothing
+}
+
+Point p = new Point();  // uses default constructor
+System.out.println(p.x);  // 0 (fields auto-initialized to default values)</code></pre>
+
+      <h3>Parameterized Constructor</h3>
+      <pre><code class="language-java">class Point {
+    int x;
+    int y;
+
+    // Define custom constructor — overrides default
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+Point p = new Point(10, 20);
+System.out.println(p.x + ", " + p.y);  // 10, 20</code></pre>
+
+      <h3>Constructor Overloading</h3>
+      <pre><code class="language-java">class Rectangle {
+    int width;
+    int height;
+
+    Rectangle() {
+        this.width = 1;
+        this.height = 1;
+    }
+
+    Rectangle(int side) {
+        this.width = side;
+        this.height = side;
+    }
+
+    Rectangle(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+}
+
+Rectangle r1 = new Rectangle();           // 1x1
+Rectangle r2 = new Rectangle(5);          // 5x5
+Rectangle r3 = new Rectangle(10, 20);     // 10x20</code></pre>
+
+      <h3>Constructor Chaining with this(...)</h3>
+      <pre><code class="language-java">class Rectangle {
+    int width;
+    int height;
+
+    // All constructors eventually call the full constructor
+    Rectangle() {
+        this(1, 1);  // chains to Rectangle(int, int)
+    }
+
+    Rectangle(int side) {
+        this(side, side);  // chains to Rectangle(int, int)
+    }
+
+    Rectangle(int width, int height) {
+        // Only this constructor does actual work
+        this.width = width;
+        this.height = height;
+    }
+
+    int area() { return width * height; }
+}
+
+System.out.println(new Rectangle().area());           // 1
+System.out.println(new Rectangle(5).area());          // 25
+System.out.println(new Rectangle(4, 6).area());       // 24
+
+// WRONG — this() is not first statement, will not compile
+// Rectangle(int x) {
+//     System.out.println(x);
+//     this(x, x);  // ERROR — this() must be FIRST statement
+// }</code></pre>
+
+      <h3>The this Keyword for Disambiguation</h3>
+      <pre><code class="language-java">class Person {
+    String name;
+    int age;
+
+    Person(String name, int age) {
+        this.name = name;  // this.name = parameter name
+        this.age = age;    // this.age = parameter age
+    }
+
+    // WRONG — confused which 'name' and 'age'
+    // Person(String name, int age) {
+    //     name = name;  // WRONG! assigns parameter to itself
+    //     age = age;    // WRONG! assigns parameter to itself
+    // }
+}
+
+Person p = new Person("Alice", 30);
+System.out.println(p.name);  // "Alice" — correctly assigned</code></pre>
+
+      <ul class="bullet-list">
+        <li>Default constructor auto-generated if none defined</li>
+        <li>Can define multiple constructors (overloading) with different parameters</li>
+        <li>Constructor chaining with <code>this(...)</code> reduces code duplication</li>
+        <li><code>this(...)</code> must be first statement in constructor</li>
+      </ul>
+    </section>
+
+    <!-- 4. THIS KEYWORD -->
+    <section id="this-keyword">
+      <h2>4. The this Keyword</h2>
+
+      <h3>Accessing Fields and Methods</h3>
+      <pre><code class="language-java">class Circle {
+    double radius;
+
+    Circle(double radius) {
+        this.radius = radius;  // this.radius = field, radius = parameter
+    }
+
+    double area() {
+        return Math.PI * this.radius * this.radius;
+    }
+
+    void printInfo() {
+        this.displayArea();  // this.methodName() to call another method
+    }
+
+    void displayArea() {
+        System.out.println("Area: " + this.area());
+    }
+}</code></pre>
+
+      <h3>Returning this for Method Chaining (Builder Pattern)</h3>
+      <pre><code class="language-java">class StringBuilder_Example {
+    private String name;
+    private int age;
+    private String email;
+
+    StringBuilder_Example name(String n) {
+        this.name = n;
+        return this;  // return this to allow chaining
+    }
+
+    StringBuilder_Example age(int a) {
+        this.age = a;
+        return this;  // return this to allow chaining
+    }
+
+    StringBuilder_Example email(String e) {
+        this.email = e;
+        return this;  // return this to allow chaining
+    }
+
+    String build() {
+        return name + " (" + age + ") " + email;
+    }
+}
+
+// Method chaining — each method returns 'this' for next call
+String result = new StringBuilder_Example()
+    .name("Alice")
+    .age(30)
+    .email("alice@example.com")
+    .build();
+
+System.out.println(result);  // Alice (30) alice@example.com</code></pre>
+
+      <h3>Practical Example: Fluent Configuration</h3>
+      <pre><code class="language-java">class DatabaseConnection {
+    private String host = "localhost";
+    private int port = 5432;
+    private String database = "mydb";
+    private boolean ssl = false;
+
+    DatabaseConnection host(String h) {
+        this.host = h;
+        return this;
+    }
+
+    DatabaseConnection port(int p) {
+        this.port = p;
+        return this;
+    }
+
+    DatabaseConnection database(String db) {
+        this.database = db;
+        return this;
+    }
+
+    DatabaseConnection ssl(boolean s) {
+        this.ssl = s;
+        return this;
+    }
+
+    void connect() {
+        System.out.println("Connecting to " + host + ":" + port + "/" + database + " (SSL=" + ssl + ")");
+    }
+}
+
+// Fluent interface — reads naturally
+new DatabaseConnection()
+    .host("prod.example.com")
+    .port(5432)
+    .database("analytics")
+    .ssl(true)
+    .connect();
+// Output: Connecting to prod.example.com:5432/analytics (SSL=true)</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>this.field</code> — access current object's field</li>
+        <li><code>this.method()</code> — call current object's method</li>
+        <li><code>return this</code> — enables method chaining for fluent interfaces</li>
+        <li>Method chaining improves readability for complex object configuration</li>
+      </ul>
+    </section>
+
+    <!-- 5. ACCESS MODIFIERS -->
+    <section id="access-modifiers">
+      <h2>5. Access Modifiers</h2>
+
+      <h3>Four Access Levels</h3>
+      <table>
+        <tr>
+          <th>Modifier</th>
+          <th>Same Class</th>
+          <th>Same Package</th>
+          <th>Subclass (different package)</th>
+          <th>Everywhere Else</th>
+        </tr>
+        <tr>
+          <td><code>private</code></td>
+          <td>✓</td>
+          <td>✗</td>
+          <td>✗</td>
+          <td>✗</td>
+        </tr>
+        <tr>
+          <td>(no modifier / package-private)</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td>✗</td>
+          <td>✗</td>
+        </tr>
+        <tr>
+          <td><code>protected</code></td>
+          <td>✓</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td>✗</td>
+        </tr>
+        <tr>
+          <td><code>public</code></td>
+          <td>✓</td>
+          <td>✓</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+      </table>
+
+      <h3>Private: Same Class Only</h3>
+      <pre><code class="language-java">class BankAccount {
+    private double balance;  // only BankAccount can access
+    private String pin;      // private data
+
+    public double getBalance() {
+        return balance;  // OK — same class
+    }
+
+    public void deposit(double amount) {
+        balance += amount;  // OK — same class
+    }
+}
+
+BankAccount acc = new BankAccount();
+acc.getBalance();   // OK — public method
+acc.balance;        // COMPILE ERROR — private field</code></pre>
+
+      <h3>Package-Private (Default): Same Package Only</h3>
+      <pre><code class="language-java">// package com.example.utils
+
+class Logger {
+    void log(String msg) {  // no modifier = package-private
+        System.out.println(msg);
+    }
+}
+
+// Same package — OK to access
+new Logger().log("Message");  // OK
+
+// Different package — COMPILE ERROR
+// com.example.other.SomeClass cannot access Logger.log()</code></pre>
+
+      <h3>Protected: Same Package + Subclasses</h3>
+      <pre><code class="language-java">// package animals
+
+class Animal {
+    protected void makeSound() {  // accessible in subclasses
+        System.out.println("Some sound");
+    }
+}
+
+// Same package — OK
+class Zoo {
+    void visitAnimal(Animal a) {
+        a.makeSound();  // OK — same package
+    }
+}
+
+// Different package, but extends Animal — OK
+package visitors;
+class Dog extends Animal {
+    @Override
+    protected void makeSound() {
+        System.out.println("Woof!");  // OK — subclass can override
+    }
+}
+
+// Different package, not subclass — COMPILE ERROR
+class RandomClass {
+    void visit(Animal a) {
+        a.makeSound();  // COMPILE ERROR — not subclass, different package
+    }
+}</code></pre>
+
+      <h3>Public: Everywhere</h3>
+      <pre><code class="language-java">public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+
+// Any class, any package
+Calculator c = new Calculator();
+int result = c.add(5, 3);  // OK — public class and method</code></pre>
+
+      <h3>Visibility Diagram</h3>
+      <pre class="diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                   PACKAGE: com.shop                         │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  class Product {                                     │   │
+│  │    private    String sku;        ← only Product     │   │
+│  │    (default)  int stockLevel;    ← Warehouse OK    │   │
+│  │    protected  void reorder();    ← Warehouse OK    │   │
+│  │    public     double getPrice(); ← everyone OK     │   │
+│  │  }                                                  │   │
+│  │  class Warehouse { /* can access default, protected */ } │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│              PACKAGE: com.shop.delivery                      │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  class DeliveryDriver extends Product {              │   │
+│  │    can access: protected, public (not private)      │   │
+│  │  }                                                  │   │
+│  │  class DeliveryHelper {                             │   │
+│  │    can access: public only (not even protected)    │   │
+│  │  }                                                  │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│           PACKAGE: com.customer                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  class Customer {                                    │   │
+│  │    can access: public only (not even protected)    │   │
+│  │  }                                                  │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+</pre>
+
+      <ul class="bullet-list">
+        <li><strong>private:</strong> tightest encapsulation, same class only</li>
+        <li><strong>package-private (default):</strong> accessible within package, good for internal APIs</li>
+        <li><strong>protected:</strong> allows subclasses to inherit and override, still restricted outside package</li>
+        <li><strong>public:</strong> widest access, use carefully for stable APIs</li>
+      </ul>
+    </section>
+
+    <!-- 6. ENCAPSULATION -->
+    <section id="encapsulation">
+      <h2>6. Encapsulation</h2>
+
+      <h3>Private Fields with Public Getters and Setters</h3>
+      <pre><code class="language-java">class Student {
+    private String name;
+    private int age;
+    private double gpa;
+
+    // Getters — read access
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public double getGpa() {
+        return gpa;
+    }
+
+    // Setters — write access with validation
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+        this.name = name;
+    }
+
+    public void setAge(int age) {
+        if (age < 0 || age > 120) {
+            throw new IllegalArgumentException("Age must be 0-120");
+        }
+        this.age = age;
+    }
+
+    public void setGpa(double gpa) {
+        if (gpa < 0 || gpa > 4.0) {
+            throw new IllegalArgumentException("GPA must be 0.0-4.0");
+        }
+        this.gpa = gpa;
+    }
+}
+
+// Using encapsulation
+Student s = new Student();
+s.setName("Alice");
+s.setAge(20);
+s.setGpa(3.85);
+
+System.out.println(s.getName());  // Alice
+System.out.println(s.getGpa());   // 3.85
+
+s.setGpa(5.0);  // IllegalArgumentException — enforces constraint</code></pre>
+
+      <h3>Bank Account with Validation</h3>
+      <pre><code class="language-java">class BankAccount {
+    private String accountHolder;
+    private double balance;
+
+    public BankAccount(String holder, double initialBalance) {
+        this.accountHolder = holder;
+        this.balance = initialBalance;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit must be positive");
+        }
+        balance += amount;
+        System.out.println("Deposited " + amount + ". New balance: " + balance);
+    }
+
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal must be positive");
+        }
+        if (amount > balance) {
+            throw new IllegalArgumentException("Insufficient funds. Balance: " + balance);
+        }
+        balance -= amount;
+        System.out.println("Withdrawn " + amount + ". New balance: " + balance);
+    }
+
+    public void transfer(BankAccount recipient, double amount) {
+        this.withdraw(amount);
+        recipient.deposit(amount);
+        System.out.println("Transferred " + amount + " to " + recipient.accountHolder);
+    }
+}
+
+BankAccount alice = new BankAccount("Alice", 1000);
+BankAccount bob = new BankAccount("Bob", 500);
+
+alice.withdraw(100);        // Withdrawn 100. New balance: 900
+alice.transfer(bob, 200);   // Withdrawn 200. New balance: 700
+                            // Deposited 200. New balance: 700
+                            // Transferred 200 to Bob
+bob.withdraw(1000);         // IllegalArgumentException — insufficient funds</code></pre>
+
+      <h3>Benefits of Encapsulation</h3>
+      <pre><code class="language-java">// WRONG — no encapsulation, direct field access
+class BadUser {
+    public String email;
+    public int age;
+}
+BadUser u = new BadUser();
+u.email = "";               // invalid!
+u.age = -5;                 // invalid!
+u.age = 200;                // invalid!
+
+// CORRECT — encapsulation with validation
+class GoodUser {
+    private String email;
+    private int age;
+
+    public void setEmail(String e) {
+        if (!e.contains("@")) throw new IllegalArgumentException("Invalid email");
+        this.email = e;
+    }
+
+    public void setAge(int a) {
+        if (a < 18) throw new IllegalArgumentException("Must be 18+");
+        this.age = a;
+    }
+}
+GoodUser u = new GoodUser();
+u.setEmail("");             // IllegalArgumentException — caught!
+u.setAge(-5);               // IllegalArgumentException — caught!</code></pre>
+
+      <p class="tip">Records (Java 16+) provide encapsulation automatically with getters, equals, hashCode, and toString.</p>
+      <pre><code class="language-java">record Point(int x, int y) { }  // automatic getters x() and y()
+Point p = new Point(10, 20);
+int px = p.x();  // getter is x(), not getX()</code></pre>
+
+      <ul class="bullet-list">
+        <li>Encapsulation = hide implementation, expose controlled interface</li>
+        <li>Private fields prevent direct invalid access</li>
+        <li>Setters provide validation and business logic enforcement</li>
+        <li>Internal changes don't affect external code using getters/setters</li>
+      </ul>
+    </section>
+
+    <!-- 7. INHERITANCE -->
+    <section id="inheritance">
+      <h2>7. Inheritance</h2>
+
+      <h3>extends Keyword: Single Inheritance</h3>
+      <pre><code class="language-java">class Animal {
+    String name;
+
+    void eat() {
+        System.out.println(name + " eats");
+    }
+
+    void sleep() {
+        System.out.println(name + " sleeps");
+    }
+}
+
+class Dog extends Animal {
+    // Inherits: name, eat(), sleep()
+
+    void bark() {
+        System.out.println(name + " barks");
+    }
+}
+
+class Cat extends Animal {
+    // Inherits: name, eat(), sleep()
+
+    void meow() {
+        System.out.println(name + " meows");
+    }
+}
+
+Dog dog = new Dog();
+dog.name = "Rex";
+dog.eat();    // inherited method — Rex eats
+dog.bark();   // own method — Rex barks
+
+Cat cat = new Cat();
+cat.name = "Whiskers";
+cat.eat();    // inherited method — Whiskers eats
+cat.meow();   // own method — Whiskers meows</code></pre>
+
+      <h3>Inheritance Hierarchy</h3>
+      <pre class="diagram">
+                    Animal
+                   /      \
+                 Dog      Cat
+               /   \       |
+         GoldenR  Poodle  Persian
+
+GoldenRetriever inherits from Dog,
+which inherits from Animal.
+All inherit: eat(), sleep()
+
+Dog adds: bark()
+GoldenRetriever adds: fetch()
+</pre>
+
+      <h3>Multi-Level Inheritance</h3>
+      <pre><code class="language-java">class Vehicle {
+    String brand;
+    int speed;
+
+    void drive() {
+        System.out.println(brand + " drives at " + speed);
+    }
+}
+
+class Car extends Vehicle {
+    int doors;
+
+    void honk() {
+        System.out.println(brand + " honks");
+    }
+}
+
+class ElectricCar extends Car {
+    int batteryPercent;
+
+    void chargeBattery() {
+        batteryPercent = 100;
+        System.out.println(brand + " fully charged");
+    }
+}
+
+ElectricCar tesla = new ElectricCar();
+tesla.brand = "Tesla";
+tesla.speed = 120;
+tesla.doors = 4;
+tesla.batteryPercent = 75;
+
+tesla.drive();          // inherited from Vehicle — Tesla drives at 120
+tesla.honk();           // inherited from Car — Tesla honks
+tesla.chargeBattery();  // own method — Tesla fully charged</code></pre>
+
+      <h3>IS-A Relationship</h3>
+      <pre><code class="language-java">// Inheritance creates IS-A relationship
+Dog dog = new Dog();
+
+dog instanceof Dog    // true — dog IS-A Dog
+dog instanceof Animal // true — dog IS-A Animal (through inheritance)
+dog instanceof Object // true — dog IS-A Object (all classes extend Object)</code></pre>
+
+      <h3>Adding and Overriding in Subclass</h3>
+      <pre><code class="language-java">class Shape {
+    double width;
+    double height;
+
+    double area() {
+        return 0;
+    }
+}
+
+class Rectangle extends Shape {
+    // Inherits: width, height, area()
+
+    // Override inherited method
+    @Override
+    double area() {
+        return width * height;
+    }
+
+    // Add new method
+    double perimeter() {
+        return 2 * (width + height);
+    }
+}
+
+class Triangle extends Shape {
+    // Inherits: width, height, area()
+
+    // Override with different implementation
+    @Override
+    double area() {
+        return (width * height) / 2;
+    }
+
+    // Add new method
+    boolean isRightTriangle() {
+        // Pythagorean theorem check
+        return true;  // simplified
+    }
+}
+
+Rectangle rect = new Rectangle();
+rect.width = 10;
+rect.height = 5;
+System.out.println(rect.area());       // 50 — Rectangle's implementation
+System.out.println(rect.perimeter());  // 30 — Rectangle's new method
+
+Triangle tri = new Triangle();
+tri.width = 10;
+tri.height = 5;
+System.out.println(tri.area());        // 25 — Triangle's implementation</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>extends</code> keyword creates parent-child relationship</li>
+        <li>Java supports single inheritance only (unlike C++)</li>
+        <li>Subclass inherits non-private fields and methods</li>
+        <li>Subclass can add new fields/methods and override inherited ones</li>
+      </ul>
+    </section>
+
+    <!-- 8. SUPER KEYWORD -->
+    <section id="super-keyword">
+      <h2>8. The super Keyword</h2>
+
+      <h3>Calling Parent Constructor with super(...)</h3>
+      <pre><code class="language-java">class Vehicle {
+    String brand;
+    int speed;
+
+    Vehicle(String brand, int speed) {
+        this.brand = brand;
+        this.speed = speed;
+    }
+}
+
+class Car extends Vehicle {
+    int doors;
+
+    Car(String brand, int speed, int doors) {
+        super(brand, speed);  // MUST be first statement
+        this.doors = doors;
+    }
+}
+
+Car car = new Car("Toyota", 100, 4);
+System.out.println(car.brand);   // Toyota
+System.out.println(car.speed);   // 100
+System.out.println(car.doors);   // 4
+
+// WRONG — super() not first statement
+// class Car extends Vehicle {
+//     Car(String brand, int speed, int doors) {
+//         this.doors = doors;  // ERROR — super() must be first!
+//         super(brand, speed);
+//     }
+// }</code></pre>
+
+      <h3>Calling Parent Method with super.method()</h3>
+      <pre><code class="language-java">class Animal {
+    String name;
+
+    void describe() {
+        System.out.println("Animal: " + name);
+    }
+}
+
+class Dog extends Animal {
+    String breed;
+
+    @Override
+    void describe() {
+        super.describe();  // call parent's version first
+        System.out.println("Dog breed: " + breed);
+    }
+}
+
+Dog dog = new Dog();
+dog.name = "Rex";
+dog.breed = "Labrador";
+dog.describe();
+// Output:
+// Animal: Rex
+// Dog breed: Labrador</code></pre>
+
+      <h3>Accessing Parent Field with super.field</h3>
+      <pre><code class="language-java">class Parent {
+    int value = 10;
+}
+
+class Child extends Parent {
+    int value = 20;  // shadows parent's value
+
+    void display() {
+        System.out.println(value);        // 20 — child's value
+        System.out.println(super.value);  // 10 — parent's value
+    }
+}
+
+Child c = new Child();
+c.display();
+// Output:
+// 20
+// 10</code></pre>
+
+      <h3>Complete super Example</h3>
+      <pre><code class="language-java">class Employee {
+    String name;
+    double salary;
+
+    Employee(String name, double salary) {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    void work() {
+        System.out.println(name + " works");
+    }
+
+    double getSalary() {
+        return salary;
+    }
+}
+
+class Manager extends Employee {
+    int teamSize;
+    double bonus;
+
+    Manager(String name, double salary, int teamSize) {
+        super(name, salary);  // initialize parent fields
+        this.teamSize = teamSize;
+        this.bonus = 0.1 * salary;  // 10% bonus
+    }
+
+    @Override
+    void work() {
+        super.work();  // parent's version
+        System.out.println(name + " manages " + teamSize + " people");
+    }
+
+    @Override
+    double getSalary() {
+        return super.getSalary() + bonus;  // salary + bonus
+    }
+}
+
+Manager mgr = new Manager("Alice", 100000, 5);
+mgr.work();
+// Output:
+// Alice works
+// Alice manages 5 people
+
+System.out.println(mgr.getSalary());  // 110000.0</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>super(...)</code> calls parent constructor, must be first statement</li>
+        <li><code>super.method()</code> calls parent's version of method</li>
+        <li><code>super.field</code> accesses parent's field if shadowed by child</li>
+        <li>Use <code>super</code> to reuse parent logic instead of duplicating code</li>
+      </ul>
+    </section>
+
+    <!-- 9. METHOD OVERRIDING -->
+    <section id="method-overriding">
+      <h2>9. Method Overriding</h2>
+
+      <h3>Same Signature, Different Implementation</h3>
+      <pre><code class="language-java">class Shape {
+    double width;
+    double height;
+
+    double area() {
+        return 0;
+    }
+}
+
+class Rectangle extends Shape {
+    @Override  // recommended annotation
+    double area() {
+        return width * height;
+    }
+}
+
+class Triangle extends Shape {
+    @Override
+    double area() {
+        return (width * height) / 2;
+    }
+}
+
+class Circle extends Shape {
+    @Override
+    double area() {
+        return Math.PI * width * width;  // width is radius
+    }
+}
+
+Rectangle rect = new Rectangle();
+rect.width = 10; rect.height = 5;
+System.out.println(rect.area());  // 50
+
+Triangle tri = new Triangle();
+tri.width = 10; tri.height = 5;
+System.out.println(tri.area());   // 25
+
+Circle circ = new Circle();
+circ.width = 5;
+System.out.println(circ.area());  // 78.53981...</code></pre>
+
+      <h3>@Override Annotation Catches Typos</h3>
+      <pre><code class="language-java">class Parent {
+    void doSomething() {
+        System.out.println("Parent does something");
+    }
+}
+
+// WRONG — typo not caught, creates new method instead of overriding
+class ChildWrong extends Parent {
+    void doSomthing() {  // typo: "Somthing" instead of "Something"
+        System.out.println("Child does something");
+    }
+    // Now Child has TWO methods: doSomething() and doSomthing()
+}
+
+// CORRECT — @Override annotation catches typo
+class ChildCorrect extends Parent {
+    @Override
+    void doSomthing() {  // compile error — Parent has no doSomthing()
+        System.out.println("Child does something");
+    }
+}</code></pre>
+
+      <h3>Visibility and Exception Rules</h3>
+      <pre><code class="language-java">class Parent {
+    protected void method() { }
+}
+
+class Child extends Parent {
+    // WRONG — cannot reduce visibility
+    // private void method() { }  // compile error
+
+    // CORRECT — same visibility or more visible
+    @Override
+    public void method() { }  // public is more visible than protected
+}
+
+// Exception throwing rules
+class Reader {
+    void read() throws IOException { }  // throws checked exception
+}
+
+class BufferedReader extends Reader {
+    @Override
+    void read() throws IOException { }  // same exception — OK
+
+    // WRONG — cannot throw broader exception
+    // void read() throws Exception { }  // compile error
+
+    // OK — can throw narrower exception or none
+    // void read() { }  // OK
+}
+</code></pre>
+
+      <h3>Covariant Return Types</h3>
+      <pre><code class="language-java">class Shape {
+    Shape clone() {
+        return new Shape();
+    }
+}
+
+class Circle extends Shape {
+    @Override
+    Circle clone() {  // return type is subtype (covariant)
+        return new Circle();
+    }
+}
+
+// Caller code is more specific
+Circle c = new Circle();
+Circle c2 = c.clone();  // no cast needed</code></pre>
+
+      <h3>Overriding vs Overloading (Common Confusion)</h3>
+      <pre><code class="language-java">class Parent {
+    void method(int x) {
+        System.out.println("Parent: int");
+    }
+}
+
+class Child extends Parent {
+    // OVERRIDING — same signature
+    @Override
+    void method(int x) {
+        System.out.println("Child: int");
+    }
+
+    // OVERLOADING — different signature (different parameter type)
+    void method(String x) {
+        System.out.println("Child: String");
+    }
+
+    // OVERLOADING — different signature (different number of parameters)
+    void method(int x, int y) {
+        System.out.println("Child: int, int");
+    }
+}
+
+Child c = new Child();
+c.method(5);      // Child: int (overriding)
+c.method("hi");   // Child: String (overloading)
+c.method(5, 10);  // Child: int, int (overloading)</code></pre>
+
+      <ul class="bullet-list">
+        <li>Method overriding: subclass method has same signature as parent</li>
+        <li><code>@Override</code> annotation recommended to catch typos</li>
+        <li>Cannot reduce visibility; cannot throw broader exceptions</li>
+        <li>Covariant return types allowed: return subtype of parent's return type</li>
+        <li>Overloading ≠ overriding: overloading changes parameters, overriding keeps signature</li>
+      </ul>
+    </section>
+
+    <!-- 10. POLYMORPHISM -->
+    <section id="polymorphism">
+      <h2>10. Polymorphism</h2>
+
+      <h3>Compile-Time (Static) Polymorphism: Method Overloading</h3>
+      <pre><code class="language-java">class Printer {
+    void print(int x) {
+        System.out.println("Printing int: " + x);
+    }
+
+    void print(String x) {
+        System.out.println("Printing String: " + x);
+    }
+
+    void print(double x) {
+        System.out.println("Printing double: " + x);
+    }
+
+    void print(String x, int count) {
+        for (int i = 0; i < count; i++) {
+            System.out.println(x);
+        }
+    }
+}
+
+Printer p = new Printer();
+p.print(10);           // Printing int: 10
+p.print("Hello");      // Printing String: Hello
+p.print(3.14);         // Printing double: 3.14
+p.print("Hi", 3);      // Printing Hi (3 times)</code></pre>
+
+      <h3>Runtime (Dynamic) Polymorphism: Method Overriding</h3>
+      <pre><code class="language-java">class Animal {
+    void makeSound() {
+        System.out.println("Generic animal sound");
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    void makeSound() {
+        System.out.println("Woof!");
+    }
+}
+
+class Cat extends Animal {
+    @Override
+    void makeSound() {
+        System.out.println("Meow!");
+    }
+}
+
+class Bird extends Animal {
+    @Override
+    void makeSound() {
+        System.out.println("Tweet!");
+    }
+}
+
+// Polymorphism: same method, different behavior based on actual object
+Animal animal1 = new Dog();
+Animal animal2 = new Cat();
+Animal animal3 = new Bird();
+
+animal1.makeSound();  // Woof! (actual type is Dog)
+animal2.makeSound();  // Meow! (actual type is Cat)
+animal3.makeSound();  // Tweet! (actual type is Bird)
+
+// Key: compiler sees Animal type, JVM sees actual type at runtime</code></pre>
+
+      <h3>Polymorphic Collection</h3>
+      <pre><code class="language-java">List&lt;Animal&gt; animals = new ArrayList&lt;&gt;();
+animals.add(new Dog());
+animals.add(new Cat());
+animals.add(new Bird());
+animals.add(new Dog());
+
+// Loop calls each animal's own makeSound() — polymorphism!
+for (Animal animal : animals) {
+    animal.makeSound();
+}
+// Output:
+// Woof!
+// Meow!
+// Tweet!
+// Woof!</code></pre>
+
+      <h3>Virtual Method Dispatch</h3>
+      <pre class="diagram">
+┌──────────────────────────────────────────────────────┐
+│ Compile Time:                                        │
+│   Animal ref = new Dog();                           │
+│   ref.makeSound();                                  │
+│   Compiler: "Animal has makeSound(), allow it"      │
+└──────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────┐
+│ Runtime:                                             │
+│   ref points to Dog object on heap                  │
+│   ↓                                                  │
+│   JVM checks: actual type is Dog                    │
+│   ↓                                                  │
+│   JVM calls Dog.makeSound()                         │
+│   ↓                                                  │
+│   Outputs: "Woof!"                                  │
+└──────────────────────────────────────────────────────┘
+
+POLYMORPHISM: Same reference, different behavior based on actual object type
+</pre>
+
+      <h3>Practical Example: Payment Processing</h3>
+      <pre><code class="language-java">abstract class PaymentMethod {
+    abstract void pay(double amount);
+}
+
+class CreditCard extends PaymentMethod {
+    @Override
+    void pay(double amount) {
+        System.out.println("Charged " + amount + " to credit card");
+    }
+}
+
+class PayPal extends PaymentMethod {
+    @Override
+    void pay(double amount) {
+        System.out.println("Sent " + amount + " via PayPal");
+    }
+}
+
+class BitCoin extends PaymentMethod {
+    @Override
+    void pay(double amount) {
+        System.out.println("Transferred " + amount + " BTC");
+    }
+}
+
+class ShoppingCart {
+    double total = 99.99;
+
+    void checkout(PaymentMethod method) {
+        method.pay(total);  // polymorphism — method's type depends on actual argument
+    }
+}
+
+ShoppingCart cart = new ShoppingCart();
+cart.checkout(new CreditCard());  // Charged 99.99 to credit card
+cart.checkout(new PayPal());       // Sent 99.99 via PayPal
+cart.checkout(new BitCoin());      // Transferred 99.99 BTC
+
+// Same method, different implementations based on actual type</code></pre>
+
+      <ul class="bullet-list">
+        <li>Static polymorphism: method overloading, resolved at compile time</li>
+        <li>Dynamic polymorphism: method overriding, resolved at runtime</li>
+        <li>JVM uses virtual dispatch: calls method of actual object type, not reference type</li>
+        <li>Polymorphism enables flexible, extensible code without knowing concrete types</li>
+      </ul>
+    </section>
+
+    <!-- 11. OBJECT CASTING -->
+    <section id="object-casting">
+      <h2>11. Object Casting</h2>
+
+      <h3>Upcasting (Implicit, Always Safe)</h3>
+      <pre><code class="language-java">class Animal { }
+class Dog extends Animal { }
+
+// Upcasting: specific type → general type
+Dog dog = new Dog();
+Animal animal = dog;  // implicit upcasting, no cast needed
+
+// But you lose Dog-specific methods
+Animal a = new Dog();
+// a.bark();  // COMPILE ERROR — Animal doesn't have bark()</code></pre>
+
+      <h3>Downcasting (Explicit, May Throw ClassCastException)</h3>
+      <pre><code class="language-java">class Animal { }
+class Dog extends Animal { }
+class Cat extends Animal { }
+
+// Downcasting: general type → specific type
+Animal animal = new Dog();
+Dog dog = (Dog) animal;  // explicit cast
+dog.bark();              // now we can call Dog-specific methods
+
+// WRONG — runtime exception
+Animal catAnimal = new Cat();
+Dog wrongDog = (Dog) catAnimal;  // compiles fine!
+wrongDog.bark();                 // ClassCastException at runtime
+                                 // Cat is not a Dog</code></pre>
+
+      <h3>instanceof Check Before Downcasting</h3>
+      <pre><code class="language-java">// Safe downcasting with instanceof check (Java 14 and earlier)
+Animal animal = new Dog();
+if (animal instanceof Dog) {
+    Dog dog = (Dog) animal;
+    dog.bark();
+}
+
+// Pattern variable (Java 16+) — cleaner
+Animal animal = new Dog();
+if (animal instanceof Dog dog) {
+    dog.bark();  // dog is already Dog type, no need to cast
+}
+
+// Old way (still works but verbose)
+if (animal instanceof Dog) {
+    Dog dog = (Dog) animal;  // redundant, already checked
+    dog.bark();
+}</code></pre>
+
+      <h3>Checking Multiple Types</h3>
+      <pre><code class="language-java">void handleAnimal(Animal animal) {
+    if (animal instanceof Dog dog) {
+        dog.bark();
+    } else if (animal instanceof Cat cat) {
+        cat.meow();
+    } else if (animal instanceof Bird bird) {
+        bird.chirp();
+    } else {
+        System.out.println("Unknown animal");
+    }
+}
+
+handleAnimal(new Dog());   // calls dog.bark()
+handleAnimal(new Cat());   // calls cat.meow()
+handleAnimal(new Bird());  // calls bird.chirp()</code></pre>
+
+      <h3>ClassCastException Example</h3>
+      <pre><code class="language-java">class Shape { }
+class Circle extends Shape { }
+class Rectangle extends Shape { }
+
+// WRONG — trying to cast to wrong type
+Shape shape = new Circle();
+Rectangle rect = (Rectangle) shape;  // ClassCastException!
+// Circle is not Rectangle
+
+// CORRECT — with instanceof guard
+Shape shape = new Circle();
+if (shape instanceof Rectangle) {
+    Rectangle rect = (Rectangle) shape;
+} else {
+    System.out.println("Shape is not a Rectangle");  // this executes
+}</code></pre>
+
+      <h3>Casting with Collections</h3>
+      <pre><code class="language-java">List animals = new ArrayList();
+animals.add(new Dog());
+animals.add(new Cat());
+animals.add(new Dog());
+
+// Old way (without generics, type erasure)
+for (Object obj : animals) {
+    if (obj instanceof Dog dog) {
+        dog.bark();
+    } else if (obj instanceof Cat cat) {
+        cat.meow();
+    }
+}
+
+// Better way — use generics to avoid casting
+List&lt;Animal&gt; typedAnimals = new ArrayList&lt;&gt;();
+typedAnimals.add(new Dog());
+typedAnimals.add(new Cat());
+
+for (Animal animal : typedAnimals) {
+    if (animal instanceof Dog dog) {
+        dog.bark();
+    }
+}</code></pre>
+
+      <ul class="bullet-list">
+        <li>Upcasting: subtype to supertype, implicit, always safe</li>
+        <li>Downcasting: supertype to subtype, explicit, must check with <code>instanceof</code></li>
+        <li>Pattern variables (Java 16+): <code>if (x instanceof Dog dog)</code> combines check and cast</li>
+        <li>Avoid downcasting when possible; prefer design with common interface</li>
+      </ul>
+    </section>
+
+    <!-- 12. OBJECT CLASS METHODS -->
+    <section id="object-class">
+      <h2>12. Object Class Methods</h2>
+
+      <p class="important">Every class implicitly extends Object. Three critical methods to override: toString(), equals(), hashCode().</p>
+
+      <h3>toString(): String Representation</h3>
+      <pre><code class="language-java">class Point {
+    int x, y;
+
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    // Default (not overridden)
+    // Point@1f32e575
+
+    // Override for meaningful output
+    @Override
+    public String toString() {
+        return "Point(" + x + ", " + y + ")";
+    }
+}
+
+Point p = new Point(10, 20);
+System.out.println(p);              // Point(10, 20)
+System.out.println(p.toString());   // Point(10, 20)
+System.out.println("Point: " + p);  // Point: Point(10, 20)</code></pre>
+
+      <h3>equals(): Value Equality</h3>
+      <pre><code class="language-java">class Point {
+    int x, y;
+
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    // Default equals() checks identity (==)
+    // new Point(1, 2).equals(new Point(1, 2)) → false
+
+    // Override for value-based equality
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;  // same object
+        if (!(o instanceof Point p)) return false;  // wrong type
+        return x == p.x && y == p.y;  // same values
+    }
+}
+
+Point p1 = new Point(10, 20);
+Point p2 = new Point(10, 20);
+Point p3 = p1;
+
+System.out.println(p1 == p2);        // false — different objects
+System.out.println(p1.equals(p2));   // true — same values
+System.out.println(p1 == p3);        // true — same object
+System.out.println(p1.equals(p3));   // true — same object and values</code></pre>
+
+      <h3>hashCode(): Hashing for Collections</h3>
+      <pre><code class="language-java">class Point {
+    int x, y;
+
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Point p)) return false;
+        return x == p.x && y == p.y;
+    }
+
+    // Contract: if equals() returns true, hashCode() must return same value
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
+}
+
+Set&lt;Point&gt; points = new HashSet&lt;&gt;();
+points.add(new Point(1, 2));
+points.add(new Point(1, 2));  // duplicate — same hash and equals
+points.add(new Point(3, 4));
+
+System.out.println(points.size());  // 2 — duplicates removed because of equals+hashCode
+
+Map&lt;Point, String&gt; map = new HashMap&lt;&gt;();
+Point p1 = new Point(1, 2);
+Point p2 = new Point(1, 2);  // equal to p1 but different object
+
+map.put(p1, "first");
+map.put(p2, "second");  // overwrites first because equals returns true
+System.out.println(map.size());     // 1
+System.out.println(map.get(p1));    // "second"
+System.out.println(map.get(p2));    // "second"</code></pre>
+
+      <h3>getClass(): Runtime Type Information</h3>
+      <pre><code class="language-java">class Animal { }
+class Dog extends Animal { }
+
+Animal a = new Dog();
+
+System.out.println(a.getClass());       // class Dog
+System.out.println(a.getClass().getName());  // "Dog"
+System.out.println(a instanceof Dog);   // true
+
+String className = a.getClass().getName();
+if (className.equals("Dog")) {
+    // we know it's a Dog
+}</code></pre>
+
+      <h3>clone(): Shallow Copy</h3>
+      <pre><code class="language-java">class Point implements Cloneable {
+    int x, y;
+
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public Point clone() throws CloneNotSupportedException {
+        return (Point) super.clone();
+    }
+}
+
+Point original = new Point(10, 20);
+Point copy = original.clone();
+
+copy.x = 99;
+
+System.out.println(original.x);  // 10 — unchanged
+System.out.println(copy.x);      // 99 — independent copy</code></pre>
+
+      <h3>Complete equals/hashCode/toString Example</h3>
+      <pre><code class="language-java">class Person {
+    String name;
+    int age;
+
+    Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + age + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Person p)) return false;
+        return age == p.age && Objects.equals(name, p.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+}
+
+Set&lt;Person&gt; people = new HashSet&lt;&gt;();
+people.add(new Person("Alice", 30));
+people.add(new Person("Alice", 30));  // duplicate, not added
+people.add(new Person("Bob", 25));
+
+System.out.println(people.size());  // 2
+for (Person p : people) {
+    System.out.println(p);  // Alice (30), Bob (25)
+}</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>toString():</code> returns string representation, used by print statements</li>
+        <li><code>equals():</code> compares value equality, default is identity comparison</li>
+        <li><code>hashCode():</code> must be consistent with equals() for use in HashSet/HashMap</li>
+        <li><code>getClass():</code> returns runtime type for reflection or type checking</li>
+      </ul>
+    </section>
+
+    <!-- 13. ABSTRACT CLASSES -->
+    <section id="abstract-classes">
+      <h2>13. Abstract Classes</h2>
+
+      <h3>Abstract Methods (No Body)</h3>
+      <pre><code class="language-java">abstract class Shape {
+    // Abstract methods — subclass MUST implement
+    abstract double area();
+    abstract double perimeter();
+
+    // Concrete method — inherited as-is
+    void describe() {
+        System.out.printf("Area: %.2f, Perimeter: %.2f%n", area(), perimeter());
+    }
+}
+
+// WRONG — cannot instantiate abstract class
+// Shape s = new Shape();  // compile error
+
+// Subclass must implement all abstract methods
+class Circle extends Shape {
+    double radius;
+
+    Circle(double r) { this.radius = r; }
+
+    @Override
+    double area() {
+        return Math.PI * radius * radius;
+    }
+
+    @Override
+    double perimeter() {
+        return 2 * Math.PI * radius;
+    }
+}
+
+Circle c = new Circle(5);
+c.describe();  // Area: 78.54, Perimeter: 31.42</code></pre>
+
+      <h3>Multiple Implementations of Same Abstract Class</h3>
+      <pre><code class="language-java">abstract class Shape {
+    abstract double area();
+}
+
+class Rectangle extends Shape {
+    double w, h;
+    @Override
+    double area() { return w * h; }
+}
+
+class Triangle extends Shape {
+    double base, height;
+    @Override
+    double area() { return (base * height) / 2; }
+}
+
+class Circle extends Shape {
+    double radius;
+    @Override
+    double area() { return Math.PI * radius * radius; }
+}
+
+// Polymorphic behavior
+Shape[] shapes = new Shape[3];
+shapes[0] = new Rectangle();
+shapes[1] = new Triangle();
+shapes[2] = new Circle();
+
+// Each calls its own area() implementation
+for (Shape s : shapes) {
+    System.out.println(s.area());  // different calculations
+}</code></pre>
+
+      <h3>Abstract Class with Fields and Constructor</h3>
+      <pre><code class="language-java">abstract class Vehicle {
+    String color;
+    int maxSpeed;
+
+    // Constructor — called by subclass via super()
+    Vehicle(String color, int maxSpeed) {
+        this.color = color;
+        this.maxSpeed = maxSpeed;
+    }
+
+    // Abstract method
+    abstract void drive();
+
+    // Concrete method
+    void describe() {
+        System.out.println(color + " vehicle, max speed: " + maxSpeed);
+    }
+}
+
+class Car extends Vehicle {
+    Car(String color, int maxSpeed) {
+        super(color, maxSpeed);
+    }
+
+    @Override
+    void drive() {
+        System.out.println("Car drives on road");
+    }
+}
+
+Car car = new Car("red", 200);
+car.describe();  // red vehicle, max speed: 200
+car.drive();     // Car drives on road</code></pre>
+
+      <h3>Abstract vs Concrete Methods</h3>
+      <pre><code class="language-java">abstract class Animal {
+    // Abstract — subclass chooses implementation
+    abstract void makeSound();
+
+    // Concrete — all subclasses inherit same behavior
+    final void sleep() {
+        System.out.println("Zzz");
+    }
+
+    // Concrete — subclass can override if needed
+    void eat() {
+        System.out.println("Eating food");
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    void makeSound() {
+        System.out.println("Woof!");  // must implement abstract method
+    }
+
+    @Override
+    void eat() {
+        System.out.println("Dog eats kibble");  // can override concrete
+    }
+    // sleep() inherited without change
+}
+
+Dog dog = new Dog();
+dog.makeSound();  // Woof!
+dog.eat();        // Dog eats kibble
+dog.sleep();      // Zzz</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>abstract</code> classes cannot be instantiated directly</li>
+        <li>Abstract methods have no body; subclass must implement them</li>
+        <li>Concrete methods are inherited; can be overridden if needed</li>
+        <li>Abstract classes can have constructors called by subclasses via <code>super()</code></li>
+      </ul>
+    </section>
+
+    <!-- 14. INTERFACES -->
+    <section id="interfaces">
+      <h2>14. Interfaces</h2>
+
+      <h3>Basic Interface Definition</h3>
+      <pre><code class="language-java">interface Drawable {
+    void draw();  // implicitly abstract and public
+    void erase();
+}
+
+interface Colorable {
+    void setColor(String color);
+    String getColor();
+}
+
+class Shape implements Drawable, Colorable {
+    String color;
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing shape in " + color);
+    }
+
+    @Override
+    public void erase() {
+        System.out.println("Erasing shape");
+    }
+
+    @Override
+    public void setColor(String c) {
+        this.color = c;
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+}
+
+Shape s = new Shape();
+s.setColor("blue");
+s.draw();   // Drawing shape in blue
+s.erase();  // Erasing shape</code></pre>
+
+      <h3>Interface Constants</h3>
+      <pre><code class="language-java">interface Constants {
+    // All fields are implicitly public static final
+    int MAX_SIZE = 100;
+    String APP_NAME = "MyApp";
+    double PI = 3.14159;
+}
+
+class MyApp implements Constants {
+    void checkSize(int size) {
+        if (size > MAX_SIZE) {  // accessing interface constant
+            System.out.println("Exceeds " + APP_NAME + " limit");
+        }
+    }
+}
+
+// Access directly from interface
+System.out.println(Constants.MAX_SIZE);  // 100</code></pre>
+
+      <h3>Default Methods (Java 8+)</h3>
+      <pre><code class="language-java">interface Logger {
+    // Abstract method
+    void log(String msg);
+
+    // Default implementation — can be inherited or overridden
+    default void info(String msg) {
+        System.out.println("[INFO] " + msg);
+    }
+
+    default void error(String msg) {
+        System.out.println("[ERROR] " + msg);
+    }
+}
+
+class ConsoleLogger implements Logger {
+    @Override
+    public void log(String msg) {
+        System.out.println(msg);
+    }
+
+    // Inherits info() and error() by default
+}
+
+class FileLogger implements Logger {
+    @Override
+    public void log(String msg) {
+        // write to file
+    }
+
+    @Override
+    public void error(String msg) {
+        System.out.println("[CRITICAL ERROR] " + msg);  // override default
+    }
+}
+
+Logger console = new ConsoleLogger();
+console.info("Starting app");       // [INFO] Starting app
+console.error("Something failed");  // [ERROR] Something failed
+
+Logger file = new FileLogger();
+file.error("Something failed");     // [CRITICAL ERROR] Something failed</code></pre>
+
+      <h3>Static Methods in Interfaces (Java 8+)</h3>
+      <pre><code class="language-java">interface Database {
+    // Abstract method
+    void connect();
+
+    // Default method
+    default void disconnect() {
+        System.out.println("Disconnected");
+    }
+
+    // Static factory method
+    static Database createMySQL() {
+        return new MySQLDatabase();
+    }
+
+    static Database createPostgreSQL() {
+        return new PostgreSQLDatabase();
+    }
+}
+
+class MySQLDatabase implements Database {
+    @Override
+    public void connect() {
+        System.out.println("Connecting to MySQL");
+    }
+}
+
+class PostgreSQLDatabase implements Database {
+    @Override
+    public void connect() {
+        System.out.println("Connecting to PostgreSQL");
+    }
+}
+
+Database db1 = Database.createMySQL();       // static factory
+Database db2 = Database.createPostgreSQL();  // static factory
+db1.connect();  // Connecting to MySQL</code></pre>
+
+      <h3>Private Methods in Interfaces (Java 9+)</h3>
+      <pre><code class="language-java">interface DataProcessor {
+    default void process(String data) {
+        validateData(data);  // use private helper
+        System.out.println("Processing: " + data);
+    }
+
+    // Private helper method (Java 9+)
+    private void validateData(String data) {
+        if (data == null || data.isEmpty()) {
+            throw new IllegalArgumentException("Data cannot be empty");
+        }
+    }
+}
+
+class MyProcessor implements DataProcessor { }
+
+MyProcessor p = new MyProcessor();
+p.process("Hello");  // Processing: Hello
+p.process("");       // IllegalArgumentException</code></pre>
+
+      <h3>Multiple Interface Implementation</h3>
+      <pre><code class="language-java">interface Comparable {
+    int compareTo(Object o);
+}
+
+interface Serializable {
+    byte[] serialize();
+}
+
+interface Cloneable {
+    Object clone();
+}
+
+class Document implements Comparable, Serializable, Cloneable {
+    String title;
+
+    @Override
+    public int compareTo(Object o) {
+        // compare by title
+        return 0;
+    }
+
+    @Override
+    public byte[] serialize() {
+        // convert to bytes
+        return new byte[0];
+    }
+
+    @Override
+    public Object clone() {
+        // create copy
+        return new Document();
+    }
+}
+
+Document d = new Document();
+if (d instanceof Comparable && d instanceof Serializable) {
+    System.out.println("Document is comparable and serializable");
+}</code></pre>
+
+      <h3>Diamond Problem Resolution</h3>
+      <pre><code class="language-java">interface Flyer {
+    default void fly() {
+        System.out.println("Flying");
+    }
+}
+
+interface Swimmer {
+    default void fly() {
+        System.out.println("Swimming");  // name conflict!
+    }
+}
+
+// Duck implements both
+class Duck implements Flyer, Swimmer {
+    @Override
+    public void fly() {
+        System.out.println("Duck can do both!");  // must choose
+        Flyer.super.fly();     // access Flyer's version
+        Swimmer.super.fly();   // access Swimmer's version
+    }
+}
+
+Duck d = new Duck();
+d.fly();
+// Output:
+// Duck can do both!
+// Flying
+// Swimming</code></pre>
+
+      <h3>Interfaces vs Abstract Classes</h3>
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th>Interface</th>
+          <th>Abstract Class</th>
+        </tr>
+        <tr>
+          <td>Instantiation</td>
+          <td>Cannot instantiate</td>
+          <td>Cannot instantiate</td>
+        </tr>
+        <tr>
+          <td>Methods</td>
+          <td>All abstract (except default, static)</td>
+          <td>Mix of abstract and concrete</td>
+        </tr>
+        <tr>
+          <td>Fields</td>
+          <td>Constants only (public static final)</td>
+          <td>Any access level, any type</td>
+        </tr>
+        <tr>
+          <td>Constructor</td>
+          <td>None</td>
+          <td>Can have constructors</td>
+        </tr>
+        <tr>
+          <td>Multiple Implementation</td>
+          <td>Class can implement many</td>
+          <td>Class extends only one</td>
+        </tr>
+        <tr>
+          <td>Use Case</td>
+          <td>Contract/capability</td>
+          <td>Shared implementation</td>
+        </tr>
+      </table>
+
+      <ul class="bullet-list">
+        <li>All interface methods are abstract unless marked <code>default</code> or <code>static</code></li>
+        <li>A class implements multiple interfaces but extends only one class</li>
+        <li>Default methods allow backward-compatible interface evolution</li>
+        <li>Static methods on interfaces provide factory patterns</li>
+      </ul>
+    </section>
+
+    <!-- 15. FUNCTIONAL INTERFACES -->
+    <section id="functional-interfaces">
+      <h2>15. Functional Interfaces</h2>
+
+      <h3>Single Abstract Method Requirement</h3>
+      <pre><code class="language-java">// Functional interface — exactly ONE abstract method
+@FunctionalInterface
+interface Greeting {
+    String greet(String name);
+
+    // Can have default/static methods
+    default void sayGoodbye() {
+        System.out.println("Goodbye!");
+    }
+}
+
+// Traditional implementation
+class FormalGreeting implements Greeting {
+    @Override
+    public String greet(String name) {
+        return "Good day, " + name;
+    }
+}
+
+// Lambda expression — much cleaner!
+Greeting casual = name -> "Hey " + name;
+Greeting formal = new FormalGreeting();
+
+System.out.println(casual.greet("Alice"));  // Hey Alice
+System.out.println(formal.greet("Bob"));    // Good day, Bob</code></pre>
+
+      <h3>Common Built-in Functional Interfaces</h3>
+      <pre><code class="language-java">// java.util.function.Predicate&lt;T&gt; — test a condition
+Predicate&lt;Integer&gt; isEven = n -> n % 2 == 0;
+System.out.println(isEven.test(4));   // true
+System.out.println(isEven.test(3));   // false
+
+// java.util.function.Function&lt;T, R&gt; — transform value
+Function&lt;String, Integer&gt; stringLength = s -> s.length();
+System.out.println(stringLength.apply("Hello"));  // 5
+
+// java.util.function.Consumer&lt;T&gt; — consume value
+Consumer&lt;String&gt; printer = s -> System.out.println(s);
+printer.accept("Hello");  // Hello
+
+// java.util.function.Supplier&lt;T&gt; — supply value
+Supplier&lt;Integer&gt; random = () -> new Random().nextInt(100);
+System.out.println(random.get());  // random number</code></pre>
+
+      <h3>Lambdas with Collections</h3>
+      <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+
+// Filter with Predicate
+List&lt;Integer&gt; evens = numbers.stream()
+    .filter(n -> n % 2 == 0)  // Predicate&lt;Integer&gt;
+    .collect(Collectors.toList());
+System.out.println(evens);  // [2, 4, 6]
+
+// Transform with Function
+List&lt;Integer&gt; squared = numbers.stream()
+    .map(n -> n * n)  // Function&lt;Integer, Integer&gt;
+    .collect(Collectors.toList());
+System.out.println(squared);  // [1, 4, 9, 16, 25, 36]
+
+// Process with Consumer
+numbers.forEach(n -> System.out.println("Number: " + n));  // prints each</code></pre>
+
+      <h3>Custom Functional Interface</h3>
+      <pre><code class="language-java">@FunctionalInterface
+interface Calculator {
+    int calculate(int a, int b);
+}
+
+Calculator add = (a, b) -> a + b;
+Calculator multiply = (a, b) -> a * b;
+Calculator divide = (a, b) -> a / b;
+
+System.out.println(add.calculate(5, 3));      // 8
+System.out.println(multiply.calculate(5, 3)); // 15
+System.out.println(divide.calculate(6, 3));   // 2</code></pre>
+
+      <h3>Multi-Parameter Functional Interfaces</h3>
+      <pre><code class="language-java">// java.util.function.BiFunction&lt;T, U, R&gt; — two inputs, one output
+BiFunction&lt;Integer, Integer, Integer&gt; add = (a, b) -> a + b;
+System.out.println(add.apply(5, 3));  // 8
+
+// java.util.function.BiConsumer&lt;T, U&gt; — consume two values
+BiConsumer&lt;String, Integer&gt; printPair = (s, n) ->
+    System.out.println(s + ": " + n);
+printPair.accept("Count", 42);  // Count: 42
+
+// Custom multi-parameter functional interface
+@FunctionalInterface
+interface ThreeParamFunc {
+    int apply(int a, int b, int c);
+}
+
+ThreeParamFunc sum = (a, b, c) -> a + b + c;
+System.out.println(sum.apply(1, 2, 3));  // 6</code></pre>
+
+      <ul class="bullet-list">
+        <li>Functional interface = exactly one abstract method</li>
+        <li><code>@FunctionalInterface</code> annotation documents intent and enforces rule</li>
+        <li>Lambdas are syntax sugar for functional interface implementations</li>
+        <li>Built-in functional interfaces: Predicate, Function, Consumer, Supplier, BiFunction, BiConsumer</li>
+      </ul>
+    </section>
+
+    <!-- 16. SEALED CLASSES -->
+    <section id="sealed-classes">
+      <h2>16. Sealed Classes <span class="badge">Java 17+</span></h2>
+
+      <h3>Restricting Inheritance with permits</h3>
+      <pre><code class="language-java">// Shape can only be extended by Circle, Rectangle, Triangle
+sealed class Shape permits Circle, Rectangle, Triangle {
+    abstract double area();
+}
+
+final class Circle extends Shape {
+    double radius;
+    @Override
+    double area() { return Math.PI * radius * radius; }
+}
+
+final class Rectangle extends Shape {
+    double w, h;
+    @Override
+    double area() { return w * h; }
+}
+
+final class Triangle extends Shape {
+    double base, height;
+    @Override
+    double area() { return (base * height) / 2; }
+}
+
+// WRONG — Color is not in permits list
+// final class Color extends Shape { }  // compile error</code></pre>
+
+      <h3>Three Options for Sealed Subclasses</h3>
+      <pre><code class="language-java">sealed class Vehicle permits Car, Truck, Bicycle {
+    abstract void drive();
+}
+
+// Option 1: final — cannot be extended further
+final class Car extends Vehicle {
+    @Override
+    void drive() { System.out.println("Car drives"); }
+}
+
+// Option 2: sealed — restrict further extensions
+sealed class Truck extends Vehicle permits ElectricTruck {
+    @Override
+    void drive() { System.out.println("Truck drives"); }
+}
+
+final class ElectricTruck extends Truck {
+    @Override
+    void drive() { System.out.println("ElectricTruck drives"); }
+}
+
+// Option 3: non-sealed — allow unlimited further extension
+non-sealed class Bicycle extends Vehicle {
+    @Override
+    void drive() { System.out.println("Bicycle drives"); }
+}
+
+class MountainBike extends Bicycle { }  // allowed — non-sealed</code></pre>
+
+      <h3>Pattern Matching with Sealed Classes</h3>
+      <pre><code class="language-java">sealed class Shape permits Circle, Rectangle { }
+final class Circle extends Shape { double radius; }
+final class Rectangle extends Shape { double w, h; }
+
+double area(Shape s) {
+    return switch (s) {
+        case Circle c -> Math.PI * c.radius * c.radius;
+        case Rectangle r -> r.w * r.h;
+        // Compiler knows all subclasses, no need for default case!
+    };
+}
+
+// Compiler ensures exhaustiveness — must handle all permitted types</code></pre>
+
+      <h3>Benefits of Sealed Classes</h3>
+      <pre><code class="language-java">// WRONG — no control over subclasses, complex inheritance tree
+class PaymentMethod {
+    // anyone can extend
+}
+class CreditCard extends PaymentMethod { }
+class PayPal extends PaymentMethod { }
+class Bitcoin extends PaymentMethod { }
+class UnknownMethod extends PaymentMethod { }  // unexpected subclass!
+
+// CORRECT — sealed for clear, known hierarchy
+sealed class PaymentMethod permits CreditCard, PayPal, Bitcoin {
+    abstract void pay(double amount);
+}
+
+double processPayment(PaymentMethod method, double amount) {
+    return switch (method) {
+        case CreditCard cc -> { /* handle credit card */ yield 0; }
+        case PayPal pp -> { /* handle PayPal */ yield 0; }
+        case Bitcoin btc -> { /* handle Bitcoin */ yield 0; }
+        // No other case possible — sealed class exhaustiveness
+    };
+}</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>sealed</code> keyword restricts which classes can extend</li>
+        <li><code>permits</code> lists allowed subclasses</li>
+        <li>Subclasses must be <code>final</code>, <code>sealed</code>, or <code>non-sealed</code></li>
+        <li>Works perfectly with pattern matching for exhaustive switches</li>
+      </ul>
+    </section>
+
+    <!-- 17. RECORDS -->
+    <section id="records">
+      <h2>17. Records <span class="badge">Java 16+</span></h2>
+
+      <h3>Basic Record (Immutable Data Carrier)</h3>
+      <pre><code class="language-java">// One line defines: fields, constructor, getters, equals, hashCode, toString
+record Point(int x, int y) { }
+
+Point p = new Point(10, 20);
+System.out.println(p);           // Point[x=10, y=20]
+System.out.println(p.x());       // 10 — getter is x(), not getX()
+System.out.println(p.y());       // 20 — getter is y(), not getY()
+
+Point p2 = new Point(10, 20);
+System.out.println(p.equals(p2));  // true — auto-generated
+System.out.println(p.hashCode() == p2.hashCode());  // true — auto-generated
+
+// p.x = 5;  // COMPILE ERROR — records are immutable</code></pre>
+
+      <h3>What Records Auto-Generate</h3>
+      <pre><code class="language-java">record Point(int x, int y) { }
+
+// Automatically generated:
+// 1. Constructor: public Point(int x, int y) { this.x = x; this.y = y; }
+// 2. Getters: public int x() { return x; }
+//             public int y() { return y; }
+// 3. equals(): compares x and y fields
+// 4. hashCode(): based on x and y
+// 5. toString(): "Point[x=10, y=20]"
+
+// Equivalent manual class:
+class PointManual {
+    private final int x;
+    private final int y;
+
+    PointManual(int x, int y) { this.x = x; this.y = y; }
+
+    public int x() { return x; }
+    public int y() { return y; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PointManual p)) return false;
+        return x == p.x && y == p.y;
+    }
+
+    @Override
+    public int hashCode() { return Objects.hash(x, y); }
+
+    @Override
+    public String toString() { return "PointManual[x=" + x + ", y=" + y + "]"; }
+}</code></pre>
+
+      <h3>Compact Constructor for Validation</h3>
+      <pre><code class="language-java">record Range(int min, int max) {
+    // Compact constructor — params already in scope, auto-assigned
+    Range {
+        if (min > max) {
+            throw new IllegalArgumentException("min > max");
+        }
+    }
+}
+
+Range r = new Range(1, 10);
+System.out.println(r);  // Range[min=1, max=10]
+
+Range bad = new Range(10, 1);  // IllegalArgumentException</code></pre>
+
+      <h3>Adding Custom Methods</h3>
+      <pre><code class="language-java">record Point(int x, int y) {
+    // Custom instance method
+    double distanceTo(Point other) {
+        int dx = x - other.x;
+        int dy = y - other.y;
+        return Math.hypot(dx, dy);
+    }
+
+    // Custom static method
+    static Point origin() {
+        return new Point(0, 0);
+    }
+
+    // Override toString for custom format
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+}
+
+Point p1 = new Point(0, 0);
+Point p2 = new Point(3, 4);
+System.out.println(p1.distanceTo(p2));  // 5.0
+System.out.println(Point.origin());     // (0, 0)</code></pre>
+
+      <h3>Records with Generics</h3>
+      <pre><code class="language-java">record Pair&lt;T, U&gt;(T first, U second) { }
+
+Pair&lt;String, Integer&gt; p1 = new Pair&lt;&gt;("Alice", 30);
+Pair&lt;Integer, Integer&gt; p2 = new Pair&lt;&gt;(1, 2);
+
+System.out.println(p1.first());   // Alice
+System.out.println(p2.second());  // 2</code></pre>
+
+      <h3>Records Implementing Interfaces</h3>
+      <pre><code class="language-java">interface Drawable {
+    void draw();
+}
+
+record Point(int x, int y) implements Drawable {
+    @Override
+    public void draw() {
+        System.out.println("Drawing point at (" + x + ", " + y + ")");
+    }
+}
+
+Point p = new Point(10, 20);
+p.draw();  // Drawing point at (10, 20)</code></pre>
+
+      <h3>Record Limitations</h3>
+      <pre><code class="language-java">// Records are final — cannot extend another class or be extended
+record Point(int x, int y) { }
+
+// WRONG
+// class ColoredPoint extends Point { }  // compile error
+
+// But records can implement interfaces
+record Point(int x, int y) implements Comparable&lt;Point&gt; {
+    @Override
+    public int compareTo(Point other) {
+        int cmp = Integer.compare(x, other.x);
+        return cmp != 0 ? cmp : Integer.compare(y, other.y);
+    }
+}</code></pre>
+
+      <ul class="bullet-list">
+        <li>Records eliminate boilerplate for immutable data classes</li>
+        <li>Auto-generated: constructor, getters, equals, hashCode, toString</li>
+        <li>Compact constructor for validation without repeating field assignments</li>
+        <li>Records are implicitly <code>final</code> and cannot extend other classes</li>
+      </ul>
+    </section>
+
+    <!-- 18. ENUMS -->
+    <section id="enums">
+      <h2>18. Enums</h2>
+
+      <h3>Basic Enum</h3>
+      <pre><code class="language-java">enum Day { MON, TUE, WED, THU, FRI, SAT, SUN }
+
+Day today = Day.MON;
+System.out.println(today);  // MON
+System.out.println(today.name());    // "MON" — enum name as string
+System.out.println(today.ordinal());  // 0 — position in enum (0-indexed)</code></pre>
+
+      <h3>Enum Methods</h3>
+      <pre><code class="language-java">enum Season { SPRING, SUMMER, FALL, WINTER }
+
+// values() — all constants
+for (Season s : Season.values()) {
+    System.out.println(s);  // SPRING, SUMMER, FALL, WINTER
+}
+
+// valueOf() — string to enum
+Season s = Season.valueOf("SUMMER");
+System.out.println(s);  // SUMMER
+
+// ordinal() — position
+System.out.println(Season.FALL.ordinal());  // 2
+
+// name() — constant name
+System.out.println(Season.SPRING.name());   // "SPRING"</code></pre>
+
+      <h3>Enum with Fields and Constructor</h3>
+      <pre><code class="language-java">enum Planet {
+    MERCURY(3.303e+23, 2.4397e6),
+    VENUS(4.869e+24, 6.0518e6),
+    EARTH(5.976e+24, 6.37814e6),
+    MARS(6.4185e+23, 3.3972e6),
+    JUPITER(1.8986e+27, 7.1492e7);
+
+    final double mass;
+    final double radius;
+    static final double G = 6.67300E-11;
+
+    Planet(double mass, double radius) {
+        this.mass = mass;
+        this.radius = radius;
+    }
+
+    double surfaceGravity() {
+        return G * mass / (radius * radius);
+    }
+
+    double surfaceWeight(double otherMass) {
+        return otherMass * surfaceGravity();
+    }
+}
+
+double earthWeight = 100;
+for (Planet p : Planet.values()) {
+    double weight = p.surfaceWeight(earthWeight);
+    System.out.printf("%s: %.1f kg%n", p, weight);
+}
+// Output:
+// MERCURY: 37.7 kg
+// VENUS: 88.9 kg
+// EARTH: 100.0 kg
+// MARS: 37.9 kg
+// JUPITER: 236.6 kg</code></pre>
+
+      <h3>Enum with Abstract Methods</h3>
+      <pre><code class="language-java">enum Operation {
+    PLUS("+") {
+        @Override
+        double apply(double x, double y) { return x + y; }
+    },
+    MINUS("-") {
+        @Override
+        double apply(double x, double y) { return x - y; }
+    },
+    TIMES("*") {
+        @Override
+        double apply(double x, double y) { return x * y; }
+    },
+    DIVIDE("/") {
+        @Override
+        double apply(double x, double y) { return x / y; }
+    };
+
+    final String symbol;
+
+    Operation(String symbol) {
+        this.symbol = symbol;
+    }
+
+    abstract double apply(double x, double y);
+}
+
+System.out.println(Operation.PLUS.apply(5, 3));    // 8.0
+System.out.println(Operation.MINUS.apply(5, 3));   // 2.0
+System.out.println(Operation.TIMES.apply(5, 3));   // 15.0
+System.out.println(Operation.DIVIDE.apply(6, 3));  // 2.0</code></pre>
+
+      <h3>Enum in Switch Statements</h3>
+      <pre><code class="language-java">enum Status { PENDING, ACTIVE, COMPLETED, FAILED }
+
+void handleStatus(Status s) {
+    switch (s) {
+        case PENDING:
+            System.out.println("Waiting to start");
+            break;
+        case ACTIVE:
+            System.out.println("Currently running");
+            break;
+        case COMPLETED:
+            System.out.println("Finished successfully");
+            break;
+        case FAILED:
+            System.out.println("Encountered error");
+            break;
+    }
+}
+
+handleStatus(Status.ACTIVE);  // Currently running
+
+// Java 16+ — pattern matching
+String message = switch (Status.COMPLETED) {
+    case PENDING -> "Waiting to start";
+    case ACTIVE -> "Currently running";
+    case COMPLETED -> "Finished successfully";
+    case FAILED -> "Encountered error";
+};
+System.out.println(message);  // Finished successfully</code></pre>
+
+      <h3>EnumSet and EnumMap</h3>
+      <pre><code class="language-java">enum Color { RED, GREEN, BLUE, YELLOW }
+
+// EnumSet — efficient set of enums
+Set&lt;Color&gt; primary = EnumSet.of(Color.RED, Color.GREEN, Color.BLUE);
+Set&lt;Color&gt; warm = EnumSet.of(Color.RED, Color.YELLOW);
+System.out.println(primary.contains(Color.RED));  // true
+System.out.println(warm.contains(Color.BLUE));    // false
+
+// EnumMap — efficient map with enum keys
+Map&lt;Color, String&gt; names = new EnumMap&lt;&gt;(Color.class);
+names.put(Color.RED, "primary");
+names.put(Color.BLUE, "primary");
+names.put(Color.YELLOW, "secondary");
+System.out.println(names.get(Color.RED));  // primary</code></pre>
+
+      <h3>Comparing Enums</h3>
+      <pre><code class="language-java">enum Priority { LOW, MEDIUM, HIGH, CRITICAL }
+
+Priority p1 = Priority.HIGH;
+Priority p2 = Priority.HIGH;
+Priority p3 = Priority.LOW;
+
+System.out.println(p1 == p2);          // true — same constant
+System.out.println(p1.equals(p2));     // true — equivalent
+System.out.println(p1 == p3);          // false — different constants
+System.out.println(p1.ordinal() > p3.ordinal());  // true — 2 > 0</code></pre>
+
+      <ul class="bullet-list">
+        <li>Enums define set of named constants</li>
+        <li>Enums can have fields, constructors, and methods</li>
+        <li><code>values()</code> returns all constants; <code>valueOf(String)</code> converts string to enum</li>
+        <li>Each constant can have different behavior via abstract methods</li>
+        <li>Use <code>EnumSet</code> and <code>EnumMap</code> for optimal performance</li>
+      </ul>
+    </section>
+
+    <!-- 19. NESTED CLASSES -->
+    <section id="nested-classes">
+      <h2>19. Nested Classes</h2>
+
+      <h3>Static Nested Class</h3>
+      <pre><code class="language-java">class Outer {
+    static int x = 10;
+
+    static class StaticNested {
+        void printOuterX() {
+            System.out.println("Outer x: " + Outer.x);
+        }
+    }
+}
+
+// Instantiate static nested class
+Outer.StaticNested nested = new Outer.StaticNested();
+nested.printOuterX();  // Outer x: 10
+
+// Can access like top-level class
+Outer.StaticNested obj = new Outer.StaticNested();</code></pre>
+
+      <h3>Inner Class (Non-Static Nested)</h3>
+      <pre><code class="language-java">class Outer {
+    int x = 10;  // outer field
+
+    class Inner {
+        void printOuterX() {
+            System.out.println("Outer x: " + x);  // accesses outer's x
+        }
+    }
+}
+
+// Outer must be instantiated first
+Outer outer = new Outer();
+Outer.Inner inner = outer.new Inner();  // notice 'outer.new' syntax
+inner.printOuterX();  // Outer x: 10
+
+// Inner has implicit reference to outer
+class Outer {
+    int value = 42;
+
+    class Inner {
+        void show() {
+            System.out.println(Outer.this.value);  // explicit outer reference
+        }
+    }
+}</code></pre>
+
+      <h3>Local Class (Inside Method)</h3>
+      <pre><code class="language-java">void methodWithLocalClass() {
+    final int x = 10;  // must be final or effectively final
+
+    // Local class — defined inside method
+    class LocalClass {
+        void display() {
+            System.out.println("x: " + x);
+        }
+    }
+
+    LocalClass local = new LocalClass();
+    local.display();  // x: 10
+}
+
+// Cannot use LocalClass outside method
+// LocalClass obj = new LocalClass();  // COMPILE ERROR</code></pre>
+
+      <h3>Anonymous Class</h3>
+      <pre><code class="language-java">interface Greeter {
+    void greet(String name);
+}
+
+// Anonymous class — inline implementation without named class
+Greeter g = new Greeter() {
+    @Override
+    public void greet(String name) {
+        System.out.println("Hello, " + name);
+    }
+};
+
+g.greet("Alice");  // Hello, Alice
+
+// More practical: callback handler
+button.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        System.out.println("Button clicked!");
+    }
+});
+
+// Modern Java (Java 8+): use lambda instead
+button.setOnClickListener(v -> System.out.println("Button clicked!"));</code></pre>
+
+      <h3>Comparison of All Nested Class Types</h3>
+      <pre><code class="language-java">class Outer {
+    int outerValue = 10;
+
+    // 1. Static Nested Class
+    static class StaticNested {
+        void useOuter() {
+            // System.out.println(outerValue);  // WRONG — no access
+            System.out.println(Outer.class);   // can reference Outer class
+        }
+    }
+
+    // 2. Inner Class
+    class InnerClass {
+        void useOuter() {
+            System.out.println(outerValue);  // OK — implicit access
+        }
+    }
+
+    // 3. Local Class (inside method)
+    void method() {
+        final int local = 5;
+        class LocalClass {
+            void use() {
+                System.out.println(local);      // OK — final/effectively final
+                System.out.println(outerValue); // OK — access outer
+            }
+        }
+        new LocalClass().use();
+    }
+
+    // 4. Anonymous Class (no name)
+    Runnable r = new Runnable() {
+        @Override
+        public void run() {
+            System.out.println(outerValue);
+        }
+    };
+}
+
+// Usage:
+Outer outer = new Outer();
+Outer.StaticNested sn = new Outer.StaticNested();
+Outer.InnerClass ic = outer.new InnerClass();
+outer.method();
+outer.r.run();</code></pre>
+
+      <ul class="bullet-list">
+        <li><strong>Static nested:</strong> no implicit outer reference, like top-level class</li>
+        <li><strong>Inner class:</strong> implicit outer reference, accesses outer fields/methods</li>
+        <li><strong>Local class:</strong> defined in method, accesses effectively final locals and outer fields</li>
+        <li><strong>Anonymous class:</strong> one-time implementation, no name, useful for callbacks</li>
+      </ul>
+    </section>
+
+    <!-- 20. FINAL KEYWORD -->
+    <section id="final-keyword">
+      <h2>20. final Keyword</h2>
+
+      <h3>final Variable: Assign Once</h3>
+      <pre><code class="language-java">class Config {
+    // Instance final field — assign in constructor or initializer
+    final String apiKey;
+    final int maxRetries = 3;  // assign at declaration
+
+    Config(String key) {
+        this.apiKey = key;  // assign once in constructor
+        // this.apiKey = "new key";  // WRONG — cannot reassign
+    }
+}
+
+// Local final variable
+final int x = 10;
+// x = 20;  // COMPILE ERROR — cannot reassign
+
+// final in loop
+final int[] array = {1, 2, 3};
+array[0] = 99;  // OK — modifying array contents
+// array = new int[]{4, 5, 6};  // WRONG — cannot reassign reference
+
+// Parameters marked final
+void process(final String s) {
+    // s = "new value";  // COMPILE ERROR
+}</code></pre>
+
+      <h3>Blank Final Fields</h3>
+      <pre><code class="language-java">class User {
+    final String userId;
+    final String email;
+    final Date created;
+
+    // Blank final fields — assigned in constructor
+    User(String userId, String email) {
+        this.userId = userId;
+        this.email = email;
+        this.created = new Date();
+    }
+
+    // WRONG — blank finals not set in this constructor
+    // User() {
+    //     this.userId = null;  // userId not set!
+    // }
+}</code></pre>
+
+      <h3>final Method: Cannot Override</h3>
+      <pre><code class="language-java">class Parent {
+    void normalMethod() {
+        System.out.println("Can be overridden");
+    }
+
+    final void criticalMethod() {
+        System.out.println("Cannot be overridden");
+    }
+}
+
+class Child extends Parent {
+    @Override
+    void normalMethod() {
+        System.out.println("Overridden");
+    }
+
+    // WRONG — cannot override final method
+    // @Override
+    // void criticalMethod() { }  // COMPILE ERROR
+}</code></pre>
+
+      <h3>final Class: Cannot Extend</h3>
+      <pre><code class="language-java">final class ImmutableString {
+    private final String value;
+    ImmutableString(String value) { this.value = value; }
+}
+
+// WRONG — cannot extend final class
+// class MyString extends ImmutableString { }  // COMPILE ERROR
+
+// Examples of final classes in JDK:
+// - String
+// - Integer
+// - Long
+// - System
+// (These are final for security and performance)</code></pre>
+
+      <h3>When to Use final</h3>
+      <pre><code class="language-java">// GOOD USE CASES:
+
+// 1. Immutable data classes
+final class Point {
+    final int x, y;
+    Point(int x, int y) { this.x = x; this.y = y; }
+}
+
+// 2. Critical security code that shouldn't be overridden
+class SecurityManager {
+    final void restrictAccess() {
+        // no subclass can weaken security
+    }
+}
+
+// 3. Constants
+final double PI = 3.14159;
+final String APP_NAME = "MyApp";
+
+// 4. Performance-critical methods (allows inline optimization)
+final int criticalCalculation(int x) {
+    return x * x;  // compiler can inline this
+}</code></pre>
+
+      <ul class="bullet-list">
+        <li><code>final</code> variable: assign once, cannot be changed</li>
+        <li><code>final</code> method: subclass cannot override</li>
+        <li><code>final</code> class: cannot be extended</li>
+        <li>Blank finals: assigned in constructor or initializer, not at declaration</li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <section class="summary">
+      <h2>Key Takeaways</h2>
+      <ul>
+        <li><strong>Classes are blueprints; objects are instances</strong> created on the heap with references on the stack.</li>
+        <li><strong>Inheritance:</strong> single inheritance with <code>extends</code>; use <code>super</code> to access parent.</li>
+        <li><strong>Polymorphism:</strong> runtime method dispatch calls the actual object type's method.</li>
+        <li><strong>Encapsulation:</strong> private fields with public getters/setters enforce invariants.</li>
+        <li><strong>Interfaces:</strong> define contracts; support multiple implementation and default methods.</li>
+        <li><strong>Abstract classes:</strong> mix abstract and concrete methods; share implementation across subclasses.</li>
+        <li><strong>Sealed classes:</strong> restrict subclass hierarchy for better exhaustiveness checking.</li>
+        <li><strong>Records:</strong> eliminate boilerplate for immutable data carriers.</li>
+        <li><strong>Enums:</strong> type-safe constants; can have fields, constructors, and methods.</li>
+        <li><strong>Access modifiers:</strong> private (same class), default (same package), protected (package + subclasses), public (everywhere).</li>
+      </ul>
+    </section>
+
+  </article>
+
+  <nav class="bottom-nav">
+    <a href="chapter04-methods-arrays.html">← Chapter 4</a>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter06-collections-apis.html">Chapter 6 →</a>
+  </nav>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

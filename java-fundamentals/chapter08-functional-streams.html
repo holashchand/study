@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 8 — Functional Programming &amp; Streams | Java Fundamentals</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="chapter07-exceptions-io.html">← Chapter 7</a>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter09-concurrency.html">Chapter 9 →</a>
+  </nav>
+
+  <article>
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 8</div>
+      <h1 class="chapter-title">Functional Programming &amp; Streams</h1>
+      <p class="chapter-subtitle">Lambdas, functional interfaces, method references, Stream API, Optional, java.time</p>
+    </div>
+
+    <nav class="chapter-toc">
+      <h2>Chapter Contents</h2>
+      <ol>
+        <li><a href="#imperative-vs-functional">Imperative vs Functional Programming</a></li>
+        <li><a href="#lambda-expressions">Lambda Expressions</a></li>
+        <li><a href="#functional-interface">@FunctionalInterface Annotation</a></li>
+        <li><a href="#builtin-functional">Built-in Functional Interfaces</a></li>
+        <li><a href="#method-references">Method References</a></li>
+        <li><a href="#stream-overview">Stream API — Overview</a></li>
+        <li><a href="#creating-streams">Creating Streams</a></li>
+        <li><a href="#intermediate-ops">Intermediate Operations</a></li>
+        <li><a href="#terminal-ops">Terminal Operations</a></li>
+        <li><a href="#collectors">Collectors</a></li>
+        <li><a href="#parallel-streams">Parallel Streams</a></li>
+        <li><a href="#optional">Optional&lt;T&gt;</a></li>
+        <li><a href="#java-time">java.time API</a></li>
+      </ol>
+    </nav>
+
+    <!-- ============ SECTION 1: IMPERATIVE VS FUNCTIONAL ============ -->
+    <section id="imperative-vs-functional">
+      <h2>1. Imperative vs Functional Programming</h2>
+
+      <h3>The Difference: HOW vs WHAT</h3>
+
+      <p class="note">
+        <strong>Imperative:</strong> Tell the computer HOW to do something (step-by-step instructions)<br>
+        <strong>Functional:</strong> Tell the computer WHAT to do (declare the desired transformation)
+      </p>
+
+      <h4>Example: Filter and transform a list of names</h4>
+
+      <pre><code class="language-java">// ========== IMPERATIVE (traditional loop) ==========
+List&lt;String&gt; names = List.of("Alice", "Amy", "Bob", "Charlie", "Alex");
+
+// HOW: manually iterate, check, build result
+List&lt;String&gt; result = new ArrayList&lt;&gt;();
+for (String s : names) {
+    if (s.startsWith("A")) {
+        result.add(s.toUpperCase());
+    }
+}
+System.out.println(result);  // [ALICE, AMY, ALEX]
+
+// ========== FUNCTIONAL (Stream API) ==========
+// WHAT: filter then map
+List&lt;String&gt; result2 = names.stream()
+    .filter(s -&gt; s.startsWith("A"))
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+System.out.println(result2);  // [ALICE, AMY, ALEX]</code></pre>
+
+      <h3>Key Principles of Functional Programming</h3>
+
+      <ul>
+        <li><strong>Immutability:</strong> Don't modify data; create new data instead</li>
+        <li><strong>No side effects:</strong> Functions shouldn't modify external state (only return values)</li>
+        <li><strong>First-class functions:</strong> Pass functions as values, return them from methods</li>
+        <li><strong>Composition:</strong> Combine small functions into larger ones</li>
+      </ul>
+
+      <h4>More Complex Example: Chain transformations</h4>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// WRONG — imperative, hard to read:
+List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
+for (Integer n : nums) {
+    if (n % 2 == 0) {
+        result.add(n * n);
+    }
+}
+Collections.sort(result, Collections.reverseOrder());
+for (Integer n : result) {
+    System.out.println(n);
+}
+
+// CORRECT — functional, clear intent:
+nums.stream()
+    .filter(n -&gt; n % 2 == 0)           // keep evens
+    .map(n -&gt; n * n)                    // square
+    .sorted(Comparator.reverseOrder())  // big to small
+    .forEach(System.out::println);      // print
+// Output: 100, 64, 36, 16, 4</code></pre>
+
+      <div class="tip">
+        <strong>Tip:</strong> Functional code is often more concise and expresses INTENT better. But use it when it makes code clearer, not just to be trendy.
+      </div>
+    </section>
+
+    <!-- ============ SECTION 2: LAMBDA EXPRESSIONS ============ -->
+    <section id="lambda-expressions">
+      <h2>2. Lambda Expressions</h2>
+
+      <p class="note">
+        A lambda is a <strong>short anonymous function</strong> that implements a functional interface. Syntax: <code>(parameters) -&gt; body</code>
+      </p>
+
+      <h3>Lambda Syntax — All Forms</h3>
+
+      <pre><code class="language-java">// ===== NO PARAMETERS =====
+Runnable greet = () -&gt; System.out.println("Hello");
+greet.run();  // prints: Hello
+
+Supplier&lt;String&gt; message = () -&gt; "Good morning";
+System.out.println(message.get());  // Good morning
+
+// ===== SINGLE PARAMETER (parens optional) =====
+Consumer&lt;String&gt; print1 = s -&gt; System.out.println(s);
+Consumer&lt;String&gt; print2 = (s) -&gt; System.out.println(s);  // same, explicit parens
+Consumer&lt;String&gt; print3 = (String s) -&gt; System.out.println(s);  // with type
+// All three are equivalent
+
+// ===== MULTIPLE PARAMETERS =====
+BiFunction&lt;Integer, Integer, Integer&gt; add = (a, b) -&gt; a + b;
+System.out.println(add.apply(3, 5));  // 8
+
+Comparator&lt;String&gt; compare = (s1, s2) -&gt; s1.compareTo(s2);
+
+// ===== BLOCK BODY (multiple statements) =====
+BiFunction&lt;Integer, Integer, Integer&gt; divSafe = (a, b) -&gt; {
+    if (b == 0) throw new ArithmeticException("divide by zero");
+    return a / b;
+};
+System.out.println(divSafe.apply(10, 2));  // 5
+
+Consumer&lt;List&lt;String&gt;&gt; printAndLog = list -&gt; {
+    System.out.println("Processing...");
+    list.forEach(System.out::println);
+    System.out.println("Done!");
+};
+
+// ===== EXPLICIT TYPES (rarely needed) =====
+BiFunction&lt;String, String, Integer&gt; customCompare = (String a, String b) -&gt; a.length() - b.length();
+
+// ===== EXPRESSION BODY (implicit return) =====
+Function&lt;String, Integer&gt; len = s -&gt; s.length();  // returns length
+Function&lt;String, String&gt; upper = s -&gt; s.toUpperCase();  // returns uppercase</code></pre>
+
+      <h3>Effectively Final Variables</h3>
+
+      <p class="note">
+        Lambda can access variables from outer scope, but only if they're <strong>effectively final</strong> (never reassigned after initialization).
+      </p>
+
+      <pre><code class="language-java">// WRONG — variable reassigned after lambda uses it:
+int x = 5;
+Runnable r = () -&gt; System.out.println(x);  // capture x
+x = 10;  // COMPILE ERROR: x is not effectively final!
+
+// CORRECT — never reassign:
+int y = 5;
+Runnable r2 = () -&gt; System.out.println(y);  // OK
+// y = 10;  // Don't do this
+
+// CORRECT — use final keyword explicitly:
+final int z = 5;
+Runnable r3 = () -&gt; System.out.println(z);
+
+// This works because we NEVER reassign:
+int multiplier = 10;
+Function&lt;Integer, Integer&gt; multiply = n -&gt; n * multiplier;
+System.out.println(multiply.apply(5));  // 50
+// multiplier = 20;  // Would break the lambda
+
+// Objects are effectively final if reference doesn't change:
+List&lt;String&gt; items = new ArrayList&lt;&gt;();
+Consumer&lt;String&gt; add = s -&gt; items.add(s);  // OK — list content changes, not reference
+add.accept("apple");
+add.accept("banana");
+System.out.println(items);  // [apple, banana]
+// items = new ArrayList&lt;&gt;();  // Would break the lambda</code></pre>
+
+      <h3>Lambda vs Anonymous Class</h3>
+
+      <pre><code class="language-java">// Anonymous class (pre-Java 8):
+Comparator&lt;String&gt; comp1 = new Comparator&lt;String&gt;() {
+    @Override
+    public int compare(String a, String b) {
+        return a.compareTo(b);
+    }
+};
+
+// Lambda (Java 8+):
+Comparator&lt;String&gt; comp2 = (a, b) -&gt; a.compareTo(b);
+
+// They behave similarly, but:
+// - Lambda is more concise
+// - Lambda doesn't create new object each time (usually)
+// - Anonymous class has its own 'this'; lambda's 'this' refers to enclosing class</code></pre>
+
+      <h4>Important: `this` in Lambdas</h4>
+
+      <pre><code class="language-java">public class MyClass {
+    private String name = "MyClass";
+
+    public void demo() {
+        // 'this' in lambda refers to MyClass instance, NOT the lambda
+        Runnable r = () -&gt; System.out.println(this.name);
+        r.run();  // prints: MyClass
+
+        // Compare with anonymous class:
+        Runnable anon = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(this.name);  // 'this' is the Runnable instance
+            }
+        };
+        // This would be an error because Runnable has no 'name' field
+    }
+}</code></pre>
+
+      <div class="tip">
+        <strong>Tip:</strong> Start with simple lambdas (one line). If it gets complex, consider extracting a method instead.
+      </div>
+    </section>
+
+    <!-- ============ SECTION 3: @FUNCTIONALINTERFACE ============ -->
+    <section id="functional-interface">
+      <h2>3. @FunctionalInterface Annotation</h2>
+
+      <p class="note">
+        A functional interface has <strong>exactly one abstract method</strong>. It can have default and static methods. The <code>@FunctionalInterface</code> annotation documents this contract and makes compilation fail if you violate it.
+      </p>
+
+      <h3>Creating a Functional Interface</h3>
+
+      <pre><code class="language-java">@FunctionalInterface
+public interface StringProcessor {
+    // Exactly ONE abstract method:
+    String process(String input);
+
+    // Can have default methods:
+    default StringProcessor andThen(StringProcessor next) {
+        return s -&gt; next.process(this.process(s));
+    }
+
+    // Can have static methods:
+    static StringProcessor identity() {
+        return s -&gt; s;
+    }
+
+    // Can have Object methods (don't count):
+    @Override
+    String toString();
+}
+
+// Usage:
+StringProcessor toUpper = s -&gt; s.toUpperCase();
+StringProcessor trim = s -&gt; s.trim();
+
+// Compose using default method:
+StringProcessor combined = trim.andThen(toUpper);
+System.out.println(combined.process("  hello  "));  // HELLO
+
+// Use static method:
+StringProcessor id = StringProcessor.identity();
+System.out.println(id.process("test"));  // test</code></pre>
+
+      <h3>Why @FunctionalInterface Matters</h3>
+
+      <pre><code class="language-java">// With @FunctionalInterface annotation:
+@FunctionalInterface
+public interface BadInterface {
+    String method1(String s);
+    String method2(String s);  // COMPILE ERROR: too many abstract methods!
+}
+
+// Without annotation, this compiles (but is wrong):
+public interface SilentlyBroken {
+    String method1(String s);
+    String method2(String s);
+}
+// Can't use lambda with SilentlyBroken because it's not functional!</code></pre>
+
+      <h3>Real-World Example: Function Composition</h3>
+
+      <pre><code class="language-java">@FunctionalInterface
+public interface Transformer&lt;T&gt; {
+    T transform(T input);
+
+    default &lt;U&gt; Transformer&lt;U&gt; pipe(Function&lt;T, U&gt; next) {
+        return u -&gt; next.apply(this.transform(u));
+    }
+}
+
+// Usage:
+Transformer&lt;String&gt; upper = s -&gt; s.toUpperCase();
+Transformer&lt;String&gt; exclaim = s -&gt; s + "!!!";
+
+Transformer&lt;String&gt; pipeline = upper.pipe(String::new)
+    .pipe(exclaim::transform);  // Actually, this example is awkward...
+
+// Better with Function's built-in compose/andThen:
+Function&lt;String, String&gt; f1 = String::toUpperCase;
+Function&lt;String, String&gt; f2 = s -&gt; s + "!!!";
+Function&lt;String, String&gt; combined = f1.andThen(f2);
+System.out.println(combined.apply("hello"));  // HELLO!!!</code></pre>
+    </section>
+
+    <!-- ============ SECTION 4: BUILTIN FUNCTIONAL INTERFACES ============ -->
+    <section id="builtin-functional">
+      <h2>4. Built-in Functional Interfaces (java.util.function)</h2>
+
+      <p class="note">
+        The <code>java.util.function</code> package provides common functional interfaces so you don't have to create your own.
+      </p>
+
+      <h3>Quick Reference Table</h3>
+
+      <table border="1" cellpadding="8">
+        <tr>
+          <th>Interface</th>
+          <th>Signature</th>
+          <th>Purpose</th>
+          <th>Example</th>
+        </tr>
+        <tr>
+          <td><code>Function&lt;T,R&gt;</code></td>
+          <td><code>R apply(T t)</code></td>
+          <td>Transform T → R</td>
+          <td><code>String::length</code></td>
+        </tr>
+        <tr>
+          <td><code>BiFunction&lt;T,U,R&gt;</code></td>
+          <td><code>R apply(T t, U u)</code></td>
+          <td>Transform (T,U) → R</td>
+          <td><code>(a,b) -&gt; a + b</code></td>
+        </tr>
+        <tr>
+          <td><code>Predicate&lt;T&gt;</code></td>
+          <td><code>boolean test(T t)</code></td>
+          <td>Test condition</td>
+          <td><code>s -&gt; s.length() &gt; 5</code></td>
+        </tr>
+        <tr>
+          <td><code>BiPredicate&lt;T,U&gt;</code></td>
+          <td><code>boolean test(T t, U u)</code></td>
+          <td>Test (T,U) condition</td>
+          <td><code>(a,b) -&gt; a &gt; b</code></td>
+        </tr>
+        <tr>
+          <td><code>Consumer&lt;T&gt;</code></td>
+          <td><code>void accept(T t)</code></td>
+          <td>Consume, no return</td>
+          <td><code>System.out::println</code></td>
+        </tr>
+        <tr>
+          <td><code>BiConsumer&lt;T,U&gt;</code></td>
+          <td><code>void accept(T t, U u)</code></td>
+          <td>Consume (T,U)</td>
+          <td><code>(k,v) -&gt; map.put(k,v)</code></td>
+        </tr>
+        <tr>
+          <td><code>Supplier&lt;T&gt;</code></td>
+          <td><code>T get()</code></td>
+          <td>Produce value</td>
+          <td><code>LocalDate::now</code></td>
+        </tr>
+        <tr>
+          <td><code>UnaryOperator&lt;T&gt;</code></td>
+          <td><code>T apply(T t)</code></td>
+          <td>Same type transform</td>
+          <td><code>String::toUpperCase</code></td>
+        </tr>
+        <tr>
+          <td><code>BinaryOperator&lt;T&gt;</code></td>
+          <td><code>T apply(T t1, T t2)</code></td>
+          <td>Combine two same-type</td>
+          <td><code>Integer::max</code></td>
+        </tr>
+      </table>
+
+      <h3>Function&lt;T, R&gt; — Transform One Value</h3>
+
+      <pre><code class="language-java">// Basic transformation:
+Function&lt;String, Integer&gt; strLen = String::length;
+System.out.println(strLen.apply("hello"));  // 5
+
+Function&lt;Integer, String&gt; intToStr = Object::toString;
+System.out.println(intToStr.apply(42));  // "42"
+
+// Chaining with andThen:
+Function&lt;String, Integer&gt; len = String::length;
+Function&lt;Integer, String&gt; toStr = Object::toString;
+Function&lt;String, String&gt; pipeline = len.andThen(toStr);
+System.out.println(pipeline.apply("hello"));  // "5"
+
+// Chaining with compose (opposite direction):
+Function&lt;Integer, Integer&gt; double1 = n -&gt; n * 2;
+Function&lt;Integer, Integer&gt; addOne = n -&gt; n + 1;
+// First addOne, then double1:
+Function&lt;Integer, Integer&gt; composed = double1.compose(addOne);
+System.out.println(composed.apply(5));  // (5+1)*2 = 12</code></pre>
+
+      <h3>BiFunction&lt;T, U, R&gt; — Transform Two Values</h3>
+
+      <pre><code class="language-java">// Basic use:
+BiFunction&lt;String, Integer, String&gt; repeat = (s, n) -&gt; s.repeat(n);
+System.out.println(repeat.apply("ab", 3));  // "ababab"
+
+// Comparing:
+BiFunction&lt;Integer, Integer, Integer&gt; max = Integer::max;
+System.out.println(max.apply(10, 20));  // 20
+
+// String operations:
+BiFunction&lt;String, String, Integer&gt; compare = String::compareTo;
+System.out.println(compare.apply("apple", "banana"));  // negative (apple &lt; banana)</code></pre>
+
+      <h3>Predicate&lt;T&gt; — Test Conditions</h3>
+
+      <pre><code class="language-java">// Basic test:
+Predicate&lt;String&gt; isLong = s -&gt; s.length() &gt; 5;
+Predicate&lt;String&gt; isUpper = s -&gt; s.equals(s.toUpperCase());
+
+System.out.println(isLong.test("hello"));    // false (5 chars)
+System.out.println(isLong.test("elephant"));  // true (8 chars)
+
+// Combining with and, or, negate:
+Predicate&lt;String&gt; longAndUpper = isLong.and(isUpper);
+System.out.println(longAndUpper.test("ELEPHANT"));  // true
+System.out.println(longAndUpper.test("hello"));     // false
+
+Predicate&lt;String&gt; longOrUpper = isLong.or(isUpper);
+System.out.println(longOrUpper.test("HI"));         // true (upper)
+System.out.println(longOrUpper.test("elephant"));   // true (long)
+
+Predicate&lt;String&gt; notLong = isLong.negate();
+System.out.println(notLong.test("hi"));  // true
+
+// Static utility for NOT (Java 11+):
+Predicate&lt;String&gt; notNull = Predicate.not(Objects::isNull);
+System.out.println(notNull.test("hello"));  // true
+System.out.println(notNull.test(null));     // false</code></pre>
+
+      <h3>Consumer&lt;T&gt; — Act Without Returning</h3>
+
+      <pre><code class="language-java">// Basic action:
+Consumer&lt;String&gt; print = System.out::println;
+print.accept("Hello");  // prints: Hello
+
+// Chaining with andThen:
+Consumer&lt;String&gt; log = s -&gt; System.err.println("[LOG] " + s);
+Consumer&lt;String&gt; both = print.andThen(log);
+both.accept("Something");  // prints then logs
+
+// BiConsumer — two inputs:
+BiConsumer&lt;String, Integer&gt; printWithCount = (msg, count) -&gt;
+    System.out.println(msg + " x" + count);
+printWithCount.accept("Hello", 3);  // "Hello x3"
+
+// Real use: iterate with side effects:
+Map&lt;String, Integer&gt; map = Map.of("a", 1, "b", 2);
+map.forEach((key, value) -&gt; System.out.println(key + "=" + value));</code></pre>
+
+      <h3>Supplier&lt;T&gt; — Produce Values</h3>
+
+      <pre><code class="language-java">// Factory pattern:
+Supplier&lt;List&lt;String&gt;&gt; listFactory = ArrayList::new;
+List&lt;String&gt; list1 = listFactory.get();
+List&lt;String&gt; list2 = listFactory.get();  // fresh list each time
+
+// Date/time:
+Supplier&lt;LocalDate&gt; today = LocalDate::now;
+System.out.println(today.get());  // today's date
+
+// Lazy evaluation (don't compute until needed):
+Supplier&lt;Integer&gt; expensive = () -&gt; {
+    System.out.println("Computing...");
+    return 42;
+};
+// Not computed yet
+System.out.println("Calling get()");
+int result = expensive.get();  // NOW it computes
+System.out.println("Result: " + result);</code></pre>
+
+      <h3>UnaryOperator&lt;T&gt; &amp; BinaryOperator&lt;T&gt;</h3>
+
+      <pre><code class="language-java">// UnaryOperator — function where input and output are same type:
+UnaryOperator&lt;String&gt; trim = String::trim;
+UnaryOperator&lt;String&gt; upper = String::toUpperCase;
+System.out.println(trim.apply("  hello  "));  // "hello"
+System.out.println(upper.apply("hello"));     // "HELLO"
+
+// Chaining UnaryOperators:
+UnaryOperator&lt;String&gt; trimUpper = trim.andThen(upper);
+System.out.println(trimUpper.apply("  hello  "));  // "HELLO"
+
+// BinaryOperator — combine two values of same type:
+BinaryOperator&lt;Integer&gt; max = Integer::max;
+BinaryOperator&lt;Integer&gt; sum = (a, b) -&gt; a + b;
+System.out.println(max.apply(10, 20));  // 20
+System.out.println(sum.apply(10, 20));  // 30
+
+// Useful with reduce:
+int result = IntStream.rangeClosed(1, 5)
+    .reduce(1, (a, b) -&gt; a * b);  // 1*1*2*3*4*5 = 120</code></pre>
+
+      <h3>Primitive Stream Functional Interfaces</h3>
+
+      <pre><code class="language-java">// IntFunction — int input, generic output:
+IntFunction&lt;String&gt; toBinary = n -&gt; Integer.toBinaryString(n);
+System.out.println(toBinary.apply(5));  // "101"
+
+// ToIntFunction — generic input, int output:
+ToIntFunction&lt;String&gt; len = String::length;
+System.out.println(len.applyAsInt("hello"));  // 5
+
+// IntSupplier — produce int:
+IntSupplier random = () -&gt; (int)(Math.random() * 100);
+System.out.println(random.getAsInt());  // random 0-99
+
+// IntConsumer — consume int:
+IntConsumer print = System.out::println;
+print.accept(42);  // prints: 42
+
+// IntUnaryOperator — int to int:
+IntUnaryOperator double1 = n -&gt; n * 2;
+System.out.println(double1.applyAsInt(5));  // 10
+
+// IntBinaryOperator — two ints:
+IntBinaryOperator max1 = Integer::max;
+System.out.println(max1.applyAsInt(10, 20));  // 20
+
+// Same variants for LongFunction, ToLongFunction, LongSupplier, etc.
+// And for Double: DoubleFunction, ToDoubleFunction, DoubleSupplier, etc.</code></pre>
+    </section>
+
+    <!-- ============ SECTION 5: METHOD REFERENCES ============ -->
+    <section id="method-references">
+      <h2>5. Method References</h2>
+
+      <p class="note">
+        A method reference is a shorthand for a lambda that just calls an existing method. Syntax: <code>ClassName::methodName</code> or <code>instance::methodName</code> or <code>ClassName::new</code>
+      </p>
+
+      <h3>Type 1: Static Method Reference</h3>
+
+      <pre><code class="language-java">// Syntax: ClassName::staticMethod
+
+// Example 1: Parse integers
+Function&lt;String, Integer&gt; parse = Integer::parseInt;
+System.out.println(parse.apply("42"));  // 42
+
+// Equivalent lambda:
+// Function&lt;String, Integer&gt; parse = s -&gt; Integer.parseInt(s);
+
+// Example 2: Math methods
+IntBinaryOperator max = Integer::max;
+System.out.println(max.applyAsInt(10, 20));  // 20
+
+UnaryOperator&lt;Double&gt; sqrt = Math::sqrt;
+System.out.println(sqrt.apply(16.0));  // 4.0
+
+// Example 3: Custom static methods
+class StringUtils {
+    static boolean isEmpty(String s) {
+        return s == null || s.isBlank();
+    }
+    static String reverse(String s) {
+        return new StringBuilder(s).reverse().toString();
+    }
+}
+
+Predicate&lt;String&gt; empty = StringUtils::isEmpty;
+System.out.println(empty.test(""));     // true
+System.out.println(empty.test("hello")); // false
+
+UnaryOperator&lt;String&gt; rev = StringUtils::reverse;
+System.out.println(rev.apply("hello"));  // "olleh"</code></pre>
+
+      <h3>Type 2: Bound Instance Method Reference</h3>
+
+      <pre><code class="language-java">// Syntax: instance::methodName
+
+String prefix = "Hello, ";
+
+// Reference to instance method:
+Function&lt;String, String&gt; greet = prefix::concat;
+System.out.println(greet.apply("Alice"));  // "Hello, Alice"
+System.out.println(greet.apply("Bob"));    // "Hello, Bob"
+
+// Equivalent lambda:
+// Function&lt;String, String&gt; greet = s -&gt; prefix.concat(s);
+
+// Another example: capturing list operations
+List&lt;String&gt; items = new ArrayList&lt;&gt;();
+Consumer&lt;String&gt; addItem = items::add;
+addItem.accept("apple");
+addItem.accept("banana");
+System.out.println(items);  // [apple, banana]
+
+// Equivalent lambda:
+// Consumer&lt;String&gt; addItem = s -&gt; items.add(s);</code></pre>
+
+      <h3>Type 3: Unbound Instance Method Reference</h3>
+
+      <pre><code class="language-java">// Syntax: ClassName::instanceMethod
+// The instance becomes the first parameter
+
+// Example 1: String methods
+Function&lt;String, String&gt; toUpper = String::toUpperCase;
+System.out.println(toUpper.apply("hello"));  // "HELLO"
+
+ToIntFunction&lt;String&gt; len = String::length;
+System.out.println(len.applyAsInt("hello"));  // 5
+
+// Equivalent lambdas:
+// Function&lt;String, String&gt; toUpper = s -&gt; s.toUpperCase();
+// ToIntFunction&lt;String&gt; len = s -&gt; s.length();
+
+// Example 2: Two parameters (object + argument)
+BiFunction&lt;String, String, Integer&gt; compare = String::compareTo;
+System.out.println(compare.apply("apple", "banana"));  // negative
+
+// Equivalent:
+// BiFunction&lt;String, String, Integer&gt; compare = (s1, s2) -&gt; s1.compareTo(s2);
+
+// Example 3: In streams
+List&lt;String&gt; words = List.of("apple", "Zebra", "banana", "Cherry");
+words.stream()
+    .sorted(String::compareToIgnoreCase)  // unbound method ref
+    .map(String::toUpperCase)             // unbound method ref
+    .forEach(System.out::println);        // bound method ref to PrintStream</code></pre>
+
+      <h3>Type 4: Constructor Reference</h3>
+
+      <pre><code class="language-java">// Syntax: ClassName::new
+
+// Example 1: No-arg constructor
+Supplier&lt;ArrayList&lt;String&gt;&gt; listFactory = ArrayList::new;
+ArrayList&lt;String&gt; list1 = listFactory.get();
+ArrayList&lt;String&gt; list2 = listFactory.get();  // fresh instance
+
+// Equivalent lambda:
+// Supplier&lt;ArrayList&lt;String&gt;&gt; listFactory = () -&gt; new ArrayList&lt;&gt;();
+
+// Example 2: Single-arg constructor
+Function&lt;String, StringBuilder&gt; sbFactory = StringBuilder::new;
+StringBuilder sb = sbFactory.apply("Hello");
+System.out.println(sb);  // "Hello"
+
+// Equivalent:
+// Function&lt;String, StringBuilder&gt; sbFactory = s -&gt; new StringBuilder(s);
+
+// Example 3: Converting string array to integer array
+Function&lt;Integer, int[]&gt; arrayFactory = int[]::new;
+int[] arr = arrayFactory.apply(10);  // creates int array of size 10
+
+// Example 4: In streams
+List&lt;String&gt; words = List.of("a", "b", "c");
+Stream&lt;StringBuilder&gt; builders = words.stream().map(StringBuilder::new);
+// Each word becomes a StringBuilder
+
+// Example 5: Two-arg constructor (rare)
+class Pair&lt;A, B&gt; {
+    A first;
+    B second;
+    Pair(A a, B b) { this.first = a; this.second = b; }
+}
+
+BiFunction&lt;String, Integer, Pair&lt;String, Integer&gt;&gt; pairFactory = Pair::new;
+Pair&lt;String, Integer&gt; p = pairFactory.apply("age", 25);
+System.out.println(p.first + " = " + p.second);  // "age = 25"</code></pre>
+
+      <h3>When to Use Method References</h3>
+
+      <pre><code class="language-java">// ✓ GOOD — reference is more readable:
+list.sort(String::compareToIgnoreCase);
+numbers.stream().map(String::valueOf).collect(Collectors.toList());
+supplier = LocalDate::now;
+
+// ✗ AVOID — lambda is clearer:
+// Complex logic:
+numbers.stream().filter(n -&gt; n % 2 == 0 &amp;&amp; n &gt; 5)  // can't do with method ref easily
+    .map(n -&gt; n * n)
+
+// ✓ Use reference:
+numbers.stream().filter(n -&gt; n % 2 == 0)
+    .map(n -&gt; n * n)
+    .forEach(System.out::println);</code></pre>
+
+      <h3>Real-World Example: Stream Processing</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; names = List.of("charlie", "ALICE", "bob", "David");
+
+// Using multiple method references:
+names.stream()
+    .map(String::toLowerCase)           // Type 3: String::toLowerCase
+    .map(String::trim)                   // Type 3: String::trim
+    .filter(s -&gt; !s.isEmpty())          // can't be a method ref
+    .sorted(String::compareTo)           // Type 3: String::compareTo
+    .forEach(System.out::println);       // Type 2: System.out::println
+// Output:
+// alice
+// bob
+// charlie
+// david</code></pre>
+    </section>
+
+    <!-- ============ SECTION 6: STREAM OVERVIEW ============ -->
+    <section id="stream-overview">
+      <h2>6. Stream API — Overview and Pipeline Model</h2>
+
+      <p class="note">
+        A <strong>Stream</strong> is a sequence of values that can be processed with functional operations. Unlike collections, streams are <strong>lazy</strong> and <strong>single-use</strong>.
+      </p>
+
+      <h3>Stream Pipeline Diagram</h3>
+
+      <pre class="diagram">┌─────────────────────────────────────────────────────────────────┐
+│                        STREAM PIPELINE                          │
+└─────────────────────────────────────────────────────────────────┘
+
+SOURCE                INTERMEDIATE OPS (lazy)      TERMINAL OP (executes)
+  ▼                             ▼                           ▼
+┌──────┐    ┌────────────────────────────────┐    ┌──────────────┐
+│List/ │    │ filter() ─→ map() ─→ sorted()  │    │ collect() or │
+│Array │───▶│ (no execution yet)              │───▶│ forEach()    │
+│Stream│    │                                │    │ (now runs!)  │
+└──────┘    └────────────────────────────────┘    └──────────────┘
+             Stream&lt;T&gt;                          Result value
+</pre>
+
+      <h3>Key Properties</h3>
+
+      <ul>
+        <li><strong>Lazy evaluation:</strong> Intermediate operations (filter, map, etc.) don't run until a terminal operation is called</li>
+        <li><strong>Single-use:</strong> Once a terminal operation is called, the stream is consumed and can't be reused</li>
+        <li><strong>No modification of source:</strong> Streams don't change the original collection</li>
+        <li><strong>Functional style:</strong> Operations return new streams or results, don't modify state</li>
+      </ul>
+
+      <h3>Lazy Evaluation Example</h3>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+
+// None of this executes yet (no terminal op):
+Stream&lt;Integer&gt; stream = nums.stream()
+    .filter(n -&gt; {
+        System.out.println("Filtering " + n);
+        return n &gt; 2;
+    })
+    .map(n -&gt; {
+        System.out.println("Mapping " + n);
+        return n * n;
+    });
+
+// Still hasn't run! Stream is waiting.
+
+// NOW it executes (forEach is terminal):
+stream.forEach(System.out::println);
+
+// Output (see the order!):
+// Filtering 1
+// Filtering 2
+// Filtering 3
+// Mapping 3
+// 9
+// Filtering 4
+// Mapping 4
+// 16
+// Filtering 5
+// Mapping 5
+// 25
+
+// Note: it processes element-by-element, not all filters then all maps!</code></pre>
+
+      <h3>Single-Use Principle</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry");
+
+Stream&lt;String&gt; stream = words.stream();
+
+// First terminal operation: works fine
+long count = stream.count();
+System.out.println(count);  // 3
+
+// WRONG — stream already used!
+stream.forEach(System.out::println);  // IllegalStateException!
+
+// CORRECT — create a new stream:
+stream = words.stream();  // Fresh stream
+stream.forEach(System.out::println);  // Works!</code></pre>
+    </section>
+
+    <!-- ============ SECTION 7: CREATING STREAMS ============ -->
+    <section id="creating-streams">
+      <h2>7. Creating Streams</h2>
+
+      <h3>From Collections</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; list = List.of("apple", "banana", "cherry");
+
+// Sequential stream:
+Stream&lt;String&gt; seq = list.stream();
+
+// Parallel stream (runs on multiple threads):
+Stream&lt;String&gt; par = list.parallelStream();
+
+// Same with Set and other collections:
+Set&lt;String&gt; set = new HashSet&lt;&gt;(list);
+Stream&lt;String&gt; setStream = set.stream();
+
+// Map has special streaming methods:
+Map&lt;String, Integer&gt; map = Map.of("a", 1, "b", 2);
+map.keySet().stream().forEach(System.out::println);    // a, b
+map.values().stream().forEach(System.out::println);    // 1, 2
+map.entrySet().stream()
+    .forEach(e -&gt; System.out.println(e.getKey() + "=" + e.getValue()));</code></pre>
+
+      <h3>From Arrays</h3>
+
+      <pre><code class="language-java">// Object array:
+String[] names = {"Alice", "Bob", "Charlie"};
+Stream&lt;String&gt; stream1 = Arrays.stream(names);
+
+// Primitive array (returns IntStream, not Stream&lt;Integer&gt;):
+int[] nums = {1, 2, 3, 4, 5};
+IntStream stream2 = Arrays.stream(nums);
+System.out.println(stream2.sum());  // 15
+
+// Partial array:
+String[] all = {"a", "b", "c", "d"};
+Stream&lt;String&gt; partial = Arrays.stream(all, 1, 3);  // elements at index 1-2
+partial.forEach(System.out::println);  // b, c</code></pre>
+
+      <h3>Explicit Values with Stream.of()</h3>
+
+      <pre><code class="language-java">// Direct values:
+Stream&lt;String&gt; stream1 = Stream.of("apple", "banana", "cherry");
+stream1.forEach(System.out::println);
+
+// From array (same as above):
+Stream&lt;Integer&gt; stream2 = Stream.of(1, 2, 3, 4, 5);
+System.out.println(stream2.count());  // 5
+
+// Empty stream:
+Stream&lt;String&gt; empty = Stream.empty();
+System.out.println(empty.count());  // 0</code></pre>
+
+      <h3>Generate (Infinite) — Supplier</h3>
+
+      <pre><code class="language-java">// Generate random numbers (infinite):
+Stream&lt;Double&gt; randoms = Stream.generate(Math::random);
+randoms.limit(5).forEach(System.out::println);  // 5 random doubles
+
+// Constant stream:
+Stream&lt;Integer&gt; ones = Stream.generate(() -&gt; 1);
+ones.limit(3).forEach(System.out::println);  // 1, 1, 1
+
+// UUID generator:
+Stream&lt;String&gt; uuids = Stream.generate(() -&gt; UUID.randomUUID().toString());
+uuids.limit(2).forEach(System.out::println);
+
+// Current time stream:
+Stream&lt;LocalDate&gt; dates = Stream.generate(LocalDate::now);
+dates.limit(1).forEach(System.out::println);  // Always today</code></pre>
+
+      <h3>Iterate (Infinite) — Seed and Function</h3>
+
+      <pre><code class="language-java">// Old API (Java 8):
+Stream&lt;Integer&gt; naturals = Stream.iterate(0, n -&gt; n + 1);
+naturals.limit(5).forEach(System.out::println);  // 0, 1, 2, 3, 4
+
+// Evens (0, 2, 4, 6, ...):
+Stream&lt;Integer&gt; evens = Stream.iterate(0, n -&gt; n + 2);
+evens.limit(5).forEach(System.out::println);  // 0, 2, 4, 6, 8
+
+// With termination condition (Java 9+):
+Stream&lt;Integer&gt; limited = Stream.iterate(
+    1,                    // seed
+    n -&gt; n &lt; 100,        // condition: continue while...
+    n -&gt; n * 2           // next function: 1, 2, 4, 8, 16, 32, 64
+);
+limited.forEach(System.out::println);
+
+// Real sequence: countdown
+Stream&lt;Integer&gt; countdown = Stream.iterate(10, n -&gt; n &gt; 0, n -&gt; n - 1);
+countdown.forEach(System.out::println);  // 10, 9, 8, ..., 1</code></pre>
+
+      <h3>Primitive Streams</h3>
+
+      <pre><code class="language-java">// IntStream.range (exclusive end):
+IntStream stream1 = IntStream.range(1, 6);
+stream1.forEach(System.out::println);  // 1, 2, 3, 4, 5
+
+// IntStream.rangeClosed (inclusive end):
+IntStream stream2 = IntStream.rangeClosed(1, 5);
+stream2.forEach(System.out::println);  // 1, 2, 3, 4, 5
+
+// LongStream:
+LongStream bigNums = LongStream.range(0L, 1_000_000L);
+System.out.println(bigNums.count());  // 1000000
+
+// DoubleStream:
+DoubleStream doubles = DoubleStream.of(1.1, 2.2, 3.3, 4.4);
+System.out.println(doubles.average());  // OptionalDouble[2.75]
+
+// From string (character codes):
+IntStream chars = "Hello".chars();  // Unicode values
+chars.forEach(c -&gt; System.out.print((char)c + " "));  // H e l l o</code></pre>
+
+      <h3>From Files</h3>
+
+      <pre><code class="language-java">import java.nio.file.*;
+
+// Read lines from file:
+try (Stream&lt;String&gt; lines = Files.lines(Path.of("data.txt"))) {
+    lines.filter(s -&gt; !s.isBlank())
+         .forEach(System.out::println);
+}
+
+// Read all lines (loads into memory):
+List&lt;String&gt; allLines = Files.readAllLines(Path.of("data.txt"));
+allLines.stream().forEach(System.out::println);
+
+// Walk file tree:
+try (Stream&lt;Path&gt; paths = Files.walk(Path.of("src"))) {
+    paths.filter(Files::isRegularFile)
+         .filter(p -&gt; p.toString().endsWith(".java"))
+         .forEach(System.out::println);
+}</code></pre>
+
+      <h3>Combining Streams</h3>
+
+      <pre><code class="language-java">Stream&lt;Integer&gt; s1 = Stream.of(1, 2, 3);
+Stream&lt;Integer&gt; s2 = Stream.of(4, 5, 6);
+
+// Concatenate:
+Stream&lt;Integer&gt; combined = Stream.concat(s1, s2);
+combined.forEach(System.out::println);  // 1, 2, 3, 4, 5, 6</code></pre>
+    </section>
+
+    <!-- ============ SECTION 8: INTERMEDIATE OPERATIONS ============ -->
+    <section id="intermediate-ops">
+      <h2>8. Intermediate Operations</h2>
+
+      <p class="note">
+        Intermediate operations return a Stream and are <strong>lazy</strong> — they don't execute until a terminal operation is called.
+      </p>
+
+      <h3>filter — Keep Elements Matching Condition</h3>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Keep only evens:
+nums.stream()
+    .filter(n -&gt; n % 2 == 0)
+    .forEach(System.out::println);  // 2, 4, 6, 8, 10
+
+// Keep numbers &gt; 5:
+nums.stream()
+    .filter(n -&gt; n &gt; 5)
+    .forEach(System.out::println);  // 6, 7, 8, 9, 10
+
+// Multiple filters:
+nums.stream()
+    .filter(n -&gt; n &gt; 3)
+    .filter(n -&gt; n &lt; 8)
+    .forEach(System.out::println);  // 4, 5, 6, 7</code></pre>
+
+      <h3>map — Transform Each Element</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("hello", "world", "java");
+
+// String to length:
+words.stream()
+    .map(String::length)
+    .forEach(System.out::println);  // 5, 5, 4
+
+// String to uppercase:
+words.stream()
+    .map(String::toUpperCase)
+    .forEach(System.out::println);  // HELLO, WORLD, JAVA
+
+// Chained transformations:
+words.stream()
+    .map(String::toUpperCase)
+    .map(s -&gt; "[" + s + "]")
+    .forEach(System.out::println);  // [HELLO], [WORLD], [JAVA]
+
+// Integer transformations:
+List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+nums.stream()
+    .map(n -&gt; n * n)
+    .forEach(System.out::println);  // 1, 4, 9, 16, 25</code></pre>
+
+      <h3>mapToInt, mapToLong, mapToDouble — Convert to Primitive Stream</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("hello", "world", "java");
+
+// Convert to IntStream (lengths):
+int totalChars = words.stream()
+    .mapToInt(String::length)
+    .sum();
+System.out.println(totalChars);  // 14
+
+// Average length:
+double avgLen = words.stream()
+    .mapToInt(String::length)
+    .average()
+    .orElse(0);
+System.out.println(avgLen);  // 4.666...
+
+// List of objects to primitive stream:
+class Person {
+    String name;
+    int age;
+    Person(String name, int age) { this.name = name; this.age = age; }
+    public int getAge() { return age; }
+}
+
+List&lt;Person&gt; people = List.of(
+    new Person("Alice", 25),
+    new Person("Bob", 30),
+    new Person("Carol", 28)
+);
+
+int totalAge = people.stream()
+    .mapToInt(Person::getAge)
+    .sum();
+System.out.println(totalAge);  // 83</code></pre>
+
+      <h3>flatMap — Flatten Nested Structures</h3>
+
+      <pre><code class="language-java">// List of lists:
+List&lt;List&lt;Integer&gt;&gt; nested = List.of(
+    List.of(1, 2),
+    List.of(3, 4),
+    List.of(5)
+);
+
+// Flatten with flatMap:
+nested.stream()
+    .flatMap(Collection::stream)  // each list becomes a stream
+    .forEach(System.out::println);  // 1, 2, 3, 4, 5
+
+// Split sentences into words:
+List&lt;String&gt; sentences = List.of(
+    "hello world",
+    "java streams",
+    "are powerful"
+);
+
+sentences.stream()
+    .flatMap(s -&gt; Arrays.stream(s.split(" ")))
+    .forEach(System.out::println);
+// hello, world, java, streams, are, powerful
+
+// Real example: get all names from multiple groups
+class Group {
+    List&lt;String&gt; members;
+    Group(String... names) { members = List.of(names); }
+}
+
+List&lt;Group&gt; groups = List.of(
+    new Group("Alice", "Bob"),
+    new Group("Charlie", "Dave", "Eve")
+);
+
+groups.stream()
+    .flatMap(g -&gt; g.members.stream())
+    .forEach(System.out::println);
+// Alice, Bob, Charlie, Dave, Eve</code></pre>
+
+      <h3>sorted — Order Elements</h3>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(5, 2, 8, 1, 9);
+
+// Natural order:
+nums.stream()
+    .sorted()
+    .forEach(System.out::println);  // 1, 2, 5, 8, 9
+
+// Reverse order:
+nums.stream()
+    .sorted(Comparator.reverseOrder())
+    .forEach(System.out::println);  // 9, 8, 5, 2, 1
+
+// String with case-insensitive order:
+List&lt;String&gt; words = List.of("Zebra", "apple", "Banana", "cherry");
+words.stream()
+    .sorted(String::compareToIgnoreCase)
+    .forEach(System.out::println);
+// apple, Banana, cherry, Zebra
+
+// Complex: sort by length, then alphabetically:
+words.stream()
+    .sorted(Comparator
+        .comparingInt(String::length)
+        .thenComparing(String::compareTo))
+    .forEach(System.out::println);</code></pre>
+
+      <h3>distinct — Remove Duplicates</h3>
+
+      <pre><code class="language-java">Stream&lt;Integer&gt; nums = Stream.of(1, 2, 2, 3, 3, 3, 4, 1, 5);
+nums.distinct()
+    .forEach(System.out::println);  // 1, 2, 3, 4, 5
+
+// With strings:
+Stream&lt;String&gt; words = Stream.of("apple", "apple", "banana", "apple");
+words.distinct()
+    .forEach(System.out::println);  // apple, banana</code></pre>
+
+      <h3>limit and skip — Slice Stream</h3>
+
+      <pre><code class="language-java">// Limit (take first N):
+Stream.iterate(1, n -&gt; n + 1)
+    .limit(5)
+    .forEach(System.out::println);  // 1, 2, 3, 4, 5
+
+// Skip (skip first N):
+Stream.iterate(1, n -&gt; n + 1)
+    .skip(3)
+    .limit(3)
+    .forEach(System.out::println);  // 4, 5, 6
+
+// Pagination example:
+List&lt;Integer&gt; data = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+int pageSize = 3;
+int pageNum = 1;  // 0-indexed
+
+data.stream()
+    .skip((long)pageNum * pageSize)
+    .limit(pageSize)
+    .forEach(System.out::println);  // 4, 5, 6</code></pre>
+
+      <h3>takeWhile and dropWhile — Conditional Stop</h3>
+
+      <pre><code class="language-java">// takeWhile (take until condition fails) — Java 9+:
+Stream.of(1, 2, 3, 4, 5, 4, 3, 2, 1)
+    .takeWhile(n -&gt; n &lt; 4)
+    .forEach(System.out::println);  // 1, 2, 3
+
+// dropWhile (skip until condition fails) — Java 9+:
+Stream.of(1, 2, 3, 4, 5, 4, 3, 2, 1)
+    .dropWhile(n -&gt; n &lt; 4)
+    .forEach(System.out::println);  // 4, 5, 4, 3, 2, 1</code></pre>
+
+      <h3>peek — Debug/Side Effects (Avoid in Production)</h3>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+
+// Using peek to debug:
+nums.stream()
+    .peek(n -&gt; System.out.println("Before filter: " + n))
+    .filter(n -&gt; n &gt; 2)
+    .peek(n -&gt; System.out.println("After filter: " + n))
+    .map(n -&gt; n * n)
+    .peek(n -&gt; System.out.println("After map: " + n))
+    .forEach(System.out::println);
+
+// Output:
+// Before filter: 1
+// Before filter: 2
+// Before filter: 3
+// After filter: 3
+// After map: 9
+// 9
+// Before filter: 4
+// After filter: 4
+// After map: 16
+// 16
+// ...
+
+// DON'T use peek for logic — use it only for debugging!</code></pre>
+    </section>
+
+    <!-- ============ SECTION 9: TERMINAL OPERATIONS ============ -->
+    <section id="terminal-ops">
+      <h2>9. Terminal Operations</h2>
+
+      <p class="note">
+        Terminal operations trigger execution of the stream and return a final result (not a stream). The stream is then consumed and can't be reused.
+      </p>
+
+      <h3>collect — Gather into Collection</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry", "date");
+
+// Collect to List:
+List&lt;String&gt; list = words.stream()
+    .filter(w -&gt; w.length() &gt; 4)
+    .collect(Collectors.toList());
+System.out.println(list);  // [apple, banana, cherry]
+
+// Collect to unmodifiable list (Java 16+):
+List&lt;String&gt; immutable = words.stream()
+    .filter(w -&gt; w.length() &gt; 4)
+    .toList();  // shorthand, can't modify
+
+// Collect to Set:
+Set&lt;String&gt; set = words.stream()
+    .collect(Collectors.toSet());
+
+// Collect to specific collection type:
+TreeSet&lt;String&gt; sorted = words.stream()
+    .collect(Collectors.toCollection(TreeSet::new));
+
+// Join to String:
+String joined = words.stream()
+    .collect(Collectors.joining(", ", "[", "]"));
+System.out.println(joined);  // [apple, banana, cherry, date]</code></pre>
+
+      <h3>forEach and forEachOrdered — Side Effects</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry");
+
+// forEach (order may vary in parallel):
+words.stream()
+    .forEach(System.out::println);
+
+// forEachOrdered (guaranteed order, even in parallel):
+words.parallelStream()
+    .forEachOrdered(System.out::println);  // apple, banana, cherry (ordered)</code></pre>
+
+      <h3>count — Count Elements</h3>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+long total = nums.stream().count();
+System.out.println(total);  // 10
+
+long evens = nums.stream()
+    .filter(n -&gt; n % 2 == 0)
+    .count();
+System.out.println(evens);  // 5</code></pre>
+
+      <h3>min and max — Find Extremes</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry", "date", "fig");
+
+// Shortest word:
+Optional&lt;String&gt; shortest = words.stream()
+    .min(Comparator.comparingInt(String::length));
+System.out.println(shortest);  // Optional[fig]
+
+// Longest word:
+Optional&lt;String&gt; longest = words.stream()
+    .max(Comparator.comparingInt(String::length));
+System.out.println(longest);  // Optional[banana]
+
+// Alphabetically first:
+Optional&lt;String&gt; first = words.stream()
+    .min(String::compareTo);
+System.out.println(first);  // Optional[apple]
+
+// With integers:
+List&lt;Integer&gt; nums = List.of(5, 2, 8, 1, 9);
+Optional&lt;Integer&gt; max = nums.stream().max(Integer::compareTo);
+System.out.println(max);  // Optional[9]</code></pre>
+
+      <h3>reduce — Combine into Single Value</h3>
+
+      <pre><code class="language-java">// Sum using reduce:
+int sum = IntStream.rangeClosed(1, 5)
+    .reduce(0, Integer::sum);  // (0+1+2+3+4+5)
+System.out.println(sum);  // 15
+
+// Multiply (factorial):
+int factorial = IntStream.rangeClosed(1, 5)
+    .reduce(1, (a, b) -&gt; a * b);
+System.out.println(factorial);  // 120
+
+// Concatenate strings:
+List&lt;String&gt; words = List.of("Hello", "World", "Java");
+String result = words.stream()
+    .reduce("", (acc, word) -&gt; acc + (acc.isEmpty() ? "" : " ") + word);
+System.out.println(result);  // "Hello World Java"
+
+// Without initial value:
+List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+Optional&lt;Integer&gt; sum2 = nums.stream()
+    .reduce(Integer::sum);  // no initial value
+System.out.println(sum2);  // Optional[15]
+
+// With combiner (for parallel streams):
+int sum3 = nums.parallelStream()
+    .reduce(
+        0,                    // identity
+        Integer::sum,         // accumulator
+        Integer::sum          // combiner (for parallel)
+    );
+System.out.println(sum3);  // 15</code></pre>
+
+      <h3>Matching Operations</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry", "date");
+
+// anyMatch — at least one matches:
+boolean hasLong = words.stream()
+    .anyMatch(w -&gt; w.length() &gt; 6);
+System.out.println(hasLong);  // true (banana, cherry)
+
+// allMatch — all match:
+boolean allStart_a = words.stream()
+    .allMatch(w -&gt; w.startsWith("a"));
+System.out.println(allStart_a);  // false
+
+// noneMatch — none match:
+boolean noneHaveX = words.stream()
+    .noneMatch(w -&gt; w.contains("x"));
+System.out.println(noneHaveX);  // true
+</code></pre>
+
+      <h3>findFirst and findAny — Get Single Element</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry", "date");
+
+// findFirst — first element matching condition:
+Optional&lt;String&gt; first = words.stream()
+    .filter(w -&gt; w.startsWith("b"))
+    .findFirst();
+System.out.println(first);  // Optional[banana]
+
+// findAny — any element (often faster in parallel):
+Optional&lt;String&gt; any = words.parallelStream()
+    .filter(w -&gt; w.startsWith("c"))
+    .findAny();
+System.out.println(any);  // Optional[cherry]</code></pre>
+
+      <h3>toArray — Convert to Array</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry");
+
+// Object array:
+Object[] objArray = words.stream().toArray();
+
+// Typed array:
+String[] strArray = words.stream().toArray(String[]::new);
+System.out.println(Arrays.toString(strArray));  // [apple, banana, cherry]
+
+// Primitive arrays (from IntStream):
+int[] nums = IntStream.of(1, 2, 3, 4, 5).toArray();
+System.out.println(Arrays.toString(nums));  // [1, 2, 3, 4, 5]</code></pre>
+
+      <h3>Numeric Terminal Operations</h3>
+
+      <pre><code class="language-java">int[] nums = {5, 2, 8, 1, 9, 3};
+IntStream stream = Arrays.stream(nums);
+
+// sum:
+int total = stream.sum();  // 28
+
+// average (returns OptionalDouble):
+stream = Arrays.stream(nums);
+OptionalDouble avg = stream.average();
+System.out.println(avg.orElse(0));  // 4.666...
+
+// min and max (return OptionalInt):
+stream = Arrays.stream(nums);
+OptionalInt minimum = stream.min();
+System.out.println(minimum.orElse(-1));  // 1
+
+stream = Arrays.stream(nums);
+OptionalInt maximum = stream.max();
+System.out.println(maximum.orElse(-1));  // 9
+
+// summaryStatistics (all at once):
+stream = Arrays.stream(nums);
+IntSummaryStatistics stats = stream.summaryStatistics();
+System.out.println("Count: " + stats.getCount());      // 6
+System.out.println("Sum: " + stats.getSum());          // 28
+System.out.println("Min: " + stats.getMin());          // 1
+System.out.println("Max: " + stats.getMax());          // 9
+System.out.println("Average: " + stats.getAverage());  // 4.666...</code></pre>
+    </section>
+
+    <!-- ============ SECTION 10: COLLECTORS ============ -->
+    <section id="collectors">
+      <h2>10. Collectors</h2>
+
+      <p class="note">
+        <strong>Collectors</strong> are used with <code>collect()</code> to gather stream elements into collections, perform aggregations, or create custom results.
+      </p>
+
+      <h3>toList, toSet, toCollection</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry", "date");
+
+// To List:
+List&lt;String&gt; list = words.stream()
+    .filter(w -&gt; w.length() &gt; 4)
+    .collect(Collectors.toList());
+System.out.println(list);  // [apple, banana, cherry]
+
+// To unmodifiable List (Java 16+):
+List&lt;String&gt; immutable = words.stream()
+    .toList();  // shorthand
+
+// To Set (removes duplicates):
+Set&lt;String&gt; set = words.stream()
+    .collect(Collectors.toSet());
+
+// To specific type (TreeSet, LinkedHashSet, etc.):
+TreeSet&lt;String&gt; sorted = words.stream()
+    .collect(Collectors.toCollection(TreeSet::new));</code></pre>
+
+      <h3>toMap — Create a Map</h3>
+
+      <pre><code class="language-java">class Person {
+    String name;
+    int salary;
+    Person(String name, int salary) { this.name = name; this.salary = salary; }
+}
+
+List&lt;Person&gt; people = List.of(
+    new Person("Alice", 90000),
+    new Person("Bob", 70000),
+    new Person("Carol", 85000)
+);
+
+// Simple toMap:
+Map&lt;String, Integer&gt; nameSalary = people.stream()
+    .collect(Collectors.toMap(
+        Person::getName,       // key
+        Person::getSalary      // value
+    ));
+// {Alice=90000, Bob=70000, Carol=85000}
+
+// Handle duplicate keys (merge function):
+List&lt;Person&gt; duplicate = List.of(
+    new Person("Alice", 90000),
+    new Person("Alice", 95000)  // duplicate key!
+);
+
+Map&lt;String, Integer&gt; safe = duplicate.stream()
+    .collect(Collectors.toMap(
+        Person::getName,
+        Person::getSalary,
+        Integer::max  // merge duplicates: keep max
+    ));
+// {Alice=95000}</code></pre>
+
+      <h3>groupingBy — Group by Key</h3>
+
+      <pre><code class="language-java">class Employee {
+    String name, dept;
+    int salary;
+    Employee(String n, String d, int s) { name = n; dept = d; salary = s; }
+}
+
+List&lt;Employee&gt; employees = List.of(
+    new Employee("Alice", "Engineering", 90000),
+    new Employee("Bob", "Marketing", 70000),
+    new Employee("Carol", "Engineering", 85000),
+    new Employee("Dave", "Marketing", 75000)
+);
+
+// Group by department:
+Map&lt;String, List&lt;Employee&gt;&gt; byDept = employees.stream()
+    .collect(Collectors.groupingBy(Employee::getDept));
+// {Engineering=[Alice, Carol], Marketing=[Bob, Dave]}
+
+// Group and count:
+Map&lt;String, Long&gt; countByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::getDept,
+        Collectors.counting()
+    ));
+// {Engineering=2, Marketing=2}
+
+// Group and sum:
+Map&lt;String, Integer&gt; totalSalaryByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::getDept,
+        Collectors.summingInt(Employee::getSalary)
+    ));
+// {Engineering=175000, Marketing=145000}
+
+// Group and average:
+Map&lt;String, Double&gt; avgSalaryByDept = employees.stream()
+    .collect(Collectors.groupingBy(
+        Employee::getDept,
+        Collectors.averagingInt(Employee::getSalary)
+    ));
+// {Engineering=87500.0, Marketing=72500.0}</code></pre>
+
+      <h3>partitioningBy — Partition Into True/False Groups</h3>
+
+      <pre><code class="language-java">List&lt;Employee&gt; employees = List.of(
+    new Employee("Alice", "Eng", 90000),
+    new Employee("Bob", "Mkt", 70000),
+    new Employee("Carol", "Eng", 85000),
+    new Employee("Dave", "Mkt", 75000)
+);
+
+// Partition: high earners vs others:
+Map&lt;Boolean, List&lt;Employee&gt;&gt; highEarners = employees.stream()
+    .collect(Collectors.partitioningBy(e -&gt; e.salary &gt; 80000));
+// {true=[Alice, Carol], false=[Bob, Dave]}
+
+// With downstream collector:
+Map&lt;Boolean, Long&gt; count = employees.stream()
+    .collect(Collectors.partitioningBy(
+        e -&gt; e.salary &gt; 80000,
+        Collectors.counting()
+    ));
+// {true=2, false=2}</code></pre>
+
+      <h3>joining — Concatenate Strings</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry");
+
+// Simple join:
+String result1 = words.stream()
+    .collect(Collectors.joining());
+System.out.println(result1);  // "applebananacherry"
+
+// With delimiter:
+String result2 = words.stream()
+    .collect(Collectors.joining(", "));
+System.out.println(result2);  // "apple, banana, cherry"
+
+// With prefix and suffix:
+String result3 = words.stream()
+    .collect(Collectors.joining(", ", "[", "]"));
+System.out.println(result3);  // "[apple, banana, cherry]"
+
+// Join objects (map first):
+List&lt;Person&gt; people = List.of(
+    new Person("Alice", 25),
+    new Person("Bob", 30)
+);
+String names = people.stream()
+    .map(Person::getName)
+    .collect(Collectors.joining(" and "));
+System.out.println(names);  // "Alice and Bob"</code></pre>
+
+      <h3>Numeric Collectors</h3>
+
+      <pre><code class="language-java">List&lt;Person&gt; people = List.of(
+    new Person("Alice", 25),
+    new Person("Bob", 30),
+    new Person("Carol", 28)
+);
+
+// counting:
+long count = people.stream()
+    .collect(Collectors.counting());
+System.out.println(count);  // 3
+
+// summingInt:
+int totalAge = people.stream()
+    .collect(Collectors.summingInt(Person::getAge));
+System.out.println(totalAge);  // 83
+
+// averagingInt:
+double avgAge = people.stream()
+    .collect(Collectors.averagingInt(Person::getAge));
+System.out.println(avgAge);  // 27.666...
+
+// summarizingInt (all stats):
+IntSummaryStatistics stats = people.stream()
+    .collect(Collectors.summarizingInt(Person::getAge));
+System.out.println("Count: " + stats.getCount());      // 3
+System.out.println("Sum: " + stats.getSum());          // 83
+System.out.println("Average: " + stats.getAverage());  // 27.666...</code></pre>
+
+      <h3>collectingAndThen — Transform Result</h3>
+
+      <pre><code class="language-java">List&lt;String&gt; words = List.of("apple", "banana", "cherry");
+
+// Collect to list, then make unmodifiable:
+List&lt;String&gt; unmod = words.stream()
+    .collect(Collectors.collectingAndThen(
+        Collectors.toList(),
+        Collections::unmodifiableList
+    ));
+// unmod is now immutable
+
+// Collect then sort:
+List&lt;String&gt; sorted = words.stream()
+    .collect(Collectors.collectingAndThen(
+        Collectors.toList(),
+        list -&gt; { list.sort(String::compareTo); return list; }
+    ));</code></pre>
+
+      <h3>teeing — Use Two Collectors</h3>
+
+      <pre><code class="language-java">// Java 12+
+List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+
+// Compute count and sum simultaneously:
+var result = nums.stream()
+    .collect(Collectors.teeing(
+        Collectors.counting(),
+        Collectors.summingInt(Integer::intValue),
+        (count, sum) -&gt; "Count: " + count + ", Sum: " + sum
+    ));
+System.out.println(result);  // "Count: 5, Sum: 15"
+
+// Another example: min and max at once:
+var minMax = nums.stream()
+    .collect(Collectors.teeing(
+        Collectors.minBy(Integer::compareTo),
+        Collectors.maxBy(Integer::compareTo),
+        (min, max) -&gt; "Range: " + min.orElse(0) + "-" + max.orElse(0)
+    ));
+System.out.println(minMax);  // "Range: 1-5"</code></pre>
+    </section>
+
+    <!-- ============ SECTION 11: PARALLEL STREAMS ============ -->
+    <section id="parallel-streams">
+      <h2>11. Parallel Streams</h2>
+
+      <p class="note">
+        Parallel streams split the work across multiple threads. They're useful for large datasets and CPU-intensive operations, but can hurt performance with small data or I/O.
+      </p>
+
+      <h3>Creating Parallel Streams</h3>
+
+      <pre><code class="language-java">List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+
+// Method 1: parallelStream():
+nums.parallelStream()
+    .filter(n -&gt; n % 2 == 0)
+    .forEach(System.out::println);
+
+// Method 2: convert existing stream to parallel:
+nums.stream()
+    .parallel()
+    .filter(n -&gt; n % 2 == 0)
+    .forEach(System.out::println);
+
+// Convert back to sequential:
+nums.parallelStream()
+    .sequential()
+    .forEach(System.out::println);</code></pre>
+
+      <h3>When Parallel Helps</h3>
+
+      <pre><code class="language-java">// ✓ Good use case: large dataset, CPU-intensive operation
+long count = LongStream.rangeClosed(1, 100_000_000)
+    .parallel()
+    .filter(n -&gt; {
+        // CPU-intensive: calculate if prime
+        return isPrime(n);
+    })
+    .count();
+System.out.println(count);
+
+// Helper function
+static boolean isPrime(long n) {
+    if (n &lt; 2) return false;
+    if (n == 2) return true;
+    if (n % 2 == 0) return false;
+    for (long i = 3; i * i &lt;= n; i += 2) {
+        if (n % i == 0) return false;
+    }
+    return true;
+}</code></pre>
+
+      <h3>When Parallel Hurts</h3>
+
+      <pre><code class="language-java">// ✗ Bad: small data set
+List&lt;Integer&gt; tiny = List.of(1, 2, 3);
+tiny.parallelStream()
+    .map(n -&gt; n * n)
+    .forEach(System.out::println);
+// Parallel overhead is worse than sequential!
+
+// ✗ Bad: I/O operations
+List&lt;String&gt; urls = List.of("url1", "url2", "url3");
+urls.parallelStream()
+    .map(this::fetchUrl)  // Network calls are slow, blocking
+    .collect(Collectors.toList());
+// Threads wait on network, defeating parallelism
+
+// ✗ Bad: state mutation (race conditions)
+List&lt;Integer&gt; items = new ArrayList&lt;&gt;();
+IntStream.range(0, 1000).parallel()
+    .forEach(items::add);  // WRONG — concurrent modification!
+// items will be incomplete or corrupted</code></pre>
+
+      <h3>Thread-Safe Collection</h3>
+
+      <pre><code class="language-java">// WRONG — mutable shared state in parallel:
+List&lt;Integer&gt; results = new ArrayList&lt;&gt;();
+IntStream.range(0, 1000).parallel()
+    .forEach(results::add);  // Race condition!
+
+// CORRECT — use collect:
+List&lt;Integer&gt; results2 = IntStream.range(0, 1000)
+    .parallel()
+    .boxed()
+    .collect(Collectors.toList());  // Thread-safe
+
+// CORRECT — use parallelism properly:
+Set&lt;Integer&gt; results3 = IntStream.range(0, 1000)
+    .parallel()
+    .boxed()
+    .collect(Collectors.toUnmodifiableSet());</code></pre>
+
+      <h3>Ordering in Parallel Streams</h3>
+
+      <pre><code class="language-java">// Parallel may not preserve order:
+List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Sequential: always [1, 2, 3, 4, 5]
+nums.stream()
+    .filter(n -&gt; n &lt;= 5)
+    .forEach(System.out::print);  // 1 2 3 4 5
+
+// Parallel: may print in any order
+nums.parallelStream()
+    .filter(n -&gt; n &lt;= 5)
+    .forEach(System.out::print);  // maybe: 3 1 4 2 5
+
+// forEachOrdered guarantees order even in parallel:
+nums.parallelStream()
+    .filter(n -&gt; n &lt;= 5)
+    .forEachOrdered(System.out::print);  // Always: 1 2 3 4 5</code></pre>
+    </section>
+
+    <!-- ============ SECTION 12: OPTIONAL ============ -->
+    <section id="optional">
+      <h2>12. Optional&lt;T&gt;</h2>
+
+      <p class="note">
+        <strong>Optional</strong> is a container for a value that may or may not be present. It replaces null checking and makes code safer.
+      </p>
+
+      <h3>Creating Optional Values</h3>
+
+      <pre><code class="language-java">// Optional with value:
+Optional&lt;String&gt; present = Optional.of("Hello");  // throws if null
+
+// Optional that may be null:
+Optional&lt;String&gt; maybe = Optional.ofNullable(null);  // OK
+
+// Empty Optional:
+Optional&lt;String&gt; empty = Optional.empty();
+
+// Check what you have:
+System.out.println(present.isPresent());  // true
+System.out.println(maybe.isPresent());    // false
+System.out.println(empty.isEmpty());      // true (Java 11+)</code></pre>
+
+      <h3>Getting the Value Safely</h3>
+
+      <pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of("Hello");
+Optional&lt;String&gt; empty = Optional.empty();
+
+// WRONG — throws NoSuchElementException if empty:
+String val = empty.get();  // java.util.NoSuchElementException
+
+// CORRECT — provide default:
+String safe1 = empty.orElse("default");
+System.out.println(safe1);  // "default"
+
+// CORRECT — lazy default (computed only if needed):
+String safe2 = empty.orElseGet(() -&gt; "computed");
+System.out.println(safe2);
+
+// CORRECT — throw custom exception:
+String safe3 = empty.orElseThrow(IllegalStateException::new);  // throws
+
+// CORRECT — get or null:
+String safe4 = empty.orElse(null);  // returns null instead of exception</code></pre>
+
+      <h3>Transforming Optional Values</h3>
+
+      <pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of("hello");
+Optional&lt;String&gt; empty = Optional.empty();
+
+// map — transform if present:
+Optional&lt;Integer&gt; len = opt.map(String::length);
+System.out.println(len);  // Optional[5]
+
+Optional&lt;Integer&gt; emptyLen = empty.map(String::length);
+System.out.println(emptyLen);  // Optional.empty
+
+// flatMap — when mapper returns Optional:
+Optional&lt;Optional&lt;String&gt;&gt; nested = opt.map(s -&gt; Optional.of(s.toUpperCase()));
+// BAD — nested Optionals!
+
+Optional&lt;String&gt; flat = opt.flatMap(s -&gt; Optional.of(s.toUpperCase()));
+System.out.println(flat);  // Optional[HELLO]
+
+// Real use: null-safe chaining:
+class Address {
+    String city;
+    Address(String c) { this.city = c; }
+}
+
+class Person {
+    Address addr;
+    Person(Address a) { this.addr = a; }
+}
+
+Person p = new Person(null);
+String city = Optional.ofNullable(p)
+    .flatMap(person -&gt; Optional.ofNullable(person.addr))
+    .map(addr -&gt; addr.city)
+    .orElse("Unknown");
+System.out.println(city);  // "Unknown"</code></pre>
+
+      <h3>Conditional Actions</h3>
+
+      <pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of("Hello");
+
+// ifPresent — act if value exists:
+opt.ifPresent(s -&gt; System.out.println(s));  // prints "Hello"
+
+// ifPresentOrElse — do one of two things (Java 9+):
+opt.ifPresentOrElse(
+    s -&gt; System.out.println("Got: " + s),
+    () -&gt; System.out.println("Nothing")
+);  // prints "Got: Hello"
+
+Optional&lt;String&gt; empty = Optional.empty();
+empty.ifPresentOrElse(
+    s -&gt; System.out.println("Got: " + s),
+    () -&gt; System.out.println("Nothing")
+);  // prints "Nothing"</code></pre>
+
+      <h3>Filtering Optional</h3>
+
+      <pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of("hello");
+
+// filter — keep if predicate is true:
+Optional&lt;String&gt; long5 = opt.filter(s -&gt; s.length() &gt; 3);
+System.out.println(long5);  // Optional[hello]
+
+Optional&lt;String&gt; long10 = opt.filter(s -&gt; s.length() &gt; 10);
+System.out.println(long10);  // Optional.empty
+
+// Chaining filters:
+opt.filter(s -&gt; s.length() &gt; 2)
+   .filter(s -&gt; s.startsWith("h"))
+   .ifPresent(System.out::println);  // prints "hello"</code></pre>
+
+      <h3>or — Fallback Optional</h3>
+
+      <pre><code class="language-java">// or — return fallback Optional if empty (Java 9+):
+Optional&lt;String&gt; first = Optional.empty();
+Optional&lt;String&gt; second = Optional.of("fallback");
+
+Optional&lt;String&gt; result = first.or(() -&gt; second);
+System.out.println(result);  // Optional[fallback]
+
+// Chain multiple options:
+Optional&lt;String&gt; value = empty1
+    .or(() -&gt; empty2)
+    .or(() -&gt; Optional.of("final"))
+    .orElse("default");
+System.out.println(value);  // "final"</code></pre>
+
+      <h3>Optional in Streams</h3>
+
+      <pre><code class="language-java">// stream() converts Optional to 0 or 1 element stream (Java 9+):
+List&lt;Optional&lt;String&gt;&gt; optionals = List.of(
+    Optional.of("apple"),
+    Optional.empty(),
+    Optional.of("cherry")
+);
+
+optionals.stream()
+    .flatMap(Optional::stream)  // flatten to values only
+    .forEach(System.out::println);
+// apple
+// cherry
+
+// Remove nulls from stream:
+List&lt;String&gt; items = List.of("a", null, "b", null, "c");
+items.stream()
+    .map(Optional::ofNullable)
+    .flatMap(Optional::stream)
+    .forEach(System.out::println);
+// a
+// b
+// c</code></pre>
+
+      <h3>Common Anti-Patterns</h3>
+
+      <pre><code class="language-java">Optional&lt;String&gt; opt = Optional.of("hello");
+
+// ✗ WRONG — checking isPresent then get:
+if (opt.isPresent()) {
+    System.out.println(opt.get());
+}
+
+// ✓ CORRECT — use ifPresent:
+opt.ifPresent(System.out::println);
+
+// ✗ WRONG — using Optional as parameter:
+void process(Optional&lt;String&gt; value) {  // BAD design
+    System.out.println(value.orElse(""));
+}
+
+// ✓ CORRECT — use null or separate methods:
+void process(String value) {  // if required
+}
+
+// ✗ WRONG — nested Optionals:
+Optional&lt;Optional&lt;String&gt;&gt; bad = Optional.of(Optional.of("value"));
+
+// ✓ CORRECT — use flatMap:
+Optional&lt;String&gt; good = Optional.of("value");
+
+// ✗ WRONG — checking opt.isPresent() then conditional logic:
+if (opt.isPresent()) {
+    System.out.println("Value: " + opt.get().length());
+}
+
+// ✓ CORRECT — use map and ifPresent:
+opt.map(String::length)
+   .ifPresent(len -&gt; System.out.println("Length: " + len));</code></pre>
+    </section>
+
+    <!-- ============ SECTION 13: JAVA.TIME API ============ -->
+    <section id="java-time">
+      <h2>13. java.time API</h2>
+
+      <p class="note">
+        The <code>java.time</code> package provides immutable, thread-safe date/time classes (replaces old Date/Calendar API).
+      </p>
+
+      <h3>LocalDate — Date Only</h3>
+
+      <pre><code class="language-java">import java.time.*;
+import java.time.temporal.*;
+
+// Current date:
+LocalDate today = LocalDate.now();
+System.out.println(today);  // 2026-05-10
+
+// Specific date:
+LocalDate birthday = LocalDate.of(1990, Month.MARCH, 15);
+LocalDate xmas = LocalDate.of(2024, 12, 25);
+
+// Parse from string:
+LocalDate parsed = LocalDate.parse("2024-12-25");
+
+// Add/subtract:
+LocalDate nextWeek = today.plusWeeks(1);
+LocalDate nextMonth = today.plusMonths(1);
+LocalDate lastYear = today.minusYears(1);
+
+// Access components:
+int year = today.getYear();           // 2026
+int month = today.getMonthValue();     // 1-12 (5 = May)
+int dayOfMonth = today.getDayOfMonth(); // 1-31 (10)
+
+// Day of week:
+DayOfWeek dow = today.getDayOfWeek();  // SATURDAY
+System.out.println(dow);  // SATURDAY
+
+// Compare dates:
+boolean isBefore = birthday.isBefore(today);  // true
+boolean isAfter = today.isAfter(birthday);    // true
+boolean same = today.equals(birthday);        // false
+
+// Leap year:
+boolean isLeap = LocalDate.of(2024, 1, 1).isLeapYear();  // true</code></pre>
+
+      <h3>LocalTime — Time Only</h3>
+
+      <pre><code class="language-java">// Current time:
+LocalTime now = LocalTime.now();
+System.out.println(now);  // 14:30:45.123456789
+
+// Specific time:
+LocalTime noon = LocalTime.of(12, 0);
+LocalTime meeting = LocalTime.of(14, 30, 45);
+LocalTime precise = LocalTime.of(14, 30, 45, 123000000);  // hour, min, sec, nano
+
+// Parse:
+LocalTime t = LocalTime.parse("14:30:45");
+
+// Add/subtract:
+LocalTime later = now.plusHours(2);
+LocalTime earlier = now.minusMinutes(30);
+
+// Access components:
+int hour = now.getHour();       // 0-23
+int minute = now.getMinute();   // 0-59
+int second = now.getSecond();   // 0-59
+int nano = now.getNano();       // 0-999999999
+
+// Compare:
+boolean isBefore = meeting.isBefore(LocalTime.of(13, 0));  // false
+boolean isAfter = now.isAfter(noon);                       // depends on now</code></pre>
+
+      <h3>LocalDateTime — Date and Time</h3>
+
+      <pre><code class="language-java">// Current date and time:
+LocalDateTime dt = LocalDateTime.now();
+System.out.println(dt);  // 2026-05-10T14:30:45.123456789
+
+// Specific date and time:
+LocalDateTime xmas = LocalDateTime.of(2024, 12, 25, 0, 0);
+LocalDateTime meeting = LocalDateTime.of(2024, 12, 25, 14, 30, 45);
+
+// Combine date and time:
+LocalDate date = LocalDate.of(2024, 12, 25);
+LocalTime time = LocalTime.of(14, 30);
+LocalDateTime combined = LocalDateTime.of(date, time);
+
+// Parse:
+LocalDateTime parsed = LocalDateTime.parse("2024-12-25T14:30:45");
+
+// Add/subtract:
+LocalDateTime later = dt.plusDays(1).plusHours(2);
+
+// Access components:
+LocalDate dateOnly = dt.toLocalDate();
+LocalTime timeOnly = dt.toLocalTime();</code></pre>
+
+      <h3>ZonedDateTime — With Timezone</h3>
+
+      <pre><code class="language-java">// Current date/time in system timezone:
+ZonedDateTime zdt = ZonedDateTime.now();
+System.out.println(zdt);  // 2026-05-10T14:30:45.123456789-05:00
+
+// Specific timezone:
+ZonedDateTime nyc = ZonedDateTime.now(ZoneId.of("America/New_York"));
+ZonedDateTime tokyo = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
+ZonedDateTime utc = ZonedDateTime.now(ZoneId.of("UTC"));
+
+// System timezone:
+ZoneId sysZone = ZoneId.systemDefault();
+ZonedDateTime local = ZonedDateTime.now(sysZone);
+
+// Convert between timezones:
+ZonedDateTime nycTime = LocalDateTime.of(2024, 12, 25, 14, 0)
+    .atZone(ZoneId.of("America/New_York"));
+ZonedDateTime tokyoTime = nycTime.withZoneSameInstant(ZoneId.of("Asia/Tokyo"));
+
+// Access timezone:
+ZoneId zone = zdt.getZone();
+System.out.println(zone);</code></pre>
+
+      <h3>Instant — Machine Timestamp</h3>
+
+      <pre><code class="language-java">// Current moment (epoch):
+Instant now = Instant.now();
+System.out.println(now);  // 2026-05-10T19:30:45.123456789Z
+
+// Epoch instant:
+Instant epoch = Instant.EPOCH;  // 1970-01-01T00:00:00Z
+
+// Convert to milliseconds since epoch:
+long millis = now.toEpochMilli();
+long seconds = now.getEpochSecond();
+
+// Create from epoch:
+Instant from = Instant.ofEpochMilli(1704067200000L);
+Instant from2 = Instant.ofEpochSecond(1704067200);
+
+// Add/subtract:
+Instant later = now.plusSeconds(3600);  // 1 hour later
+Instant earlier = now.minusDuration(Duration.ofMinutes(30));
+
+// Convert to ZonedDateTime:
+ZonedDateTime zdt = now.atZone(ZoneId.of("America/New_York"));</code></pre>
+
+      <h3>Duration — Time Difference</h3>
+
+      <pre><code class="language-java">// Between two times:
+LocalTime t1 = LocalTime.of(9, 0);
+LocalTime t2 = LocalTime.of(17, 0);
+Duration workDay = Duration.between(t1, t2);
+System.out.println(workDay);  // PT8H
+
+long hours = workDay.toHours();    // 8
+long minutes = workDay.toMinutes();  // 480
+
+// Create duration:
+Duration d1 = Duration.ofHours(2);
+Duration d2 = Duration.ofMinutes(30);
+Duration d3 = d1.plusMinutes(30);  // PT2H30M
+
+// Add/subtract durations:
+LocalDateTime start = LocalDateTime.now();
+LocalDateTime end = start.plus(Duration.ofDays(1).plusHours(2));
+
+// With dates (use Period instead):
+// Duration.between only works with time-based values</code></pre>
+
+      <h3>Period — Date Difference</h3>
+
+      <pre><code class="language-java">// Between two dates:
+LocalDate birthday = LocalDate.of(1990, 3, 15);
+LocalDate today = LocalDate.now();
+Period age = Period.between(birthday, today);
+
+System.out.println(age);  // P35Y1M26D
+int years = age.getYears();    // 35
+int months = age.getMonths();  // 1
+int days = age.getDays();      // 26
+
+// Create period:
+Period p1 = Period.ofYears(1);
+Period p2 = Period.ofMonths(6);
+Period p3 = Period.ofWeeks(2);
+Period p4 = Period.ofDays(30);
+
+// Combine:
+Period combined = p1.plusMonths(6).plusDays(15);
+
+// Add to date:
+LocalDate future = today.plus(combined);</code></pre>
+
+      <h3>Formatting and Parsing</h3>
+
+      <pre><code class="language-java">import java.time.format.*;
+
+LocalDate today = LocalDate.now();
+
+// Predefined formatters:
+String iso = DateTimeFormatter.ISO_LOCAL_DATE.format(today);
+System.out.println(iso);  // 2026-05-10
+
+// Custom patterns:
+DateTimeFormatter fmt1 = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+String formatted1 = today.format(fmt1);  // 10/05/2026
+
+DateTimeFormatter fmt2 = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+String formatted2 = today.format(fmt2);  // May 10, 2026
+
+DateTimeFormatter fmt3 = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
+String formatted3 = today.format(fmt3);  // Saturday, May 10, 2026
+
+// With time:
+LocalDateTime dt = LocalDateTime.now();
+DateTimeFormatter fmt4 = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+String formatted4 = dt.format(fmt4);  // 2026-05-10 14:30:45
+
+// Parsing:
+String dateStr = "25/12/2024";
+LocalDate parsed = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+String timeStr = "14:30:45";
+LocalTime parsedTime = LocalTime.parse(timeStr);  // default format</code></pre>
+
+      <h3>Temporal Adjusters</h3>
+
+      <pre><code class="language-java">import java.time.temporal.TemporalAdjusters;
+
+LocalDate today = LocalDate.now();
+
+// Next specific day:
+LocalDate nextMonday = today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+LocalDate nextFriday = today.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+
+// Previous specific day:
+LocalDate lastSunday = today.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+
+// First/last day of month:
+LocalDate firstOfMonth = today.with(TemporalAdjusters.firstDayOfMonth());
+LocalDate lastOfMonth = today.with(TemporalAdjusters.lastDayOfMonth());
+
+// First/last day of year:
+LocalDate newYear = today.with(TemporalAdjusters.firstDayOfYear());
+LocalDate yearEnd = today.with(TemporalAdjusters.lastDayOfYear());
+
+// Last day of next month:
+LocalDate future = today.with(TemporalAdjusters.lastDayOfNextMonth());</code></pre>
+    </section>
+
+  </article>
+
+  <nav class="bottom-nav">
+    <a href="chapter07-exceptions-io.html">← Chapter 7</a>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter09-concurrency.html">Chapter 9 →</a>
+  </nav>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

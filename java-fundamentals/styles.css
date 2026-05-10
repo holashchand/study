@@ -1,0 +1,272 @@
+/* Java Fundamentals Course — Shared Stylesheet */
+
+:root {
+  --bg: #fafaf8;
+  --fg: #1a1a1a;
+  --accent: #c0392b;
+  --accent2: #2980b9;
+  --code-bg: #1e1e2e;
+  --border: #ddd;
+  --note-bg: #eaf4fb;
+  --note-border: #2980b9;
+  --tip-bg: #eafaf1;
+  --tip-border: #27ae60;
+  --warning-bg: #fef9e7;
+  --warning-border: #f39c12;
+  --important-bg: #fdf2f8;
+  --important-border: #8e44ad;
+  --diagram-bg: #f4f4f4;
+  --diagram-border: #999;
+  --nav-bg: #2c3e50;
+  --nav-fg: #ecf0f1;
+  --max-width: 960px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+article {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem 2.5rem 4rem;
+}
+
+/* ── Navigation ─────────────────────────────────────── */
+.top-nav, .bottom-nav {
+  background: var(--nav-bg);
+  color: var(--nav-fg);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.9rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.bottom-nav { position: static; margin-top: 3rem; }
+.top-nav a, .bottom-nav a {
+  color: #74b9ff;
+  text-decoration: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.top-nav a:hover, .bottom-nav a:hover { background: rgba(255,255,255,0.1); }
+.nav-toc { font-weight: bold; color: #ffeaa7; }
+
+/* ── Chapter Header ──────────────────────────────────── */
+.chapter-header {
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+.chapter-number {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+.chapter-title {
+  font-size: 2.4rem;
+  font-weight: bold;
+  color: var(--fg);
+  line-height: 1.2;
+}
+.chapter-subtitle {
+  font-size: 1.05rem;
+  color: #555;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* ── Headings ────────────────────────────────────────── */
+h1 { font-size: 2rem; margin: 2rem 0 1rem; color: var(--fg); border-bottom: 2px solid var(--border); padding-bottom: 0.4rem; }
+h2 { font-size: 1.6rem; margin: 2.5rem 0 0.8rem; color: #2c3e50; border-left: 4px solid var(--accent); padding-left: 0.75rem; }
+h3 { font-size: 1.25rem; margin: 2rem 0 0.6rem; color: #34495e; }
+h4 { font-size: 1.05rem; margin: 1.5rem 0 0.4rem; color: #555; font-style: italic; }
+
+/* ── Paragraphs & Lists ─────────────────────────────── */
+p { margin: 0.7rem 0 1rem; }
+ul, ol { margin: 0.5rem 0 1rem 1.5rem; }
+li { margin-bottom: 0.35rem; }
+ul li::marker { color: var(--accent); }
+
+/* ── Tables ─────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.92rem;
+}
+thead { background: #2c3e50; color: #ecf0f1; }
+thead th { padding: 0.6rem 0.9rem; text-align: left; font-weight: 600; }
+tbody tr:nth-child(even) { background: #f0f0f0; }
+tbody td { padding: 0.5rem 0.9rem; border-bottom: 1px solid var(--border); }
+tbody tr:hover { background: #e8f4f8; }
+
+/* ── Code & Syntax Highlighting ─────────────────────── */
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.88em;
+  background: #ebebeb;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  color: #c0392b;
+}
+pre {
+  margin: 1rem 0 1.5rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+}
+/* Prism override — ensure dark bg */
+pre[class*="language-"] {
+  background: var(--code-bg) !important;
+}
+
+/* ── ASCII Diagrams ──────────────────────────────────── */
+pre.diagram {
+  background: var(--diagram-bg) !important;
+  border: 1px solid var(--diagram-border);
+  color: #2c3e50 !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  padding: 1.2rem 1.5rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  box-shadow: none;
+  border-radius: 6px;
+}
+
+/* ── Callout Boxes ───────────────────────────────────── */
+.note, .tip, .warning, .important {
+  margin: 1.5rem 0;
+  padding: 1rem 1.2rem;
+  border-radius: 0 6px 6px 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.93rem;
+}
+.note    { background: var(--note-bg);     border-left: 5px solid var(--note-border); }
+.tip     { background: var(--tip-bg);      border-left: 5px solid var(--tip-border); }
+.warning { background: var(--warning-bg);  border-left: 5px solid var(--warning-border); }
+.important { background: var(--important-bg); border-left: 5px solid var(--important-border); }
+
+.note::before    { content: "ℹ NOTE  "; font-weight: 700; color: var(--note-border); }
+.tip::before     { content: "✓ TIP  "; font-weight: 700; color: var(--tip-border); }
+.warning::before { content: "⚠ WARNING  "; font-weight: 700; color: var(--warning-border); }
+.important::before { content: "★ IMPORTANT  "; font-weight: 700; color: var(--important-border); }
+
+/* ── Version Badge ───────────────────────────────────── */
+.badge {
+  display: inline-block;
+  background: #2980b9;
+  color: #fff;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1em 0.5em;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 0.4em;
+  letter-spacing: 0.5px;
+}
+.badge.lts { background: #27ae60; }
+.badge.preview { background: #8e44ad; }
+.badge.new { background: var(--accent); }
+
+/* ── Section Divider ─────────────────────────────────── */
+hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+/* ── TOC (index page) ────────────────────────────────── */
+.toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+.toc-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem 1.4rem;
+  text-decoration: none;
+  color: var(--fg);
+  transition: box-shadow 0.2s, transform 0.2s;
+  background: #fff;
+  display: block;
+}
+.toc-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+.toc-card .ch-num {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.toc-card .ch-title {
+  font-size: 1.05rem;
+  font-weight: bold;
+  margin: 0.2rem 0 0.5rem;
+}
+.toc-card .ch-desc {
+  font-size: 0.85rem;
+  color: #666;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.4;
+}
+
+/* ── Hero (index page) ───────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #2c3e50 0%, #c0392b 100%);
+  color: #fff;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.hero h1 { color: #fff; border: none; font-size: 2.8rem; }
+.hero p { font-size: 1.1rem; opacity: 0.9; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+/* ── Inline syntax label ─────────────────────────────── */
+.syntax-label {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #777;
+  margin: 1.5rem 0 0.3rem;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 640px) {
+  article { padding: 1rem 1.2rem 3rem; }
+  .chapter-title { font-size: 1.7rem; }
+  h2 { font-size: 1.3rem; }
+  pre { font-size: 0.8rem; }
+  table { font-size: 0.82rem; }
+}

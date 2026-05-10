@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 2 — Data Types &amp; Operators | Java Fundamentals</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+  <nav class="top-nav">
+    <a href="chapter01-java-foundations.html">← Chapter 1</a>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter03-control-flow.html">Chapter 3 →</a>
+  </nav>
+
+  <article>
+    <div class="chapter-header">
+      <div class="chapter-number">Chapter 2</div>
+      <h1 class="chapter-title">Data Types &amp; Operators</h1>
+      <p class="chapter-subtitle">Primitives, wrapper classes, casting, all operators, operator precedence</p>
+    </div>
+
+    <nav class="toc">
+      <h2>Chapter Contents</h2>
+      <ol>
+        <li><a href="#variables">Variables</a></li>
+        <li><a href="#primitive-types">The 8 Primitive Types</a></li>
+        <li><a href="#literals">Literals</a></li>
+        <li><a href="#wrapper-classes">Wrapper Classes</a></li>
+        <li><a href="#type-casting">Type Casting</a></li>
+        <li><a href="#var-keyword">var — Local Variable Type Inference</a></li>
+        <li><a href="#arithmetic-operators">Arithmetic Operators</a></li>
+        <li><a href="#unary-operators">Unary Operators</a></li>
+        <li><a href="#assignment-operators">Assignment Operators</a></li>
+        <li><a href="#comparison-operators">Comparison Operators</a></li>
+        <li><a href="#logical-operators">Logical Operators</a></li>
+        <li><a href="#bitwise-operators">Bitwise Operators</a></li>
+        <li><a href="#ternary-operator">Ternary Operator</a></li>
+        <li><a href="#instanceof-operator">instanceof Operator</a></li>
+        <li><a href="#operator-precedence">Operator Precedence</a></li>
+        <li><a href="#string-concatenation">String Concatenation with +</a></li>
+      </ol>
+    </nav>
+
+    <!-- ==================== 1. VARIABLES ==================== -->
+    <section id="variables">
+      <h2>1. Variables</h2>
+
+      <p class="syntax-label">Syntax</p>
+      <pre><code class="language-java">Type variableName;                    // declaration
+Type variableName = value;            // declaration with initialization
+Type var1 = val1, var2 = val2, var3 = val3;  // multiple declarations</code></pre>
+
+      <h3>Declaration and Initialization</h3>
+      <pre><code class="language-java">int age;                    // declared, uninitialized (not usable yet)
+int age = 25;               // declared and initialized
+double salary = 45000.50;   // double initialization
+boolean isActive = true;    // boolean initialization
+
+// Multiple variables of same type
+int x = 10, y = 20, z = 30;
+String name = "Alice", city = "New York";</code></pre>
+
+      <h3>Naming Rules and Conventions</h3>
+      <ul>
+        <li>Must start with letter, underscore, or dollar sign (NOT a digit)</li>
+        <li>Subsequent chars: letters, digits, underscores, dollar signs</li>
+        <li>Convention: camelCase for variables and methods (starts lowercase)</li>
+        <li>Cannot be Java keywords (int, class, for, while, etc.)</li>
+      </ul>
+
+      <pre><code class="language-java">// VALID names
+int studentAge = 20;
+int _privateThing = 100;
+int $dollarSign = 50;
+int snake_case_allowed = 30;  // works, but not conventional in Java
+
+// INVALID names — these will NOT compile
+int 42invalid;              // ERROR: starts with digit
+int my-variable;            // ERROR: hyphen not allowed
+int class = 5;              // ERROR: 'class' is a keyword
+int my variable;            // ERROR: space not allowed</code></pre>
+
+      <div class="note">
+        <strong>Note:</strong> Variables must be initialized before use. Using an uninitialized local variable causes a compile error.
+      </div>
+    </section>
+
+    <!-- ==================== 2. PRIMITIVE TYPES ==================== -->
+    <section id="primitive-types">
+      <h2>2. The 8 Primitive Types</h2>
+
+      <p>Java has 8 built-in primitive types. All other data is made of objects.</p>
+
+      <table class="primitive-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Size</th>
+            <th>Min Value</th>
+            <th>Max Value</th>
+            <th>Default</th>
+            <th>Example Literal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>byte</strong></td>
+            <td>8 bits</td>
+            <td>-128</td>
+            <td>127</td>
+            <td>0</td>
+            <td><code>byte b = 100;</code></td>
+          </tr>
+          <tr>
+            <td><strong>short</strong></td>
+            <td>16 bits</td>
+            <td>-32,768</td>
+            <td>32,767</td>
+            <td>0</td>
+            <td><code>short s = 10000;</code></td>
+          </tr>
+          <tr>
+            <td><strong>int</strong></td>
+            <td>32 bits</td>
+            <td>-2<sup>31</sup></td>
+            <td>2<sup>31</sup> - 1</td>
+            <td>0</td>
+            <td><code>int i = 100000;</code></td>
+          </tr>
+          <tr>
+            <td><strong>long</strong></td>
+            <td>64 bits</td>
+            <td>-2<sup>63</sup></td>
+            <td>2<sup>63</sup> - 1</td>
+            <td>0L</td>
+            <td><code>long l = 9223372036854775807L;</code></td>
+          </tr>
+          <tr>
+            <td><strong>float</strong></td>
+            <td>32 bits</td>
+            <td>≈ -3.4 × 10<sup>38</sup></td>
+            <td>≈ 3.4 × 10<sup>38</sup></td>
+            <td>0.0f</td>
+            <td><code>float f = 3.14f;</code></td>
+          </tr>
+          <tr>
+            <td><strong>double</strong></td>
+            <td>64 bits</td>
+            <td>≈ -1.7 × 10<sup>308</sup></td>
+            <td>≈ 1.7 × 10<sup>308</sup></td>
+            <td>0.0</td>
+            <td><code>double d = 3.141592653589793;</code></td>
+          </tr>
+          <tr>
+            <td><strong>char</strong></td>
+            <td>16 bits</td>
+            <td>0 (null char)</td>
+            <td>65,535</td>
+            <td>' '</td>
+            <td><code>char c = 'A';</code></td>
+          </tr>
+          <tr>
+            <td><strong>boolean</strong></td>
+            <td>1 bit (variant)</td>
+            <td colspan="2">true or false</td>
+            <td>false</td>
+            <td><code>boolean flag = true;</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>All 8 Primitive Types in One Example</h3>
+      <pre><code class="language-java">public class PrimitiveTypesDemo {
+    public static void main(String[] args) {
+        // Integers (various sizes)
+        byte b = 127;                                  // 8-bit signed
+        short s = 32767;                              // 16-bit signed
+        int i = 2_147_483_647;                        // 32-bit signed (most common)
+        long l = 9_223_372_036_854_775_807L;          // 64-bit signed (requires L suffix)
+
+        // Floating-point (decimal numbers)
+        float f = 3.14f;                              // 32-bit (requires f suffix)
+        double d = 3.141592653589793;                 // 64-bit (most common for decimals)
+
+        // Character (single Unicode character)
+        char ch = 'A';                                // 16-bit Unicode
+        char num = 65;                                // same as 'A'
+        char emoji = '😀';                            // Unicode supports emojis
+
+        // Boolean (true/false only)
+        boolean isActive = true;
+        boolean isEmpty = false;
+
+        System.out.println("byte max: " + Byte.MAX_VALUE);           // 127
+        System.out.println("int max: " + Integer.MAX_VALUE);         // 2147483647
+        System.out.println("long min: " + Long.MIN_VALUE);           // -9223372036854775808
+        System.out.println("char 'A': " + (int)ch);                  // prints 65
+    }
+}</code></pre>
+
+      <h3>Important Notes on Primitive Types</h3>
+      <ul>
+        <li><strong>int is the default integer type</strong> — use int unless you need byte/short for memory or long for huge numbers</li>
+        <li><strong>double is the default floating-point type</strong> — float requires explicit f suffix</li>
+        <li><strong>boolean is NOT convertible to int</strong> — you cannot do (int) true</li>
+        <li><strong>char is actually a number</strong> — each character has a numeric Unicode value (0-65535)</li>
+      </ul>
+
+      <div class="warning">
+        <strong>Warning:</strong> Floating-point arithmetic has precision limitations. Avoid using double/float for money—use BigDecimal instead.
+      </div>
+    </section>
+
+    <!-- ==================== 3. LITERALS ==================== -->
+    <section id="literals">
+      <h2>3. Literals</h2>
+
+      <p>A literal is a value written directly in code. Different numeric bases and formats are supported.</p>
+
+      <h3>Integer Literals (Multiple Bases)</h3>
+      <pre><code class="language-java">// Decimal (base 10) — most common
+int decimal = 42;
+int million = 1_000_000;  // underscores for readability
+
+// Hexadecimal (base 16) — prefix 0x
+int hex = 0xFF;            // 255
+int color = 0xFF_FF_00;    // yellow in RGB
+
+// Octal (base 8) — prefix 0
+int octal = 077;           // 63 in decimal (rarely used)
+
+// Binary (base 2) — prefix 0b
+int binary = 0b1010;       // 10 in decimal
+int flags = 0b1111_0000;   // underscores improve readability</code></pre>
+
+      <h3>Floating-Point Literals</h3>
+      <pre><code class="language-java">// Standard decimal notation
+double d1 = 3.14;
+double d2 = 0.5;
+double d3 = 10.0;
+
+// Scientific notation (exponent)
+double d4 = 3.14e2;        // 3.14 × 10^2 = 314.0
+double d5 = 3.14e-2;       // 3.14 × 10^-2 = 0.0314
+double d6 = 1E3;           // 1 × 10^3 = 1000.0
+
+// Float requires 'f' suffix (default is double)
+float f1 = 3.14f;          // CORRECT
+// float f2 = 3.14;         // ERROR: loses precision, must use f suffix
+
+// Special floating-point values
+double posInf = Double.POSITIVE_INFINITY;
+double negInf = Double.NEGATIVE_INFINITY;
+double notNum = Double.NaN;</code></pre>
+
+      <h3>Character Literals and Escape Sequences</h3>
+      <pre><code class="language-java">// Character literals (single character in single quotes)
+char letter = 'A';
+char digit = '9';
+char space = ' ';
+
+// Numeric value of character (Unicode code point)
+char unicode = 'A';   // 'A' (Unicode escape)
+char tab = '\t';           // tab character
+char newline = '\n';       // newline character
+char backslash = '\\';     // single backslash (needs escaping)
+char quote = '\'';         // single quote (needs escaping)
+char doubleQuote = '"';    // double quote (no escape needed in char)
+char nullChar = '\0';      // null character (0)
+char carrageReturn = '\r'; // carriage return</code></pre>
+
+      <h3>String Literals (Not Primitive, But Common)</h3>
+      <pre><code class="language-java">String name = "Alice";
+String message = "Hello, World!";
+String empty = "";
+
+// String escape sequences (same as char)
+String path = "C:\\Users\\Name\\file.txt";
+String json = "{\"name\": \"Alice\"}";
+String multiline = "Line 1\nLine 2\nLine 3";
+
+// null literal (represents no object)
+String reference = null;
+int[] array = null;</code></pre>
+
+      <div class="tip">
+        <strong>Tip:</strong> Use underscores in numeric literals to make large numbers readable: 1_000_000_000 is clearer than 1000000000.
+      </div>
+    </section>
+
+    <!-- ==================== 4. WRAPPER CLASSES ==================== -->
+    <section id="wrapper-classes">
+      <h2>4. Wrapper Classes</h2>
+
+      <p>Every primitive type has a corresponding wrapper class. Wrappers allow primitives to be treated as objects and provide useful utility methods.</p>
+
+      <table class="wrapper-table">
+        <thead>
+          <tr>
+            <th>Primitive</th>
+            <th>Wrapper Class</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>byte</td><td>Byte</td><td><code>new Byte(127)</code></td></tr>
+          <tr><td>short</td><td>Short</td><td><code>new Short(1000)</code></td></tr>
+          <tr><td>int</td><td>Integer</td><td><code>new Integer(42)</code></td></tr>
+          <tr><td>long</td><td>Long</td><td><code>new Long(999L)</code></td></tr>
+          <tr><td>float</td><td>Float</td><td><code>new Float(3.14f)</code></td></tr>
+          <tr><td>double</td><td>Double</td><td><code>new Double(3.14)</code></td></tr>
+          <tr><td>char</td><td>Character</td><td><code>new Character('A')</code></td></tr>
+          <tr><td>boolean</td><td>Boolean</td><td><code>new Boolean(true)</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Useful Wrapper Class Methods</h3>
+      <pre><code class="language-java">// Parsing strings to numbers
+int num = Integer.parseInt("42");           // String → int
+double d = Double.parseDouble("3.14");      // String → double
+boolean flag = Boolean.parseBoolean("true"); // String → boolean
+
+// Constants
+int maxInt = Integer.MAX_VALUE;             // 2147483647
+int minInt = Integer.MIN_VALUE;             // -2147483648
+long maxLong = Long.MAX_VALUE;              // 9223372036854775807
+double maxDouble = Double.MAX_VALUE;
+
+// Utility methods
+int abs = Math.abs(-42);                    // absolute value
+String binary = Integer.toBinaryString(255); // "11111111"
+String hex = Integer.toHexString(255);      // "ff"
+String octal = Integer.toOctalString(8);    // "10"
+
+// Check for special values
+boolean isNaN = Double.isNaN(0.0 / 0.0);    // true
+boolean isInf = Double.isInfinite(1.0 / 0.0); // true
+boolean isFinite = Double.isFinite(3.14);   // true</code></pre>
+
+      <h3>Autoboxing and Unboxing</h3>
+      <pre><code class="language-java">// Autoboxing: primitive → wrapper (automatic)
+Integer wrapped = 42;              // int 42 → Integer(42)
+Double d = 3.14;                   // double 3.14 → Double(3.14)
+
+// Unboxing: wrapper → primitive (automatic)
+int unwrapped = wrapped;           // Integer(42) → int 42
+double dval = d;                   // Double(3.14) → double 3.14
+
+// Useful in collections (which require objects)
+List&lt;Integer&gt; numbers = new ArrayList&lt;&gt;();
+numbers.add(42);                   // autoboxing: 42 → Integer(42)
+int first = numbers.get(0);        // unboxing: Integer(42) → 42</code></pre>
+
+      <h3>The == Cache Trap with Wrapper Classes</h3>
+      <div class="important">
+        <strong>Important:</strong> The Integer class caches values -128 to 127 for performance. Outside this range, == returns false even for equal values!
+      </div>
+
+      <pre><code class="language-java">// WRONG: comparing wrapper objects with ==
+Integer a = 127;               // cached value
+Integer b = 127;
+System.out.println(a == b);    // true (LUCK! both cached)
+
+Integer c = 200;               // NOT cached
+Integer d = 200;
+System.out.println(c == d);    // false (WRONG! different objects)
+
+// CORRECT: always use .equals() for value comparison
+System.out.println(a.equals(b));  // true
+System.out.println(c.equals(d));  // true
+
+// This applies to other wrapper classes too
+Double x = 1.0;
+Double y = 1.0;
+System.out.println(x == y);       // false (different objects)
+System.out.println(x.equals(y));  // true (same value)</code></pre>
+
+      <h3>NullPointerException from Unboxing</h3>
+      <pre><code class="language-java">Integer wrapped = null;
+// int value = wrapped;            // ERROR: NullPointerException at runtime!
+
+// Safe pattern: check for null first
+if (wrapped != null) {
+    int value = wrapped;           // safe to unbox
+}
+
+// Or use Optional (Java 8+)
+Optional&lt;Integer&gt; opt = Optional.ofNullable(wrapped);
+int value = opt.orElse(0);         // 0 if null</code></pre>
+
+      <div class="warning">
+        <strong>Warning:</strong> Unboxing a null wrapper throws NullPointerException. Always check for null before unboxing in production code.
+      </div>
+    </section>
+
+    <!-- ==================== 5. TYPE CASTING ==================== -->
+    <section id="type-casting">
+      <h2>5. Type Casting</h2>
+
+      <p>Converting from one data type to another. Widening is automatic; narrowing requires explicit cast.</p>
+
+      <h3>Type Widening Hierarchy</h3>
+      <pre class="diagram">byte → short → int → long → float → double
+              ↑
+             char</pre>
+
+      <h3>Widening (Implicit, Safe)</h3>
+      <pre><code class="language-java">// Widening: smaller type → larger type (automatic, no data loss)
+byte b = 100;
+short s = b;                    // byte → short (automatic)
+int i = s;                      // short → int (automatic)
+long l = i;                     // int → long (automatic)
+float f = l;                    // long → float (automatic)
+double d = f;                   // float → double (automatic)
+
+// In one line
+double result = 42;             // int → double (implicit widening)
+
+// Character widening
+char c = 'A';                   // 'A' = 65
+int codePoint = c;             // char → int (automatic), codePoint = 65</code></pre>
+
+      <h3>Narrowing (Explicit, Potential Data Loss)</h3>
+      <pre><code class="language-java">// Narrowing: larger type → smaller type (explicit cast required, may lose data)
+
+// WRONG: compile error without cast
+// int i = 3.14;
+
+// CORRECT: explicit cast with (Type)
+double d = 3.99;
+int i = (int) d;                // i = 3 (truncated, not rounded!)
+
+// Integer overflow in narrowing
+int big = 130;
+byte b = (byte) big;            // b = -126 (wraps around due to overflow)
+System.out.println(b);          // prints -126
+
+// Explaining the overflow
+int value = 256;
+byte b = (byte) value;          // 256 in binary: 0x100 → truncated to 0x00 = 0
+System.out.println(b);          // prints 0
+
+int value2 = 257;
+byte b2 = (byte) value2;        // 257 in binary: 0x101 → truncated to 0x01 = 1
+System.out.println(b2);         // prints 1</code></pre>
+
+      <h3>Casting Primitives in Arithmetic</h3>
+      <pre><code class="language-java">// Type promotion in mixed-type arithmetic
+int i = 5;
+double d = 2.0;
+double result = i / d;          // 5 / 2.0 = 2.5 (int promoted to double)
+
+// Common mistake: integer division
+int a = 5;
+int b = 2;
+int divided = a / b;            // 5 / 2 = 2 (integer division, not 2.5)
+double correct = (double) a / b; // (double)5 / 2 = 2.5 (correct)</code></pre>
+
+      <h3>Casting Objects (String to Number, etc.)</h3>
+      <pre><code class="language-java">// String to primitive number
+String num = "42";
+int i = Integer.parseInt(num);              // "42" → 42
+long l = Long.parseLong(num);               // "42" → 42L
+double d = Double.parseDouble("3.14");      // "3.14" → 3.14
+boolean flag = Boolean.parseBoolean("true"); // "true" → true
+
+// Primitive number to String
+int value = 42;
+String str1 = String.valueOf(value);        // 42 → "42"
+String str2 = "" + value;                   // concatenation trick: 42 → "42"
+String str3 = Integer.toString(value);      // 42 → "42"
+
+// NumberFormatException on invalid input
+try {
+    int bad = Integer.parseInt("abc");      // ERROR: not a valid number
+} catch (NumberFormatException e) {
+    System.out.println("Invalid number format");
+}</code></pre>
+
+      <div class="warning">
+        <strong>Warning:</strong> Casting from double to int truncates (not rounds). Use Math.round() if you need rounding.
+      </div>
+    </section>
+
+    <!-- ==================== 6. VAR KEYWORD ==================== -->
+    <section id="var-keyword">
+      <h2>6. var — Local Variable Type Inference (Java 10+)</h2>
+
+      <p>The var keyword allows the compiler to infer the type from the initializer. The variable is still statically typed at compile time.</p>
+
+      <h3>Valid Uses of var</h3>
+      <pre><code class="language-java">// Type is inferred from the initializer
+var name = "Alice";                    // String (inferred)
+var count = 42;                        // int (inferred)
+var salary = 50000.50;                 // double (inferred)
+var isActive = true;                   // boolean (inferred)
+
+// Useful for reducing verbosity with complex types
+var list = new ArrayList&lt;String&gt;();   // ArrayList&lt;String&gt; (inferred)
+var map = new HashMap&lt;String, Integer&gt;(); // HashMap&lt;String, Integer&gt; (inferred)
+
+// Even better readability
+var students = Arrays.asList("Alice", "Bob", "Charlie");  // List&lt;String&gt;
+var uniqueStudents = new HashSet&lt;String&gt;();             // HashSet&lt;String&gt;
+
+// Type is still known (static)
+var x = 5;
+// x = "string";  // ERROR: x is int, cannot assign string</code></pre>
+
+      <h3>INVALID Uses of var (Will Not Compile)</h3>
+      <pre><code class="language-java">// WRONG: no initializer (compiler can't infer type)
+// var x;
+
+// WRONG: initializer is null (ambiguous type)
+// var y = null;
+
+// WRONG: var only works for local variables, not fields
+// class MyClass {
+//     var field = 5;  // ERROR: var not allowed here
+// }
+
+// WRONG: var not allowed in method parameters or return types
+// public var getData() { ... }  // ERROR
+// public void method(var x) { ... } // ERROR
+
+// WRONG: can't use var with array initializer without explicit type
+// var arr = { 1, 2, 3 };  // ERROR
+var arr = new int[] { 1, 2, 3 };  // CORRECT (explicit type)</code></pre>
+
+      <h3>When to Use var</h3>
+      <ul>
+        <li>When the type is obvious from context (ArrayList<String>, HashMap, etc.)</li>
+        <li>Reduces visual clutter with long generic types</li>
+        <li>Only for local variables in methods</li>
+        <li>NOT recommended for public APIs where type clarity is important</li>
+      </ul>
+
+      <pre><code class="language-java">// Bad: type is unclear without reading the right side
+var result = complexCalculation();
+
+// Good: type is obvious
+var userList = new ArrayList&lt;User&gt;();
+var config = loadConfigFile("app.properties");
+
+// In loops
+List&lt;String&gt; names = Arrays.asList("Alice", "Bob");
+for (var name : names) {  // var inferred as String
+    System.out.println(name);
+}</code></pre>
+    </section>
+
+    <!-- ==================== 7. ARITHMETIC OPERATORS ==================== -->
+    <section id="arithmetic-operators">
+      <h2>7. Arithmetic Operators</h2>
+
+      <p>Five basic operators: + (addition), - (subtraction), * (multiplication), / (division), % (modulo/remainder).</p>
+
+      <h3>Basic Arithmetic</h3>
+      <pre><code class="language-java">int a = 10;
+int b = 3;
+
+int add = a + b;           // 13
+int subtract = a - b;      // 7
+int multiply = a * b;      // 30
+int divide = a / b;        // 3 (integer division)
+int remainder = a % b;     // 1 (10 - (3 * 3) = 1)
+
+System.out.println("10 + 3 = " + add);        // 13
+System.out.println("10 - 3 = " + subtract);   // 7
+System.out.println("10 * 3 = " + multiply);   // 30
+System.out.println("10 / 3 = " + divide);     // 3
+System.out.println("10 % 3 = " + remainder);  // 1</code></pre>
+
+      <h3>Integer Division Truncates (Does Not Round)</h3>
+      <div class="warning">
+        <strong>Common Mistake:</strong> Integer division truncates toward zero, it does NOT round.
+      </div>
+
+      <pre><code class="language-java">// Integer division: result is truncated
+int result1 = 5 / 2;           // 2 (not 2.5!)
+int result2 = 7 / 2;           // 3 (not 3.5!)
+int result3 = 9 / 4;           // 2 (not 2.25!)
+
+// WRONG: trying to round with integer division
+// int avg = sum / count;      // loses decimal part
+
+// CORRECT: cast to double for true division
+double correctAvg = (double) sum / count;  // 2.5
+double avg = sum / (double) count;         // also correct (either operand can be double)
+
+// Or use floating-point types from the start
+double dividend = 5.0;
+double divisor = 2.0;
+double result = dividend / divisor;        // 2.5 (true division)</code></pre>
+
+      <h3>Modulo with Negative Numbers</h3>
+      <pre><code class="language-java">// Modulo returns the sign of the dividend (left operand)
+System.out.println(7 % 3);       // 1
+System.out.println(-7 % 3);      // -1 (negative dividend → negative result)
+System.out.println(7 % -3);      // 1 (positive dividend → positive result)
+System.out.println(-7 % -3);     // -1 (negative dividend → negative result)
+
+// Practical: check if number is even or odd
+int num = 42;
+if (num % 2 == 0) {
+    System.out.println("Even");
+} else {
+    System.out.println("Odd");
+}</code></pre>
+
+      <h3>Arithmetic with Mixed Types (Type Promotion)</h3>
+      <pre><code class="language-java">// When mixing int and double, int is promoted to double
+int i = 5;
+double d = 2.0;
+double result = i / d;          // 5 / 2.0 = 2.5 (int promoted to double)
+
+// When mixing all integers, result is integer
+int result2 = 5 / 2;            // 2 (integer division)
+
+// Promotion happens automatically in broader operations
+byte b = 10;
+short s = 20;
+int sum = b + s;                // byte + short = int (both promoted to int)</code></pre>
+
+      <h3>Overflow and Underflow</h3>
+      <div class="warning">
+        <strong>Warning:</strong> Integer overflow wraps around silently. Java does NOT throw an exception.
+      </div>
+
+      <pre><code class="language-java">// Overflow: exceeding max value wraps to min value
+int max = Integer.MAX_VALUE;    // 2147483647
+int overflow = max + 1;         // wraps to -2147483648 (Integer.MIN_VALUE)
+System.out.println(overflow);   // prints -2147483648 (SILENT overflow)
+
+// Underflow: going below min value wraps to max value
+int min = Integer.MIN_VALUE;    // -2147483648
+int underflow = min - 1;        // wraps to 2147483647 (Integer.MAX_VALUE)
+System.out.println(underflow);  // prints 2147483647 (SILENT underflow)
+
+// Check for overflow before it happens (use long)
+long safe = (long) Integer.MAX_VALUE + 1;  // 2147483648 (no overflow)</code></pre>
+    </section>
+
+    <!-- ==================== 8. UNARY OPERATORS ==================== -->
+    <section id="unary-operators">
+      <h2>8. Unary Operators</h2>
+
+      <p>Unary operators act on a single operand. Pre and post versions of ++ and -- have different behaviors.</p>
+
+      <h3>Increment and Decrement Operators</h3>
+      <pre><code class="language-java">int x = 5;
+
+// Pre-increment: increment THEN return the value
+int a = ++x;           // x becomes 6, then a gets 6
+System.out.println(x);  // 6
+System.out.println(a);  // 6
+
+// Post-increment: return the value THEN increment
+int y = 5;
+int b = y++;           // b gets 5, then y becomes 6
+System.out.println(y);  // 6
+System.out.println(b);  // 5
+
+// Pre-decrement: decrement THEN return the value
+int z = 10;
+int c = --z;           // z becomes 9, then c gets 9
+System.out.println(z);  // 9
+System.out.println(c);  // 9
+
+// Post-decrement: return the value THEN decrement
+int w = 10;
+int d = w--;           // d gets 10, then w becomes 9
+System.out.println(w);  // 9
+System.out.println(d);  // 10</code></pre>
+
+      <h3>Side Effects in Expressions</h3>
+      <pre><code class="language-java">int x = 5;
+
+System.out.println(x++);       // prints 5, x becomes 6
+System.out.println(x);         // prints 6
+
+System.out.println(++x);       // x becomes 7, prints 7
+System.out.println(x);         // prints 7
+
+// In assignments and method calls
+int[] arr = {1, 2, 3};
+int i = 0;
+int value = arr[i++];          // value = arr[0], then i becomes 1
+System.out.println(i);         // 1
+System.out.println(value);     // 1
+
+// Common mistake: using post-increment in loop
+for (int j = 0; j < 5; j++) {
+    // j++ is executed after body, behavior is expected here
+}</code></pre>
+
+      <h3>Unary Plus and Minus</h3>
+      <pre><code class="language-java">int a = 5;
+int b = -a;            // -5 (unary minus)
+int c = +a;            // 5 (unary plus, rarely used)
+
+double d = 3.14;
+double negD = -d;      // -3.14</code></pre>
+
+      <h3>Logical NOT Operator</h3>
+      <pre><code class="language-java">boolean flag = true;
+boolean inverted = !flag;      // false
+
+boolean isEmpty = false;
+if (!isEmpty) {                // if NOT empty
+    System.out.println("Has content");
+}
+
+// Double negation (avoid, confusing)
+boolean result = !!flag;       // true (but hard to read)</code></pre>
+
+      <h3>Bitwise NOT Operator</h3>
+      <pre><code class="language-java">int a = 0b0000_1010;           // 10
+int inverted = ~a;             // flips all bits: 0b1111_0101 = -11 (two's complement)
+System.out.println(inverted);  // -11
+
+// Formula: ~x = -(x + 1)
+System.out.println(~5);        // -6
+System.out.println(~(-5));     // 4</code></pre>
+    </section>
+
+    <!-- ==================== 9. ASSIGNMENT OPERATORS ==================== -->
+    <section id="assignment-operators">
+      <h2>9. Assignment Operators</h2>
+
+      <p>Assignment operators assign a value to a variable. Compound assignment operators combine an operation with assignment.</p>
+
+      <h3>Basic and Compound Assignment</h3>
+      <pre><code class="language-java">int x = 10;
+
+// Basic assignment
+x = 5;                 // x is now 5
+
+// Arithmetic compound assignments
+x += 3;                // x = x + 3 → 8
+x -= 2;                // x = x - 2 → 6
+x *= 2;                // x = x * 2 → 12
+x /= 3;                // x = x / 3 → 4
+x %= 3;                // x = x % 3 → 1
+
+// Each compound is equivalent to its expanded form
+int y = 10;
+y += 5;                // same as: y = y + 5; (y is now 15)
+
+int z = 10;
+z -= 3;                // same as: z = z - 3; (z is now 7)</code></pre>
+
+      <h3>Bitwise Compound Assignment</h3>
+      <pre><code class="language-java">int mask = 0xFF;
+
+// AND assignment
+mask &= 0x0F;          // mask = mask & 0x0F
+
+// OR assignment
+int flags = 0b0000;
+flags |= 0b1111;       // flags = flags | 0b1111 → 0b1111
+
+// XOR assignment
+int toggle = 0b1010;
+toggle ^= 0b1100;      // toggle = toggle ^ 0b1100 → 0b0110</code></pre>
+
+      <h3>Shift Compound Assignment</h3>
+      <pre><code class="language-java">int value = 5;         // 0b0101
+
+value <<= 1;           // value = value << 1 → 10 (0b1010)
+value >>= 1;           // value = value >> 1 → 5 (0b0101)
+value >>>= 1;          // value = value >>> 1 → 2 (0b0010)</code></pre>
+
+      <div class="tip">
+        <strong>Tip:</strong> Compound assignments (+=, -=, etc.) are preferred over x = x + y because they're more concise and sometimes more efficient.
+      </div>
+    </section>
+
+    <!-- ==================== 10. COMPARISON OPERATORS ==================== -->
+    <section id="comparison-operators">
+      <h2>10. Comparison Operators</h2>
+
+      <p>Comparison operators compare two values and return a boolean. WARNING: == on objects compares references, not values.</p>
+
+      <h3>All Comparison Operators</h3>
+      <pre><code class="language-java">int a = 10;
+int b = 5;
+
+System.out.println(a == b);     // false (equality)
+System.out.println(a != b);     // true (inequality)
+System.out.println(a > b);      // true (greater than)
+System.out.println(a >= b);     // true (greater than or equal)
+System.out.println(a < b);      // false (less than)
+System.out.println(a <= b);     // false (less than or equal)
+
+double x = 3.14;
+double y = 3.14;
+System.out.println(x == y);     // true (same value)</code></pre>
+
+      <h3>The String == Trap (Comparing Objects)</h3>
+      <div class="important">
+        <strong>Critical:</strong> == compares object REFERENCES, not values. Use .equals() for String comparison.
+      </div>
+
+      <pre><code class="language-java">// WRONG: using == on String objects
+String s1 = new String("Hello");
+String s2 = new String("Hello");
+System.out.println(s1 == s2);        // false (different objects, same content)
+
+// CORRECT: using .equals()
+System.out.println(s1.equals(s2));   // true (same content)
+
+// String literals are usually interned (special optimization)
+String s3 = "Hello";
+String s4 = "Hello";
+System.out.println(s3 == s4);        // true (same reference, due to interning)
+System.out.println(s3.equals(s4));   // true (same content)
+
+// Case-insensitive comparison
+String s5 = "HELLO";
+String s6 = "hello";
+System.out.println(s5.equals(s6));           // false (case-sensitive)
+System.out.println(s5.equalsIgnoreCase(s6)); // true (case-insensitive)</code></pre>
+
+      <h3>Comparing null</h3>
+      <pre><code class="language-java">String s = null;
+
+// Safe: comparing with null using ==
+if (s == null) {
+    System.out.println("s is null");
+}
+
+// WRONG: calling method on null (NullPointerException)
+// if (s.equals("test")) { ... }  // ERROR: NullPointerException
+
+// CORRECT: check null first
+if (s != null && s.equals("test")) {
+    System.out.println("s equals test");
+}
+
+// Java 8+ Objects.equals() handles null safely
+if (Objects.equals(s, "test")) {   // safe even if s is null
+    System.out.println("s equals test");
+}</code></pre>
+    </section>
+
+    <!-- ==================== 11. LOGICAL OPERATORS ==================== -->
+    <section id="logical-operators">
+      <h2>11. Logical Operators</h2>
+
+      <p>Logical operators combine boolean values. Short-circuit evaluation is critical for safety.</p>
+
+      <h3>Logical AND (&& ) and OR (||)</h3>
+      <pre><code class="language-java">boolean a = true;
+boolean b = false;
+
+System.out.println(a && b);     // false (AND requires both true)
+System.out.println(a || b);     // true (OR requires at least one true)
+System.out.println(!a);         // false (NOT inverts boolean)
+System.out.println(!b);         // true</code></pre>
+
+      <h3>Short-Circuit Evaluation (Critical!)</h3>
+      <div class="important">
+        <strong>Important:</strong> && and || short-circuit: they stop evaluating once the result is known. This prevents NullPointerException and other errors.
+      </div>
+
+      <pre><code class="language-java">// CORRECT: short-circuit prevents null dereference
+String s = null;
+if (s != null && s.length() > 0) {
+    System.out.println(s);      // safe: never calls s.length() if s is null
+}
+
+// WRONG: single & operator does NOT short-circuit
+if (s != null & s.length() > 0) {
+    System.out.println(s);      // NullPointerException! & evaluates both sides
+}
+
+// Short-circuit with OR: stops at first true
+int x = 5;
+if (x == 5 || expensiveFunction()) {  // expensiveFunction() never called
+    System.out.println("x is 5");
+}
+
+// Both conditions evaluated if first is false
+if (x == 10 || expensiveFunction()) {  // expensiveFunction() IS called
+    System.out.println("condition met");
+}</code></pre>
+
+      <h3>Truth Tables</h3>
+      <table class="truth-table">
+        <thead>
+          <tr>
+            <th>A</th>
+            <th>B</th>
+            <th>A && B</th>
+            <th>A || B</th>
+            <th>!A</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>true</td><td>true</td><td>true</td><td>true</td><td>false</td></tr>
+          <tr><td>true</td><td>false</td><td>false</td><td>true</td><td>false</td></tr>
+          <tr><td>false</td><td>true</td><td>false</td><td>true</td><td>true</td></tr>
+          <tr><td>false</td><td>false</td><td>false</td><td>false</td><td>true</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Non-Short-Circuit Bitwise Operators (& and |)</h3>
+      <pre><code class="language-java">// & (bitwise AND): same as && for booleans, but does NOT short-circuit
+// | (bitwise OR): same as || for booleans, but does NOT short-circuit
+
+// When used with booleans, avoid & and | (prefer && and ||)
+boolean a = true;
+boolean b = true;
+
+System.out.println(a & b);      // true (but didn't short-circuit)
+System.out.println(a | b);      // true (but didn't short-circuit)
+
+// & and | are useful for bitwise operations on integers (different purpose)
+int x = 0b1100;
+int y = 0b1010;
+System.out.println(Integer.toBinaryString(x & y));  // 0b1000 (bitwise)
+System.out.println(Integer.toBinaryString(x | y));  // 0b1110 (bitwise)</code></pre>
+    </section>
+
+    <!-- ==================== 12. BITWISE OPERATORS ==================== -->
+    <section id="bitwise-operators">
+      <h2>12. Bitwise Operators</h2>
+
+      <p>Bitwise operators manipulate individual bits. Useful for flags, masks, and efficient math.</p>
+
+      <h3>Bitwise AND (&), OR (|), XOR (^), NOT (~)</h3>
+      <pre><code class="language-java">int a = 0b1010;  // 10
+int b = 0b1100;  // 12
+
+// AND: both bits must be 1
+int andResult = a & b;                          // 0b1000 = 8
+System.out.println(Integer.toBinaryString(andResult));  // "1000"
+
+// OR: at least one bit must be 1
+int orResult = a | b;                           // 0b1110 = 14
+System.out.println(Integer.toBinaryString(orResult));   // "1110"
+
+// XOR: bits must be different
+int xorResult = a ^ b;                          // 0b0110 = 6
+System.out.println(Integer.toBinaryString(xorResult));  // "110"
+
+// NOT: flip all bits (two's complement for signed numbers)
+int notA = ~a;                                  // flips all bits
+System.out.println(Integer.toBinaryString(notA));      // many bits = negative</code></pre>
+
+      <h3>Shift Operators</h3>
+      <pre><code class="language-java">int value = 8;  // 0b1000
+
+// Left shift: multiply by 2^n (shift bits left, fill with 0)
+int leftShift = value << 1;           // 0b10000 = 16 (8 * 2)
+System.out.println(leftShift);        // 16
+
+int leftShift2 = value << 2;          // 0b100000 = 32 (8 * 4)
+System.out.println(leftShift2);       // 32
+
+// Right shift (signed): divide by 2^n, preserve sign bit
+int rightShift = value >> 1;          // 0b0100 = 4 (8 / 2)
+System.out.println(rightShift);       // 4
+
+// Right shift with negative number
+int neg = -8;
+int negShift = neg >> 1;              // -4 (sign preserved)
+System.out.println(negShift);         // -4
+
+// Unsigned right shift: shift right, fill with 0 (ignores sign)
+int unsignedShift = neg >>> 1;        // huge positive number (sign bit becomes 0)
+System.out.println(unsignedShift);    // 2147483644</code></pre>
+
+      <h3>Practical Bitwise Uses: Flags and Masks</h3>
+      <pre><code class="language-java">// Using bits as flags
+int perms = 0;              // no permissions
+
+final int READ = 1;         // 0b001
+final int WRITE = 2;        // 0b010
+final int EXECUTE = 4;      // 0b100
+
+// Set flags with OR
+perms |= READ;              // add READ
+perms |= WRITE;             // add WRITE
+System.out.println(perms);  // 3 (0b011)
+
+// Check flags with AND
+if ((perms & READ) != 0) {
+    System.out.println("Can read");
+}
+if ((perms & EXECUTE) != 0) {
+    System.out.println("Can execute");
+} else {
+    System.out.println("Cannot execute");  // prints this
+}
+
+// Remove flag with AND + NOT
+perms &= ~WRITE;            // remove WRITE
+System.out.println(perms);  // 1 (0b001 = READ only)</code></pre>
+
+      <h3>Fast Multiply and Divide</h3>
+      <pre><code class="language-java">int x = 10;
+
+// Left shift is faster than multiplication
+int double_x = x << 1;      // x * 2 = 20
+int quad_x = x << 2;        // x * 4 = 40
+
+// Right shift is faster than division
+int half_x = x >> 1;        // x / 2 = 5
+int quarter_x = x >> 2;     // x / 4 = 2</code></pre>
+    </section>
+
+    <!-- ==================== 13. TERNARY OPERATOR ==================== -->
+    <section id="ternary-operator">
+      <h2>13. Ternary Operator</h2>
+
+      <p>The ternary operator (? :) is the only three-operand operator. It evaluates a condition and returns one of two values.</p>
+
+      <h3>Basic Ternary Syntax</h3>
+      <pre><code class="language-java">condition ? valueIfTrue : valueIfFalse</code></pre>
+
+      <h3>Simple Examples</h3>
+      <pre><code class="language-java">int age = 25;
+
+// Simple ternary
+String status = (age >= 18) ? "adult" : "minor";
+System.out.println(status);  // "adult"
+
+// In method calls
+System.out.println((age > 30) ? "older" : "younger");
+
+// Assigning numeric values
+int score = 85;
+int grade = (score >= 90) ? 10 : (score >= 80) ? 9 : 8;
+System.out.println(grade);  // 9</code></pre>
+
+      <h3>Nested Ternary (Use Cautiously)</h3>
+      <pre><code class="language-java">int hours = 15;
+
+// Nested ternary (readable)
+String timeOfDay = (hours < 12) ? "morning"
+                 : (hours < 18) ? "afternoon"
+                 : "evening";
+System.out.println(timeOfDay);  // "afternoon"
+
+// Same logic with if-else is often clearer
+String timeOfDay2;
+if (hours < 12) {
+    timeOfDay2 = "morning";
+} else if (hours < 18) {
+    timeOfDay2 = "afternoon";
+} else {
+    timeOfDay2 = "evening";
+}
+
+// WRONG: deeply nested ternary is hard to read
+// int result = a ? b : c ? d : e ? f : g;  // avoid!</code></pre>
+
+      <div class="tip">
+        <strong>Tip:</strong> Use ternary for simple conditions. For complex logic, prefer if-else statements.
+      </div>
+    </section>
+
+    <!-- ==================== 14. INSTANCEOF OPERATOR ==================== -->
+    <section id="instanceof-operator">
+      <h2>14. instanceof Operator</h2>
+
+      <p>The instanceof operator tests whether an object is an instance of a class or interface.</p>
+
+      <h3>Basic instanceof Usage</h3>
+      <pre><code class="language-java">Object obj = "Hello";
+
+// Check type
+if (obj instanceof String) {
+    String str = (String) obj;           // explicit cast
+    System.out.println(str.toUpperCase());
+}
+
+// Works with inheritance
+class Animal { }
+class Dog extends Animal { }
+
+Dog dog = new Dog();
+System.out.println(dog instanceof Dog);     // true
+System.out.println(dog instanceof Animal);  // true (subclass is instance of superclass)</code></pre>
+
+      <h3>Pattern Matching with instanceof (Java 16+)</h3>
+      <pre><code class="language-java">// Old way: cast explicitly
+Object obj = "Hello";
+if (obj instanceof String) {
+    String s = (String) obj;
+    System.out.println(s.length());
+}
+
+// New way: pattern variable (Java 16+)
+if (obj instanceof String s) {         // s is already cast to String
+    System.out.println(s.length());    // can use s directly
+}
+
+// Pattern with complex types
+if (obj instanceof List list) {
+    System.out.println("List size: " + list.size());
+}</code></pre>
+
+      <h3>Common Pattern: Type Checking and Casting</h3>
+      <pre><code class="language-java">void printLength(Object obj) {
+    if (obj instanceof String) {
+        System.out.println("String length: " + ((String) obj).length());
+    } else if (obj instanceof int[]) {
+        System.out.println("Array length: " + ((int[]) obj).length);
+    } else {
+        System.out.println("Unknown type");
+    }
+}</code></pre>
+    </section>
+
+    <!-- ==================== 15. OPERATOR PRECEDENCE ==================== -->
+    <section id="operator-precedence">
+      <h2>15. Operator Precedence</h2>
+
+      <p>Operators are evaluated in a specific order. Higher precedence operators are evaluated first. Use parentheses when in doubt.</p>
+
+      <h3>Complete Operator Precedence Table (Highest to Lowest)</h3>
+      <table class="precedence-table">
+        <thead>
+          <tr>
+            <th>Precedence</th>
+            <th>Operators</th>
+            <th>Associativity</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 (highest)</td>
+            <td>() [] . ++ --</td>
+            <td>Left to right</td>
+            <td><code>(a + b)</code>, <code>arr[0]</code>, <code>obj.field</code></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>! ~ ++ -- + -</td>
+            <td>Right to left</td>
+            <td><code>!true</code>, <code>~x</code>, <code>-5</code></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>* / %</td>
+            <td>Left to right</td>
+            <td><code>10 * 2 / 5</code></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>+ -</td>
+            <td>Left to right</td>
+            <td><code>5 + 3 - 2</code></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>&lt;&lt; &gt;&gt; &gt;&gt;&gt;</td>
+            <td>Left to right</td>
+            <td><code>x << 2</code>, <code>y >> 1</code></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>&lt; &lt;= &gt; &gt;= instanceof</td>
+            <td>Left to right</td>
+            <td><code>x < 10</code>, <code>obj instanceof String</code></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>== !=</td>
+            <td>Left to right</td>
+            <td><code>a == b</code>, <code>x != y</code></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>&amp; (bitwise AND)</td>
+            <td>Left to right</td>
+            <td><code>x & 0xFF</code></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>^ (XOR)</td>
+            <td>Left to right</td>
+            <td><code>a ^ b</code></td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>| (bitwise OR)</td>
+            <td>Left to right</td>
+            <td><code>flags | 0x01</code></td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td>&amp;&amp; (logical AND)</td>
+            <td>Left to right</td>
+            <td><code>a && b</code></td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td>|| (logical OR)</td>
+            <td>Left to right</td>
+            <td><code>a || b</code></td>
+          </tr>
+          <tr>
+            <td>13</td>
+            <td>? : (ternary)</td>
+            <td>Right to left</td>
+            <td><code>condition ? true_val : false_val</code></td>
+          </tr>
+          <tr>
+            <td>14</td>
+            <td>= += -= *= /= %= &amp;= |= ^= &lt;&lt;= &gt;&gt;= &gt;&gt;&gt;=</td>
+            <td>Right to left</td>
+            <td><code>x = 5</code>, <code>x += 10</code></td>
+          </tr>
+          <tr>
+            <td>15 (lowest)</td>
+            <td>;</td>
+            <td>Left to right</td>
+            <td><code>statement;</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Precedence Examples (Without Parentheses = Confusing)</h3>
+      <pre><code class="language-java">// WRONG: operator precedence causes unexpected result
+int result1 = 2 + 3 * 4;       // 14 (not 20) — * before +
+System.out.println(result1);   // prints 14
+
+// CORRECT: use parentheses for clarity
+int result2 = (2 + 3) * 4;     // 20 (addition before multiplication)
+System.out.println(result2);   // prints 20
+
+// More examples
+int a = 5, b = 3, c = 2;
+System.out.println(a + b * c);         // 11 (3*2=6, then 5+6=11)
+System.out.println((a + b) * c);       // 16 (5+3=8, then 8*2=16)
+
+// Boolean logic precedence
+boolean x = true, y = false, z = true;
+System.out.println(x || y && z);       // true (&& before ||, so y && z = false, then true || false = true)
+System.out.println((x || y) && z);     // true (x || y = true, then true && z = true)</code></pre>
+
+      <h3>Mixing Logical and Bitwise Operators (Easy to Confuse)</h3>
+      <pre><code class="language-java">int a = 5, b = 3;
+
+// Bitwise (single &, |, ^)
+System.out.println(a & b);     // 1 (0101 & 0011 = 0001)
+System.out.println(a | b);     // 7 (0101 | 0011 = 0111)
+
+// Logical (double &&, ||)
+System.out.println((a > 0) && (b > 0));  // true
+System.out.println((a > 0) || (b > 0));  // true
+
+// WRONG: confusing bitwise with logical
+// boolean result = a & b;     // type error: & expects int, not boolean
+// boolean result = (a > 0) & (b > 0);  // compiles but doesn't short-circuit!</code></pre>
+    </section>
+
+    <!-- ==================== 16. STRING CONCATENATION WITH + ==================== -->
+    <section id="string-concatenation">
+      <h2>16. String Concatenation with +</h2>
+
+      <p>The + operator concatenates strings. When mixing strings and primitives, type coercion rules apply.</p>
+
+      <h3>Basic String Concatenation</h3>
+      <pre><code class="language-java">String greeting = "Hello" + " " + "World";
+System.out.println(greeting);  // "Hello World"
+
+String name = "Alice";
+String message = "Welcome, " + name;
+System.out.println(message);   // "Welcome, Alice"</code></pre>
+
+      <h3>Concatenating Primitives (Implicit Conversion to String)</h3>
+      <pre><code class="language-java">System.out.println("The answer is: " + 42);        // "The answer is: 42"
+System.out.println("Pi is: " + 3.14);              // "Pi is: 3.14"
+System.out.println("Flag: " + true);               // "Flag: true"
+System.out.println("Char: " + 'A');                // "Char: A"
+
+// Multiple values concatenated left to right
+System.out.println("Value: " + 10 + " dollars");   // "Value: 10 dollars"</code></pre>
+
+      <h3>The Concatenation Order Trap</h3>
+      <div class="important">
+        <strong>Critical:</strong> + is left-to-right associative. String context determines if + means concatenation or arithmetic.
+      </div>
+
+      <pre><code class="language-java">// WRONG: arithmetic happens first, then concatenation
+System.out.println("Result: " + 1 + 2);    // "Result: 12" (not "Result: 3")
+// Explanation: "Result: " + 1 = "Result: 1", then "Result: 1" + 2 = "Result: 12"
+
+// CORRECT: use parentheses to do arithmetic first
+System.out.println("Result: " + (1 + 2));  // "Result: 3"
+
+// Another example
+System.out.println(1 + 2 + " items");      // "3 items" (1 + 2 = 3 first, then string)
+System.out.println("Item " + 1 + 2);       // "Item 12" (string context from left)
+
+// Complex example
+int a = 5, b = 3;
+System.out.println("a + b = " + a + b);           // "a + b = 53" (WRONG)
+System.out.println("a + b = " + (a + b));        // "a + b = 8" (CORRECT)</code></pre>
+
+      <h3>Alternatives to + Concatenation</h3>
+      <pre><code class="language-java">// Using String.format (readable, similar to printf)
+String formatted = String.format("Value: %d, Name: %s", 42, "Alice");
+System.out.println(formatted);  // "Value: 42, Name: Alice"
+
+// Using StringBuilder (efficient for many concatenations)
+StringBuilder sb = new StringBuilder();
+sb.append("Hello");
+sb.append(" ");
+sb.append("World");
+String result = sb.toString();
+System.out.println(result);     // "Hello World"
+
+// Using String.join (clean for joining multiple strings)
+String joined = String.join("-", "one", "two", "three");
+System.out.println(joined);     // "one-two-three"</code></pre>
+
+      <div class="note">
+        <strong>Note:</strong> For performance-critical code with many concatenations, use StringBuilder. The + operator creates intermediate String objects.
+      </div>
+    </section>
+
+  </article>
+
+  <nav class="bottom-nav">
+    <a href="chapter01-java-foundations.html">← Chapter 1</a>
+    <a href="index.html" class="nav-toc">Table of Contents</a>
+    <a href="chapter03-control-flow.html">Chapter 3 →</a>
+  </nav>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>
