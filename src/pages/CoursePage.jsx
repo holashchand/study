@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { TopNav } from '@/components/layout/TopNav'
 import { AppShell } from '@/components/layout/AppShell'
 import { getCourse } from '@/data/courses/registry'
-import { BookOpen, ArrowRight, Layers, Clock } from 'lucide-react'
+import { BookOpen, ArrowRight, Layers, Brain, Sparkles, Zap } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
@@ -71,8 +71,87 @@ export default function CoursePage() {
         </div>
       </section>
 
-      {/* ── CHAPTER GRID ────────────────────────────── */}
       <main className="mx-auto max-w-4xl px-6 py-10">
+
+        {/* ── COURSE-LEVEL EXTRAS (before chapters) ── */}
+        {(course.topQuestions?.length || course.quiz?.length || course.shortNotes) && (
+          <div className="mb-10">
+            <h2 className="text-xl font-bold mb-4 text-foreground">Interview Prep & Review</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+              {course.topQuestions?.length > 0 && (
+                <Link to={`/courses/${courseSlug}/top-questions`} className="group block">
+                  <div className="relative overflow-hidden rounded-xl border border-violet-200 dark:border-violet-800 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/50 dark:to-purple-950/50 p-4 h-full transition-all hover:shadow-lg hover:-translate-y-0.5">
+                    <div className="absolute -top-5 -right-5 h-16 w-16 rounded-full opacity-20 blur-xl bg-gradient-to-br from-violet-500 to-purple-600" />
+                    <div className="relative flex flex-col gap-2">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-sm">
+                        <Brain className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-violet-600 dark:text-violet-400">Interview Prep</p>
+                        <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors leading-snug">
+                          Top {course.topQuestionsCount ?? course.topQuestions.length} Questions
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">Most asked questions covering all {course.chapters.length} chapters</p>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-semibold text-violet-600 dark:text-violet-400">
+                        View all <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {course.quiz?.length > 0 && (
+                <Link to={`/courses/${courseSlug}/quiz`} className="group block">
+                  <div className="relative overflow-hidden rounded-xl border border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 p-4 h-full transition-all hover:shadow-lg hover:-translate-y-0.5">
+                    <div className="absolute -top-5 -right-5 h-16 w-16 rounded-full opacity-20 blur-xl bg-gradient-to-br from-amber-400 to-orange-500" />
+                    <div className="relative flex flex-col gap-2">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-sm">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-amber-600 dark:text-amber-400">Test Knowledge</p>
+                        <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors leading-snug">
+                          Course Quiz
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{course.quizConfig?.displayCount ?? 30} random from {course.quiz.length} questions</p>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        Start quiz <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {course.shortNotes && (
+                <Link to={`/courses/${courseSlug}/short-notes`} className="group block">
+                  <div className="relative overflow-hidden rounded-xl border border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 p-4 h-full transition-all hover:shadow-lg hover:-translate-y-0.5">
+                    <div className="absolute -top-5 -right-5 h-16 w-16 rounded-full opacity-20 blur-xl bg-gradient-to-br from-emerald-500 to-teal-600" />
+                    <div className="relative flex flex-col gap-2">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-sm">
+                        <Zap className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">Quick Revision</p>
+                        <h3 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors leading-snug">
+                          Course Notes
+                        </h3>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">Key concepts from all {course.chapters.length} chapters</p>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        Open notes <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── CHAPTER GRID ──────────────────────────── */}
         <h2 className="text-xl font-bold mb-6 text-foreground">Chapters</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -121,6 +200,7 @@ export default function CoursePage() {
             )
           })}
         </div>
+
       </main>
     </AppShell>
   )

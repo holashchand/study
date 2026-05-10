@@ -52,7 +52,17 @@ export default function ChapterPage() {
       <ProgressBar current={currentIdx + 1} total={sections.length} />
 
       <div className="flex h-[calc(100vh-7rem)] overflow-hidden">
-        <Sidebar sections={sections} currentIdx={currentIdx} onNavigate={navigate} />
+        <Sidebar
+          sections={sections}
+          currentIdx={currentIdx}
+          onNavigate={navigate}
+          extras={chapter.topQuestions?.length || chapter.quiz?.length || chapter.shortNotes ? {
+            topQuestionsUrl: chapter.topQuestions?.length ? `/courses/${courseSlug}/chapter/${chapterNum}/top-questions` : null,
+            topQuestionsCount: chapter.topQuestionsCount,
+            quizUrl: chapter.quiz?.length ? `/courses/${courseSlug}/chapter/${chapterNum}/quiz` : null,
+            shortNotesUrl: chapter.shortNotes ? `/courses/${courseSlug}/chapter/${chapterNum}/short-notes` : null,
+          } : null}
+        />
 
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex-1 overflow-y-auto bg-background">

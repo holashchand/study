@@ -29,12 +29,15 @@ npm run preview
 
 ```
 src/
-├── pages/              # Top-level page components (HomePage, CoursePage, ChapterPage)
+├── pages/              # Top-level page components (HomePage, CoursePage, ChapterPage, TopQuestionsPage, QuizPage, ShortNotesPage)
 ├── components/         # Reusable component library
 │   ├── ui/            # shadcn primitives (button, card, badge, ThemeToggle, etc.)
 │   ├── layout/        # App shell components (AppShell, TopNav, Sidebar)
 │   └── content/       # BlockRenderer + block components
-│       └── blocks/    # Individual block types (HeadingBlock, CodeBlock, etc.)
+│       ├── blocks/    # Individual block types (HeadingBlock, CodeBlock, etc.)
+│       ├── TopQuestionsView.jsx   # Searchable Q&A accordion with difficulty filter
+│       ├── QuizView.jsx           # Interactive random-question quiz with score screen
+│       └── ShortNotesView.jsx     # Key points, quick facts, remember-this panels
 ├── data/              # Content and configuration
 │   ├── courses/       # Course data (see src/data/CLAUDE.md)
 │   ├── registry.js    # Course registration
@@ -51,8 +54,14 @@ src/
 Using **HashRouter** for client-side routing (URLs like `#/courses/java`):
 
 - **`/`** — HomePage: List all available courses
-- **`/courses/:courseSlug`** — CoursePage: Course overview + chapter list
-- **`/courses/:courseSlug/chapter/:num`** — ChapterPage: Render chapter sections with sidebar navigation
+- **`/courses/:courseSlug`** — CoursePage: Course overview + chapter list + course-level Q&A + quiz cards
+- **`/courses/:courseSlug/chapter/:num`** — ChapterPage: Render chapter sections with sidebar navigation + extras bar
+- **`/courses/:courseSlug/top-questions`** — TopQuestionsPage: Course-level top N interview questions (100 for Java)
+- **`/courses/:courseSlug/quiz`** — QuizPage: Course quiz — 30 random from all chapter quiz pools (150 total for Java)
+- **`/courses/:courseSlug/short-notes`** — ShortNotesPage: Course notes aggregating all chapters (accordion, one per chapter)
+- **`/courses/:courseSlug/chapter/:num/top-questions`** — Chapter-level top questions (20 for Java)
+- **`/courses/:courseSlug/chapter/:num/quiz`** — Chapter-level quiz (10 random from 15 pool)
+- **`/courses/:courseSlug/chapter/:num/short-notes`** — Chapter short notes (key points, quick facts, reminders)
 
 ## Theme System
 
@@ -76,6 +85,19 @@ Semantic color tokens (use these, never hardcoded colors):
 4. Import metadata in `src/data/courses/registry.js` and add to `courses` array
 
 See **`src/data/CLAUDE.md`** for detailed step-by-step instructions and examples.
+
+## Chapter Extras System
+
+Each chapter in `meta.js` can optionally carry:
+- `topQuestions: []` — array of `{id, difficulty, q, a, tags?}` objects
+- `topQuestionsCount: 20` — display label for total count
+- `quiz: []` — pool of `{id, q, options[], answer, explanation}` MCQ objects
+- `quizDisplayCount: 10` — how many to randomly select per quiz attempt
+- `shortNotes: { title, color, keyPoints[], quickFacts[], rememberThis[] }` — structured key-point notes
+
+Course-level (`meta.js` root): `topQuestions`, `topQuestionsCount`, `quiz`, `quizConfig.displayCount`.
+
+Data files follow naming convention: `chapter0N-extras.js` alongside `chapter0N.js`.
 
 ## Key Design Decisions
 
