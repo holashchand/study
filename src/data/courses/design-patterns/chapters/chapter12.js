@@ -20,7 +20,7 @@ export const sections = [
       {
         type: 'diagram',
         format: 'mermaid',
-        content: 'flowchart TD\n  A["What problem<br/>are you solving?"] --> B["About object<br/>creation?"] --> C["Creational Patterns<br/>Singleton, Factory,<br/>Builder, Prototype"]]\n  A --> D["About composing<br/>objects together?"] --> E["Structural Patterns<br/>Adapter, Bridge, Composite,<br/>Decorator, Facade, Proxy"]]\n  A --> F["About how objects<br/>communicate?"] --> G["Behavioral Patterns<br/>Chain, Command, Iterator,<br/>Mediator, Memento, Observer"]]\n  A --> H["About object<br/>responsibility?"] --> I["Behavioral Patterns<br/>State, Strategy, Template,<br/>Visitor, Interpreter"]]\n  B --> J["Hide complexity?<br/>Singleton or Facade"]\n  B --> K["Avoid hardcoding<br/>dependencies?<br/>Factory, DI"]\n  B --> L["Complex construction?<br/>Builder"]',
+        content: 'flowchart TD\n  A["What problem<br/>are you solving?"] --> B["About object<br/>creation?"]\n  A --> D["About composing<br/>objects together?"]\n  A --> F["About how objects<br/>communicate?"]\n  A --> H["About object<br/>responsibility?"]\n  B --> C["Creational Patterns<br/>Singleton, Factory,<br/>Builder, Prototype"]\n  D --> E["Structural Patterns<br/>Adapter, Bridge, Composite,<br/>Decorator, Facade, Proxy"]\n  F --> G["Behavioral Patterns<br/>Chain, Command, Iterator,<br/>Mediator, Memento, Observer"]\n  H --> I["Behavioral Patterns<br/>State, Strategy, Template,<br/>Visitor, Interpreter"]',
         label: 'Pattern selection decision tree'
       },
       {

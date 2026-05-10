@@ -1,56 +1,69 @@
 import { cn } from '@/lib/utils'
-import { Zap, CheckCircle, AlertCircle, Lightbulb } from 'lucide-react'
+import { Zap, CheckCircle, AlertTriangle, Lightbulb } from 'lucide-react'
 
-const COLOR_MAP = {
-  violet: { from: 'from-violet-500', to: 'to-purple-600', light: 'bg-violet-50 dark:bg-violet-950/50', border: 'border-violet-200 dark:border-violet-800', text: 'text-violet-700 dark:text-violet-300', badge: 'bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300' },
-  blue:   { from: 'from-blue-500',   to: 'to-cyan-600',   light: 'bg-blue-50   dark:bg-blue-950/50',   border: 'border-blue-200   dark:border-blue-800',   text: 'text-blue-700   dark:text-blue-300',   badge: 'bg-blue-100   text-blue-800   dark:bg-blue-900/40   dark:text-blue-300' },
-  emerald:{ from: 'from-emerald-500',to: 'to-teal-600',   light: 'bg-emerald-50 dark:bg-emerald-950/50',border: 'border-emerald-200 dark:border-emerald-800',text: 'text-emerald-700 dark:text-emerald-300',badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300' },
-  amber:  { from: 'from-amber-500',  to: 'to-orange-600', light: 'bg-amber-50  dark:bg-amber-950/50',  border: 'border-amber-200  dark:border-amber-800',  text: 'text-amber-700  dark:text-amber-300',  badge: 'bg-amber-100  text-amber-800  dark:bg-amber-900/40  dark:text-amber-300' },
-  rose:   { from: 'from-rose-500',   to: 'to-pink-600',   light: 'bg-rose-50   dark:bg-rose-950/50',   border: 'border-rose-200   dark:border-rose-800',   text: 'text-rose-700   dark:text-rose-300',   badge: 'bg-rose-100   text-rose-800   dark:bg-rose-900/40   dark:text-rose-300' },
-  indigo: { from: 'from-indigo-500', to: 'to-blue-700',   light: 'bg-indigo-50 dark:bg-indigo-950/50', border: 'border-indigo-200 dark:border-indigo-800', text: 'text-indigo-700 dark:text-indigo-300', badge: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300' },
-  cyan:   { from: 'from-cyan-500',   to: 'to-sky-600',    light: 'bg-cyan-50   dark:bg-cyan-950/50',   border: 'border-cyan-200   dark:border-cyan-800',   text: 'text-cyan-700   dark:text-cyan-300',   badge: 'bg-cyan-100   text-cyan-800   dark:bg-cyan-900/40   dark:text-cyan-300' },
-  fuchsia:{ from: 'from-fuchsia-500',to: 'to-purple-700', light: 'bg-fuchsia-50 dark:bg-fuchsia-950/50',border: 'border-fuchsia-200 dark:border-fuchsia-800',text: 'text-fuchsia-700 dark:text-fuchsia-300',badge: 'bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/40 dark:text-fuchsia-300' },
+const THEME = {
+  violet:  { grad: 'from-violet-500 to-purple-600',  light: 'bg-violet-50 dark:bg-violet-950/50',  border: 'border-violet-200 dark:border-violet-800',  iconBg: 'bg-violet-100 dark:bg-violet-900/50',  text: 'text-violet-700 dark:text-violet-300',  num: 'text-violet-500 dark:text-violet-400' },
+  blue:    { grad: 'from-blue-500 to-cyan-600',      light: 'bg-blue-50 dark:bg-blue-950/50',      border: 'border-blue-200 dark:border-blue-800',      iconBg: 'bg-blue-100 dark:bg-blue-900/50',      text: 'text-blue-700 dark:text-blue-300',      num: 'text-blue-500 dark:text-blue-400' },
+  emerald: { grad: 'from-emerald-500 to-teal-600',   light: 'bg-emerald-50 dark:bg-emerald-950/50', border: 'border-emerald-200 dark:border-emerald-800', iconBg: 'bg-emerald-100 dark:bg-emerald-900/50', text: 'text-emerald-700 dark:text-emerald-300', num: 'text-emerald-500 dark:text-emerald-400' },
+  amber:   { grad: 'from-amber-500 to-orange-600',   light: 'bg-amber-50 dark:bg-amber-950/50',    border: 'border-amber-200 dark:border-amber-800',    iconBg: 'bg-amber-100 dark:bg-amber-900/50',    text: 'text-amber-700 dark:text-amber-300',    num: 'text-amber-500 dark:text-amber-400' },
+  rose:    { grad: 'from-rose-500 to-pink-600',      light: 'bg-rose-50 dark:bg-rose-950/50',      border: 'border-rose-200 dark:border-rose-800',      iconBg: 'bg-rose-100 dark:bg-rose-900/50',      text: 'text-rose-700 dark:text-rose-300',      num: 'text-rose-500 dark:text-rose-400' },
+  indigo:  { grad: 'from-indigo-500 to-blue-700',    light: 'bg-indigo-50 dark:bg-indigo-950/50',  border: 'border-indigo-200 dark:border-indigo-800',  iconBg: 'bg-indigo-100 dark:bg-indigo-900/50',  text: 'text-indigo-700 dark:text-indigo-300',  num: 'text-indigo-500 dark:text-indigo-400' },
+  cyan:    { grad: 'from-cyan-500 to-sky-600',       light: 'bg-cyan-50 dark:bg-cyan-950/50',      border: 'border-cyan-200 dark:border-cyan-800',      iconBg: 'bg-cyan-100 dark:bg-cyan-900/50',      text: 'text-cyan-700 dark:text-cyan-300',      num: 'text-cyan-500 dark:text-cyan-400' },
+  fuchsia: { grad: 'from-fuchsia-500 to-purple-700', light: 'bg-fuchsia-50 dark:bg-fuchsia-950/50', border: 'border-fuchsia-200 dark:border-fuchsia-800', iconBg: 'bg-fuchsia-100 dark:bg-fuchsia-900/50', text: 'text-fuchsia-700 dark:text-fuchsia-300', num: 'text-fuchsia-500 dark:text-fuchsia-400' },
 }
 
 export function ShortNotesView({ notes }) {
-  const colors = COLOR_MAP[notes.color] || COLOR_MAP.violet
+  const c = THEME[notes.color] || THEME.violet
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-slate-900 to-slate-800 dark:from-slate-800 dark:to-slate-900 text-white shadow-lg">
-          <div className="absolute inset-0 opacity-[0.06]"
-            style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-          <div className={cn('absolute -bottom-10 -right-10 h-40 w-40 rounded-full blur-3xl opacity-20 bg-gradient-to-br', colors.from, colors.to)} />
-          <div className="relative flex items-center gap-4">
-            <div className={cn('h-12 w-12 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-sm', colors.from, colors.to)}>
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+
+      {/* ── HEADER ── */}
+      <div className={cn('relative overflow-hidden rounded-2xl bg-gradient-to-br text-white', c.grad)}>
+        <div className="absolute inset-0 opacity-[0.07]"
+          style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+        <div className="absolute bottom-0 right-0 h-32 w-32 rounded-full bg-white/10 -mr-8 -mb-8 blur-2xl" />
+        <div className="relative px-6 py-5">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0 mt-0.5">
               <Zap className="h-6 w-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-xl font-black text-white">{notes.title}</h1>
-              <p className="text-sm text-white/60">Key concepts at a glance</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-1">Quick Reference</p>
+              <h1 className="text-lg font-black text-white leading-tight">{notes.title}</h1>
+              <div className="flex gap-3 mt-2">
+                <StatPill count={notes.keyPoints.length} label="concepts" />
+                <StatPill count={notes.quickFacts.length} label="facts" />
+                <StatPill count={notes.rememberThis.length} label="reminders" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Key Points Grid */}
-      <section className="mb-8">
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
-          <Lightbulb className="h-4 w-4" /> Key Concepts
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* ── KEY CONCEPTS ── */}
+      <section>
+        <SectionHeader
+          icon={<Lightbulb className="h-4 w-4" />}
+          label="Key Concepts"
+          gradient={c.grad}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
           {notes.keyPoints.map((point, i) => (
             <div key={i} className={cn(
-              'rounded-xl border p-4 transition-shadow hover:shadow-md',
-              colors.light, colors.border,
+              'rounded-xl border overflow-hidden',
+              c.border
             )}>
-              <div className="flex items-start gap-3">
-                <span className="text-xl flex-shrink-0 mt-0.5">{point.icon}</span>
-                <div>
-                  <h3 className={cn('text-sm font-bold mb-1', colors.text)}>{point.title}</h3>
-                  <p className="text-xs text-foreground/80 leading-relaxed">{point.text}</p>
+              <div className={cn('h-1 bg-gradient-to-r', c.grad)} />
+              <div className={cn('p-4', c.light)}>
+                <div className="flex items-start gap-3">
+                  <div className={cn('h-9 w-9 rounded-lg text-xl flex items-center justify-center shrink-0', c.iconBg)}>
+                    {point.icon}
+                  </div>
+                  <div className="min-w-0">
+                    <p className={cn('text-xs font-black leading-tight mb-1', c.text)}>{point.title}</p>
+                    <p className="text-xs text-foreground/75 leading-relaxed">{point.text}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -58,39 +71,72 @@ export function ShortNotesView({ notes }) {
         </div>
       </section>
 
-      {/* Quick Facts */}
-      <section className="mb-8">
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
-          <CheckCircle className="h-4 w-4" /> Quick Facts
-        </h2>
-        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      {/* ── QUICK FACTS ── */}
+      <section>
+        <SectionHeader
+          icon={<CheckCircle className="h-4 w-4" />}
+          label="Quick Facts"
+          gradient="from-emerald-500 to-teal-600"
+        />
+        <div className="mt-4 rounded-xl border border-border overflow-hidden bg-card">
           {notes.quickFacts.map((fact, i) => (
             <div key={i} className={cn(
-              'flex items-start gap-3 px-4 py-3 text-sm',
-              i % 2 === 0 ? 'bg-muted/30' : 'bg-background',
-              i !== 0 && 'border-t border-border',
+              'flex items-start gap-4 px-4 py-3',
+              i % 2 === 0 ? 'bg-muted/30' : 'bg-transparent',
+              i > 0 && 'border-t border-border/40'
             )}>
-              <span className={cn('flex-shrink-0 h-1.5 w-1.5 rounded-full mt-2', `bg-gradient-to-br ${colors.from}`)} />
-              <span className="text-foreground leading-relaxed">{fact}</span>
+              <span className={cn(
+                'text-xs font-black tabular-nums shrink-0 mt-0.5 w-6 text-right',
+                c.num
+              )}>
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span className="text-sm text-foreground/80 leading-relaxed">{fact}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Remember This */}
+      {/* ── REMEMBER THIS ── */}
       <section>
-        <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4" /> Remember This
-        </h2>
-        <div className="space-y-2">
+        <SectionHeader
+          icon={<AlertTriangle className="h-4 w-4" />}
+          label="Remember This"
+          gradient="from-amber-500 to-orange-600"
+        />
+        <div className="mt-4 space-y-2.5">
           {notes.rememberThis.map((item, i) => (
-            <div key={i} className="flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-4 py-3">
-              <span className="text-amber-500 flex-shrink-0 font-black text-base mt-0.5">!</span>
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-200 leading-relaxed">{item}</p>
+            <div key={i} className="flex items-start gap-3 px-4 py-3.5 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
+              <div className="h-5 w-5 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="h-3 w-3 text-amber-700 dark:text-amber-300" />
+              </div>
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-100 leading-relaxed">{item}</p>
             </div>
           ))}
         </div>
       </section>
+
+    </div>
+  )
+}
+
+function StatPill({ count, label }) {
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-white/70">
+      <span className="font-black text-white">{count}</span>
+      <span>{label}</span>
+    </span>
+  )
+}
+
+function SectionHeader({ icon, label, gradient }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div className={cn('h-7 w-7 rounded-lg bg-gradient-to-br flex items-center justify-center text-white shrink-0', gradient)}>
+        {icon}
+      </div>
+      <h2 className="text-sm font-black text-foreground uppercase tracking-wide">{label}</h2>
+      <div className={cn('flex-1 h-px bg-gradient-to-r to-transparent', gradient.split(' ')[0].replace('from-', 'from-') + '/20')} />
     </div>
   )
 }

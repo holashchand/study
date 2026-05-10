@@ -49,7 +49,7 @@ export const sections = [
       {
         type: 'diagram',
         format: 'mermaid',
-        content: 'flowchart TD\n  A["Need to structure entire application?"] -->|Yes| B["Choose architectural pattern"]\n  B --> C{"Domain-heavy\nor UI-heavy?"}\n  C -->|UI-heavy web app| D["Use MVC or MVVM"]\n  C -->|Complex business logic| E["Use Layered + Repository"]\n  C -->|Large domain model| F["Use CQRS or DDD"]\n  D --> G["Implement pattern"]',
+        content: 'flowchart TD\n  A["Need to structure entire application?"] -->|Yes| B["Choose architectural pattern"]\n  B --> C{"Domain-heavy or UI-heavy?"}\n  C -->|UI-heavy web app| D["Use MVC or MVVM"]\n  C -->|Complex business logic| E["Use Layered + Repository"]\n  C -->|Large domain model| F["Use CQRS or DDD"]\n  D --> G["Implement pattern"]',
         label: 'Choosing an Architectural Pattern'
       }
     ]
