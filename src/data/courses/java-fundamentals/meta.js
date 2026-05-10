@@ -1,13 +1,13 @@
-import { sections as s01 } from './chapters/chapter01'
-import { sections as s02 } from './chapters/chapter02'
-import { sections as s03 } from './chapters/chapter03'
-import { sections as s04 } from './chapters/chapter04'
-import { sections as s05 } from './chapters/chapter05'
-import { sections as s06 } from './chapters/chapter06'
-import { sections as s07 } from './chapters/chapter07'
-import { sections as s08 } from './chapters/chapter08'
-import { sections as s09 } from './chapters/chapter09'
-import { sections as s10 } from './chapters/chapter10'
+import { sections as s01 } from './chapters/chapter01.js'
+import { sections as s02 } from './chapters/chapter02.js'
+import { sections as s03 } from './chapters/chapter03.js'
+import { sections as s04 } from './chapters/chapter04.js'
+import { sections as s05 } from './chapters/chapter05.js'
+import { sections as s06 } from './chapters/chapter06.js'
+import { sections as s07 } from './chapters/chapter07.js'
+import { sections as s08 } from './chapters/chapter08.js'
+import { sections as s09 } from './chapters/chapter09.js'
+import { sections as s10 } from './chapters/chapter10.js'
 
 const meta = {
   slug: 'java-fundamentals',
