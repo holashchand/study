@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-java'
@@ -21,11 +21,12 @@ export default function ChapterPage() {
   const chapter = course?.chapters.find(c => c.num === chapterNum)
   const sections = chapter?.sections || []
 
+  const contentRef = useRef(null)
   const { currentIdx, navigate, prev, next } = useSectionNav(sections.length)
   useKeyboardNav(prev, next)
 
-  // Prism highlight after section change
   useEffect(() => {
+    contentRef.current?.scrollTo(0, 0)
     Prism.highlightAll()
   }, [currentIdx])
 
@@ -65,7 +66,7 @@ export default function ChapterPage() {
         />
 
         <div className="flex flex-col flex-1 min-w-0">
-          <div className="flex-1 overflow-y-auto bg-background">
+          <div ref={contentRef} className="flex-1 overflow-y-auto bg-background">
             <article className="px-8 py-6 max-w-none">
 
               {/* ── SECTION HEADER ──────────────────────── */}
