@@ -1,0 +1,72 @@
+// Chapter 10: Modern Java (9-26) — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'medium', q: 'What are text blocks (Java 15+)?', a: 'Triple-quoted multi-line strings: `"""..."""`. Common leading whitespace is stripped. No need to escape double quotes inside. New escapes: `\\` (line continuation, no newline), `\\s` (preserve trailing space). Line endings normalized to LF. `String.formatted()` works well with text blocks.' },
+  { id: 2, difficulty: 'medium', q: 'What are records (Java 16)?', a: 'Compact immutable data classes. `record Point(int x, int y) {}` auto-generates: canonical constructor, accessors x() y() (no "get" prefix), equals(), hashCode(), toString(). Implicitly final. Can add methods and implement interfaces. Cannot extend classes. Ideal for DTOs, value objects.' },
+  { id: 3, difficulty: 'medium', q: 'What are sealed classes (Java 17)?', a: '`sealed class Shape permits Circle, Rectangle {}`. Restricts inheritance to listed types. Permitted classes must be final, sealed, or non-sealed. Enables exhaustive switch — compiler verifies all subtypes are handled. Same package/module required. Models closed algebraic data types.' },
+  { id: 4, difficulty: 'medium', q: 'What is pattern matching for switch (Java 21)?', a: '`switch(obj) { case Integer i -> i*2; case String s when s.isEmpty() -> 0; case null -> -1; default -> 0; }`. Type patterns, guarded patterns (when), null handling. Replaces instanceOf + cast chains. Enables exhaustive matching on sealed hierarchies without default.' },
+  { id: 5, difficulty: 'medium', q: 'What are virtual threads (Java 21)?', a: 'Project Loom: JVM-managed lightweight threads, not OS threads. Millions can exist. Block without blocking platform thread — mounted/unmounted at blocking points. `Thread.ofVirtual().start(r)` or `Executors.newVirtualThreadPerTaskExecutor()`. Best for high-throughput I/O workloads.' },
+  { id: 6, difficulty: 'medium', q: 'What is the record pattern (Java 21)?', a: 'Deconstruct records in pattern matching: `case Point(int x, int y) -> x + y`. Works in switch and instanceof. Nested: `case Node(Point(int x, _) point) -> x`. Unnamed pattern `_` ignores components. Eliminates manual accessor calls after pattern match.' },
+  { id: 7, difficulty: 'easy', q: 'What Java 9+ improvements were made to interfaces?', a: 'Java 8: default and static methods. Java 9: private methods (helper for default methods). This enables interface to have real implementation helpers without exposing them. Interfaces still cannot have instance fields or constructors.' },
+  { id: 8, difficulty: 'medium', q: 'What is the module system (Java 9)?', a: '`module com.app { requires java.sql; exports com.app.api; }` in module-info.java. Provides: strong encapsulation (only exported packages accessible), reliable configuration (explicit dependencies), smaller runtimes (jlink removes unused modules). --module-path for modular apps.' },
+  { id: 9, difficulty: 'easy', q: 'What String methods were added in Java 11?', a: '`isBlank()` (true if empty or whitespace), `strip()`/`stripLeading()`/`stripTrailing()` (Unicode-aware, prefer over trim()), `lines()` (returns Stream<String> of lines), `repeat(n)` (repeat string n times). Note: strip() handles Unicode whitespace; trim() only handles ASCII ≤ \\u0020.' },
+  { id: 10, difficulty: 'medium', q: 'What is var (Java 10)?', a: 'Local variable type inference: `var list = new ArrayList<String>()` — compiler infers ArrayList<String>. NOT dynamic typing — type is fixed at compile time. Restrictions: local variables only, must have initializer, cannot be null alone. Java 11+: `(var x, var y) -> x + y` in lambda params.' },
+  { id: 11, difficulty: 'easy', q: 'What is the HTTP Client API (Java 11)?', a: 'java.net.http.HttpClient: modern, async HTTP/1.1 and HTTP/2 client. `HttpClient.newHttpClient().send(request, BodyHandlers.ofString())`. Supports: async (sendAsync returns CompletableFuture), WebSocket, streaming. Replaces verbose HttpURLConnection.' },
+  { id: 12, difficulty: 'hard', q: 'What are unnamed classes and instance main methods (Java 21 Preview, Java 23)?', a: 'Unnamed classes remove the class/public/static boilerplate: a file with just a `void main()` is valid. No class declaration needed. Instance main method: `void main()` without static. Designed for beginners and scripts. Became standard in Java 25. JEP 445 (preview) → JEP 477 (2nd preview) → stable.' },
+  { id: 13, difficulty: 'medium', q: 'What are sequenced collections (Java 21)?', a: 'New interfaces: SequencedCollection, SequencedSet, SequencedMap. Uniform API: getFirst/getLast, addFirst/addLast, removeFirst/removeLast, reversed(). Implemented by: List, Deque, LinkedHashSet, LinkedHashMap, SortedSet, SortedMap. Fixes inconsistency in accessing first/last elements.' },
+  { id: 14, difficulty: 'hard', q: 'What are scoped values (Java 21 Preview → Java 23 standard)?', a: 'Immutable per-thread values (like ThreadLocal but better). `ScopedValue<User> USER = ScopedValue.newInstance(); ScopedValue.where(USER, user).run(task);`. Immutable, no remove() needed, works well with virtual threads. Preferred over ThreadLocal in Project Loom context.' },
+  { id: 15, difficulty: 'medium', q: 'What is the difference between Java 8, 11, 17, 21?', a: 'Java 8 (LTS): lambdas, streams, Optional, Date/Time. Java 11 (LTS): HTTP client, String methods, single-file programs. Java 17 (LTS): sealed classes, records, text blocks, pattern instanceof. Java 21 (LTS): virtual threads, pattern switch, record patterns, sequenced collections.' },
+  { id: 16, difficulty: 'medium', q: 'What is the switch expression vs switch statement?', a: 'Switch statement (traditional): `switch(x) { case 1: ...; break; }`. Switch expression (Java 14+): returns a value, `->` syntax (no fall-through), exhaustive. `int result = switch(x) { case 1 -> 1; default -> 0; };`. Switch expressions with patterns: Java 21.' },
+  { id: 17, difficulty: 'hard', q: 'What is GraalVM and Native Image?', a: 'GraalVM: high-perf JVM with JIT written in Java. Native Image: ahead-of-time compiles Java to standalone native executable — instant startup, low memory, no JVM. Trade-offs: no dynamic class loading, limited reflection (need GraalVM metadata). Used in serverless, CLI tools, Quarkus, Micronaut.' },
+  { id: 18, difficulty: 'medium', q: 'What is the Optional.or() method (Java 9)?', a: '`Optional.or(Supplier<Optional<T>>)`: if the Optional is empty, produce another Optional. Different from orElse (returns T) and orElseGet (returns T). Useful for fallback Optional chains: `findInCache(key).or(() -> findInDb(key)).orElseThrow()`.' },
+  { id: 19, difficulty: 'hard', q: 'What are unnamed patterns and variables (Java 21)?', a: 'Unnamed pattern `_`: ignore record component in deconstruction: `case Point(_, int y) ->`. Unnamed variable `_`: intentionally unused variable: `catch (Exception _)`, `for (var _ : list)`. Prevents "unused variable" warnings and signals intentional non-use to readers.' },
+  { id: 20, difficulty: 'hard', q: 'What is structured concurrency and how does it improve upon CompletableFuture?', a: 'StructuredTaskScope (Java 21): all forked tasks tied to the scope. If scope is cancelled (failure or timeout), all tasks cancelled. `scope.fork(task)` returns Future<V>. `scope.join()` waits. Built-in policies: ShutdownOnFailure, ShutdownOnSuccess. Eliminates orphaned tasks, simplifies error propagation vs CompletableFuture chains.' },
+]
+
+export const quiz = [
+  { id: 1, q: 'What Java version made records stable?', options: ['Java 14', 'Java 15', 'Java 16', 'Java 17'], answer: 2, explanation: 'Records were stable (JEP 395) in Java 16. Preview in Java 14 and 15.' },
+  { id: 2, q: 'Which statement about text blocks is correct?', options: ['Requires escaping internal double quotes', 'Automatically strips common leading whitespace', 'Cannot span multiple lines', 'Added in Java 14'], answer: 1, explanation: 'Text blocks strip common leading whitespace automatically. No need to escape `"` inside. Added in Java 15 (stable).' },
+  { id: 3, q: 'What does sealed class provide that regular inheritance does not?', options: ['Better performance', 'Exhaustive pattern matching in switch', 'Automatic equals/hashCode', 'Multiple inheritance'], answer: 1, explanation: 'Sealed classes list permitted subclasses, enabling exhaustive switch — compiler verifies all subtypes are handled.' },
+  { id: 4, q: 'What is the correct way to create a virtual thread?', options: ['new VirtualThread(runnable)', 'Thread.createVirtual(runnable)', 'Thread.ofVirtual().start(runnable)', 'Executors.newVirtualThread()'], answer: 2, explanation: 'Thread.ofVirtual().start(runnable) or Thread.ofVirtual().unstarted(runnable).start(). Also: Executors.newVirtualThreadPerTaskExecutor().' },
+  { id: 5, q: 'What does `String.isBlank()` return for a string with only spaces?', options: ['false', 'true', 'null', 'depends on locale'], answer: 1, explanation: 'isBlank() returns true if the string is empty OR contains only whitespace characters. Handles Unicode whitespace unlike isEmpty().' },
+  { id: 6, q: 'What is the relationship between `var` and dynamic typing?', options: ['var is dynamic — type can change', 'var is compile-time type inference — type is fixed', 'var is only for numbers', 'var makes variables nullable'], answer: 1, explanation: 'var is static/compile-time type inference. The type is determined at compile time from the initializer and never changes.' },
+  { id: 7, q: 'What is a record component accessor named?', options: ['getX() following JavaBeans convention', 'x() matching the component name', 'accessX()', 'fieldX()'], answer: 1, explanation: 'Record accessors are named after the component: `record Point(int x, int y)` generates x() and y(), not getX() and getY().' },
+  { id: 8, q: 'Which collection interface was added in Java 21 for ordered access?', options: ['SortedCollection', 'SequencedCollection', 'OrderedList', 'NavigableList'], answer: 1, explanation: 'SequencedCollection (Java 21) provides getFirst/getLast/addFirst/addLast/reversed() for ordered collections.' },
+  { id: 9, q: 'What module-info.java keyword makes packages accessible to other modules?', options: ['imports', 'provides', 'exports', 'opens'], answer: 2, explanation: '`exports com.example.api;` makes a package accessible to other modules. `opens` allows deep reflection (testing frameworks).' },
+  { id: 10, q: 'What does `strip()` handle that `trim()` does not?', options: ['ASCII control characters', 'Unicode whitespace (non-breaking spaces etc.)', 'HTML whitespace', 'Tab characters'], answer: 1, explanation: 'strip() (Java 11+) handles all Unicode whitespace. trim() only removes chars ≤ \\u0020 (ASCII). Prefer strip() for internationalized apps.' },
+  { id: 11, q: 'What Java version made virtual threads stable?', options: ['Java 17', 'Java 19', 'Java 20', 'Java 21'], answer: 3, explanation: 'Virtual threads became stable in Java 21 (JEP 444). They were preview in Java 19 and 20.' },
+  { id: 12, q: 'What is a guarded pattern in switch?', options: ['case String s when s.isEmpty()', 'case String s if s.isEmpty()', 'case String s && s.isEmpty()', 'case String s where s.isEmpty()'], answer: 0, explanation: '`case String s when s.isEmpty()` — the `when` clause adds a boolean guard condition to the type pattern.' },
+  { id: 13, q: 'What does the `_` pattern do in record deconstruction?', options: ['Matches any type', 'Ignores the component', 'Matches null', 'Creates a variable named _'], answer: 1, explanation: 'Unnamed pattern `_` ignores the component: `case Point(_, int y)` matches any Point and only binds y.' },
+  { id: 14, q: 'Which is the preferred way to read a text file as a String in modern Java?', options: ['new FileReader(path)', 'FileInputStream + String conversion', 'Files.readString(path)', 'Scanner.nextLine() in a loop'], answer: 2, explanation: 'Files.readString(path) (Java 11+) is the simplest, most expressive way to read a text file.' },
+  { id: 15, q: 'What advantage do native images (GraalVM) have over regular JVM execution?', options: ['Better garbage collection', 'Instant startup and lower memory footprint', 'Faster long-running computation', 'Better debuggability'], answer: 1, explanation: 'GraalVM native images start instantly (no JVM warm-up) and use less memory — ideal for serverless functions and CLI tools.' },
+]
+
+export const shortNotes = {
+  title: 'Modern Java (9–26) — Quick Reference',
+  color: 'indigo',
+  keyPoints: [
+    { icon: '📦', title: 'Records (Java 16)', text: 'Compact data class. Auto: constructor, x()/y() accessors, equals, hashCode, toString. Implicitly final.' },
+    { icon: '🔒', title: 'Sealed Classes (Java 17)', text: '`sealed ... permits X, Y`. Exhaustive switch. Subtypes: final/sealed/non-sealed. Same package/module.' },
+    { icon: '🎯', title: 'Pattern Switch (Java 21)', text: 'Type patterns, guarded (when), null case, record deconstruction. Exhaustive for sealed types.' },
+    { icon: '🧵', title: 'Virtual Threads (Java 21)', text: 'Thread.ofVirtual() or newVirtualThreadPerTaskExecutor(). Millions of lightweight threads. Best for I/O.' },
+    { icon: '📝', title: 'Text Blocks (Java 15)', text: '""" ... """ — multi-line, strips leading whitespace, no escaping needed inside. \\ continues line, \\s keeps trailing space.' },
+    { icon: '🔍', title: 'var (Java 10)', text: 'Local type inference — compile-time fixed type. Not dynamic. Local vars only, must have initializer.' },
+    { icon: '📋', title: 'String Additions (Java 11)', text: 'strip/isBlank (Unicode-aware), lines(), repeat(n). Always prefer strip() over trim().' },
+    { icon: '📚', title: 'Sequenced Collections (Java 21)', text: 'getFirst/getLast, addFirst/addLast, reversed(). Uniform API for List, Deque, LinkedHashSet, LinkedHashMap.' },
+  ],
+  quickFacts: [
+    'Records: stable Java 16, Preview Java 14-15',
+    'Sealed classes: stable Java 17, Preview Java 15-16',
+    'Text blocks: stable Java 15, Preview Java 13-14',
+    'Pattern matching switch: stable Java 21',
+    'Virtual threads: stable Java 21',
+    'var: added Java 10 (JEP 286)',
+    'HTTP Client: added Java 11, replaces HttpURLConnection',
+  ],
+  rememberThis: [
+    'Records are implicitly final — cannot be subclassed',
+    'Record accessors: x() not getX()',
+    'Sealed class permits are in the same package/module',
+    'Virtual threads: for I/O-bound, not CPU-bound work',
+  ],
+}

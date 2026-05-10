@@ -1,0 +1,72 @@
+// Chapter 1: Java Foundations & Environment Setup — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'easy', q: 'What is the difference between JDK, JRE, and JVM?', a: 'JVM executes bytecode. JRE = JVM + runtime libraries (run programs). JDK = JRE + compiler + dev tools (develop programs). You need JDK to write Java; JRE to run it.' },
+  { id: 2, difficulty: 'easy', q: 'What is bytecode and why is it important?', a: 'Bytecode is platform-independent intermediate code (.class files) produced by javac. The JVM interprets/JIT-compiles it to native machine code. This enables WORA — Write Once, Run Anywhere.' },
+  { id: 3, difficulty: 'medium', q: 'What are the JVM runtime data areas?', a: 'Heap (shared, GC-managed object storage), Stack (per-thread method frames), Method Area/Metaspace (class metadata), PC Register (per-thread instruction pointer), Native Method Stack (native code). Heap and Method Area are shared; the rest are per-thread.' },
+  { id: 4, difficulty: 'medium', q: 'What is JIT compilation and how does it improve performance?', a: 'JIT (Just-In-Time) compiles hot bytecode to native machine code at runtime. Frequently executed code ("hot paths") is compiled once and cached. The JVM profiles execution to decide what to JIT-compile. This is why Java "warms up" over time.' },
+  { id: 5, difficulty: 'easy', q: 'What is the correct main() method signature in Java?', a: '`public static void main(String[] args)` — public (accessible by JVM), static (no instance needed), void (no return), String[] args (command-line arguments). Java 21+ also allows `void main()` in unnamed classes.' },
+  { id: 6, difficulty: 'medium', q: 'What is garbage collection? How does it work?', a: 'GC automatically frees heap memory occupied by unreachable objects. Uses reachability analysis from GC roots. Modern GC: G1 (default Java 9+), ZGC, Shenandoah. Phases: mark (find live objects), sweep/compact (reclaim memory). Triggered automatically; System.gc() is a hint only.' },
+  { id: 7, difficulty: 'easy', q: 'What is the classpath?', a: 'Classpath tells the JVM where to find .class files and JARs. Set via -cp/-classpath flag or CLASSPATH env var. Java 9+ replaced it with module path for modular apps. Classpath hell (version conflicts) is solved by modules.' },
+  { id: 8, difficulty: 'hard', q: 'What is the Java Module System (Project Jigsaw, Java 9+)?', a: 'Modules are named units declared in module-info.java. `module com.app { requires lib; exports com.app.api; }`. Benefits: strong encapsulation, reliable config (no classpath hell), smaller runtimes via jlink. --module-path replaces -classpath for modular apps.' },
+  { id: 9, difficulty: 'easy', q: 'What is a package in Java?', a: 'A package is a namespace grouping related classes and interfaces. Prevents naming conflicts. Maps to directory structure. Declared with `package com.example.myapp;` at the top. `java.lang` is auto-imported. Other packages need explicit `import` or fully-qualified names.' },
+  { id: 10, difficulty: 'medium', q: 'What happens during Java compilation and execution?', a: 'Compilation: `javac Main.java` → Main.class (bytecode). Execution: `java Main` → JVM loads class, verifies bytecode, JIT-compiles hot code, runs. ClassLoader loads .class files lazily. Verification ensures bytecode safety before execution.' },
+  { id: 11, difficulty: 'easy', q: 'What is JShell?', a: 'JShell (Java 9+) is an interactive REPL (Read-Eval-Print Loop) for testing Java expressions, statements, and snippets without creating a full class. Great for learning and quick experiments. Run with `jshell` command.' },
+  { id: 12, difficulty: 'medium', q: 'What is the difference between stack memory and heap memory?', a: 'Stack: per-thread, LIFO, stores method frames (local vars, params, return addr), auto-managed, limited size (StackOverflowError). Heap: shared across threads, stores all objects, GC-managed, larger size (OutOfMemoryError). Primitives in local vars go on stack; objects always on heap.' },
+  { id: 13, difficulty: 'medium', q: 'What Java versions are LTS (Long Term Support)?', a: 'LTS versions receive updates for years. Current LTS: Java 8 (end of life), Java 11, Java 17, Java 21 (latest LTS). Non-LTS releases get ~6 months support. For production, use an LTS version. Java follows a 6-month release cadence since Java 9.' },
+  { id: 14, difficulty: 'hard', q: 'What is class loading in Java? What are the three built-in ClassLoaders?', a: 'ClassLoaders load .class files dynamically. Hierarchy (delegation model): Bootstrap (loads rt.jar/core libs), Extension/Platform (loads ext libs), Application (loads classpath classes). A ClassLoader first delegates to parent before loading itself — prevents duplicate class definitions.' },
+  { id: 15, difficulty: 'easy', q: 'What is the purpose of javadoc?', a: 'Javadoc generates HTML documentation from /** ... */ comments in source code. Tags: @param (parameter), @return (return value), @throws (exception), @see (cross-reference), @since (version added). Run with `javadoc` command. Standard API docs are generated this way.' },
+  { id: 16, difficulty: 'medium', q: 'What is the difference between `java` and `javac`?', a: '`javac` is the Java compiler — converts .java source files to .class bytecode files. `java` is the launcher — starts the JVM and runs the compiled program. From Java 11+, `java SingleFile.java` compiles and runs a single-file program in one step.' },
+  { id: 17, difficulty: 'hard', q: 'What is the Metaspace (Java 8+) and how is it different from PermGen?', a: 'Metaspace replaced PermGen (Permanent Generation) in Java 8. Stores class metadata. Key difference: Metaspace lives in native memory (not Java heap), so it grows automatically without a fixed size limit (though can be capped with -XX:MaxMetaspaceSize). Eliminates java.lang.OutOfMemoryError: PermGen space errors.' },
+  { id: 18, difficulty: 'easy', q: 'What is a JAR file?', a: 'JAR (Java ARchive) is a ZIP file containing .class files, resources, and a manifest (META-INF/MANIFEST.MF). Used for distributing libraries and executable applications. Executable JARs have `Main-Class` in manifest. Run with `java -jar app.jar`.' },
+  { id: 19, difficulty: 'medium', q: 'What is the difference between the JVM specification and JVM implementation?', a: 'The JVM specification (by Oracle) defines the abstract machine behavior, bytecode format, and runtime semantics. JVM implementations include HotSpot (Oracle/OpenJDK, most common), OpenJ9 (IBM, lower memory), GraalVM (polyglot, native image). All valid implementations must comply with the spec.' },
+  { id: 20, difficulty: 'hard', q: 'What is GraalVM and native image compilation?', a: 'GraalVM is a high-performance JVM with a JIT compiler written in Java. Native image: ahead-of-time (AOT) compiles Java to a standalone native executable — instant startup, low memory, no JVM needed at runtime. Trade-off: no dynamic class loading, limited reflection. Used heavily in cloud/serverless (Quarkus, Micronaut).' },
+]
+
+export const quiz = [
+  { id: 1, q: 'What does JRE stand for?', options: ['Java Runtime Environment', 'Java Runtime Execution', 'Java Run Engine', 'Java Resource Environment'], answer: 0, explanation: 'JRE = Java Runtime Environment. It contains JVM + core libraries needed to run Java applications.' },
+  { id: 2, q: 'Which command compiles a Java source file?', options: ['java', 'javac', 'javadoc', 'jshell'], answer: 1, explanation: 'javac is the Java compiler. java is the launcher. javadoc generates documentation. jshell is the REPL.' },
+  { id: 3, q: 'Where are Java objects stored?', options: ['Stack', 'Heap', 'Metaspace', 'PC Register'], answer: 1, explanation: 'All Java objects are stored in the Heap. The Stack stores method frames and local variables (primitives and references).' },
+  { id: 4, q: 'What file extension does compiled Java code have?', options: ['.java', '.class', '.jar', '.exe'], answer: 1, explanation: '.class files contain bytecode — the output of javac compiler. .java is source, .jar is an archive.' },
+  { id: 5, q: 'Which Java version introduced JShell?', options: ['Java 8', 'Java 9', 'Java 11', 'Java 14'], answer: 1, explanation: 'JShell was introduced in Java 9 as part of JEP 222.' },
+  { id: 6, q: 'What is the role of the JIT compiler?', options: ['Compiles .java to .class', 'Interprets bytecode line by line', 'Compiles hot bytecode to native code at runtime', 'Manages garbage collection'], answer: 2, explanation: 'JIT (Just-In-Time) compiles frequently executed bytecode to native machine code at runtime for better performance.' },
+  { id: 7, q: 'What replaced PermGen in Java 8?', options: ['Heap', 'Metaspace', 'Stack', 'CodeCache'], answer: 1, explanation: 'Metaspace replaced PermGen in Java 8. It lives in native memory and auto-grows, eliminating PermGen OutOfMemoryErrors.' },
+  { id: 8, q: 'What does WORA stand for?', options: ['Write Once Run Anywhere', 'Write Once Read Anywhere', 'Write Output Run Always', 'Widest Object Runtime Access'], answer: 0, explanation: 'WORA = Write Once, Run Anywhere — Java\'s core portability principle enabled by bytecode + JVM.' },
+  { id: 9, q: 'Which of these is a valid main method signature?', options: ['static void main(String args)', 'public void main(String[] args)', 'public static void main(String[] args)', 'public static int main(String[] args)'], answer: 2, explanation: 'Must be: public (JVM access), static (no instance needed), void (no return), String[] parameter.' },
+  { id: 10, q: 'What is a JAR file?', options: ['Java Application Runtime', 'A ZIP archive of .class files and resources', 'A native executable for Java apps', 'Java API Reference'], answer: 1, explanation: 'JAR (Java ARchive) is a ZIP-format file containing .class files, resources, and a META-INF/MANIFEST.MF.' },
+  { id: 11, q: 'What does the Bootstrap ClassLoader load?', options: ['Application classes from classpath', 'Core Java libraries (rt.jar/java.base)', 'Extension libraries', 'Native libraries'], answer: 1, explanation: 'Bootstrap ClassLoader loads core Java platform classes (java.lang, java.util, etc.) from java.base module / rt.jar.' },
+  { id: 12, q: 'Which memory area is per-thread (not shared)?', options: ['Heap', 'Method Area', 'Stack', 'String Pool'], answer: 2, explanation: 'Stack (call stack) is per-thread. Each thread has its own stack with method frames. Heap and Method Area are shared.' },
+  { id: 13, q: 'What is the Java module system configured in?', options: ['pom.xml', 'module-info.java', 'MANIFEST.MF', 'build.gradle'], answer: 1, explanation: 'module-info.java in the module root declares the module name, required dependencies, and exported packages.' },
+  { id: 14, q: 'How do you run a single-file Java program (Java 11+) without explicit compilation?', options: ['javac File.java && java File', 'java File.java', 'run File.java', 'jshell File.java'], answer: 1, explanation: 'From Java 11+, `java File.java` compiles and runs in one command. No separate javac step needed for single files.' },
+  { id: 15, q: 'Which of the following is an LTS Java version?', options: ['Java 10', 'Java 13', 'Java 15', 'Java 21'], answer: 3, explanation: 'Java 21 is LTS. Other LTS versions: 8, 11, 17. Non-LTS releases (9, 10, 12-16, 18-20) get ~6 months support.' },
+]
+
+export const shortNotes = {
+  title: 'Java Foundations — Quick Reference',
+  color: 'violet',
+  keyPoints: [
+    { icon: '☕', title: 'JVM Architecture', text: 'JDK ⊃ JRE ⊃ JVM. javac compiles .java→.class. java runs .class via JVM.' },
+    { icon: '🏃', title: 'WORA Principle', text: 'Bytecode is platform-independent. JVM translates to native code per OS.' },
+    { icon: '🧠', title: 'Memory Areas', text: 'Heap (objects, shared), Stack (frames, per-thread), Metaspace (class metadata), PC Register.' },
+    { icon: '⚡', title: 'JIT Compiler', text: 'Compiles hot bytecode to native at runtime. Java "warms up" — gets faster over time.' },
+    { icon: '🗑️', title: 'Garbage Collection', text: 'Automatic memory management. G1GC default (Java 9+). GC roots determine reachability.' },
+    { icon: '📦', title: 'Packages & Classpath', text: 'Packages prevent naming conflicts. Classpath tells JVM where to find classes.' },
+    { icon: '🧩', title: 'Module System (Java 9+)', text: 'module-info.java declares requires/exports. Enables strong encapsulation and smaller runtimes.' },
+    { icon: '🚀', title: 'main() Entry Point', text: '`public static void main(String[] args)` — the JVM\'s entry point into your program.' },
+  ],
+  quickFacts: [
+    'Java was created by James Gosling at Sun Microsystems in 1995',
+    'Java follows a 6-month release cadence since Java 9',
+    'LTS versions: Java 8, 11, 17, 21',
+    'JShell (Java 9+) is the interactive REPL for quick experiments',
+    'GraalVM can compile Java to standalone native executables (AOT)',
+    'Metaspace (Java 8+) replaced PermGen — lives in native memory',
+    '`java File.java` compiles + runs in one step (Java 11+)',
+  ],
+  rememberThis: [
+    'JDK > JRE > JVM — each contains the previous',
+    'Heap is shared, Stack is per-thread',
+    'Bytecode is NOT machine code — JVM compiles it at runtime',
+    'System.gc() is only a hint — GC decides when to actually run',
+  ],
+}

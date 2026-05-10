@@ -1,0 +1,72 @@
+// Chapter 2: Data Types & Operators — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'easy', q: 'What are the 8 primitive types in Java?', a: 'byte (8-bit, -128 to 127), short (16-bit), int (32-bit), long (64-bit), float (32-bit IEEE 754), double (64-bit IEEE 754), char (16-bit Unicode, 0–65535), boolean (true/false, JVM-dependent size). All numeric types are signed except char.' },
+  { id: 2, difficulty: 'medium', q: 'What is autoboxing and unboxing? What are the pitfalls?', a: 'Autoboxing: primitive → wrapper automatically (int → Integer). Unboxing: wrapper → primitive. Pitfalls: (1) NullPointerException on unboxing null wrapper. (2) Performance overhead in loops. (3) `==` compares references for Integer — use .equals(). (4) Integer cache is only -128 to 127.' },
+  { id: 3, difficulty: 'easy', q: 'What is the difference between int and Integer?', a: 'int is a primitive — stored directly on the stack, fast, no methods. Integer is a wrapper class — object on the heap, has methods (parseInt, valueOf, etc.), can be null, works with generics. Integer caches values -128 to 127 for memory efficiency.' },
+  { id: 4, difficulty: 'medium', q: 'What happens on integer overflow in Java?', a: 'Java integers silently wrap around. Integer.MAX_VALUE + 1 == Integer.MIN_VALUE. No exception thrown. For overflow detection: use Math.addExact() (throws ArithmeticException), or use long/BigInteger for large values.' },
+  { id: 5, difficulty: 'medium', q: 'Why is floating-point arithmetic imprecise? When to use BigDecimal?', a: 'float/double use binary representation — cannot represent 0.1 exactly (like 1/3 in decimal). 0.1 + 0.2 != 0.3 with double. Use BigDecimal for financial/monetary calculations requiring exact decimal arithmetic. BigDecimal is slow but accurate.' },
+  { id: 6, difficulty: 'easy', q: 'What is the difference between `==` and `.equals()` for Strings?', a: '`==` compares object references (memory addresses). `.equals()` compares content. String literals are interned (same pool reference), but `new String("x") == "x"` is false. ALWAYS use `.equals()` for String content comparison.' },
+  { id: 7, difficulty: 'medium', q: 'What is String interning?', a: 'JVM maintains a String pool. Literals are automatically interned and shared. `String.intern()` explicitly adds to pool. Saves memory with many identical strings. From Java 7+, the pool is in the heap. `"abc" == "abc"` is true (same interned reference).' },
+  { id: 8, difficulty: 'medium', q: 'What is `var` in Java (Java 10+)?', a: '`var` enables local variable type inference. Compiler infers the type from the initializer at compile time — NOT dynamic typing. Restrictions: local variables only, cannot be used for fields/params/return types, must have an initializer, cannot be null alone. `var list = new ArrayList<String>();`' },
+  { id: 9, difficulty: 'hard', q: 'What is the difference between `>>` and `>>>` operators?', a: '`>>` (arithmetic right shift): fills with sign bit — preserves sign for negatives. `>>>` (logical right shift): always fills with 0. Example: -8 >> 1 = -4 (sign preserved); -8 >>> 1 = 2147483644 (treats bits as unsigned). Use `>>>` for bit manipulation on negative numbers.' },
+  { id: 10, difficulty: 'medium', q: 'What is the difference between prefix (++i) and postfix (i++) operators?', a: 'Prefix `++i`: increments first, then returns new value. Postfix `i++`: returns current value, then increments. In `int a = 5; int b = a++;` → b=5, a=6. In `int b = ++a;` with a=5 → b=6, a=6. In loops, both have same effect on the loop variable.' },
+  { id: 11, difficulty: 'medium', q: 'What is the ternary operator?', a: '`condition ? valueIfTrue : valueIfFalse` — a compact if-else expression. `String result = (x > 0) ? "positive" : "non-positive";`. Both branches must be compatible types. Nest sparingly — deep nesting is hard to read.' },
+  { id: 12, difficulty: 'hard', q: 'What is the difference between `float` and `double`? When to use each?', a: 'float: 32-bit, ~7 significant decimal digits, suffix L → use suffix f (3.14f). double: 64-bit, ~15-16 digits, default for decimal literals. Use double for general scientific computations; float only when memory is critical (e.g., large float arrays). Never use either for money — use BigDecimal.' },
+  { id: 13, difficulty: 'medium', q: 'What is type casting in Java? What are the types?', a: 'Widening (implicit): smaller → larger type, safe, automatic. int → long → float → double. Narrowing (explicit): larger → smaller, may lose data, requires cast: `int x = (int) 3.99;` → 3. Truncates, doesn\'t round. ClassCastException at runtime if object cast to incompatible type.' },
+  { id: 14, difficulty: 'easy', q: 'What is the default value of instance variables in Java?', a: 'Numeric types (int, long, etc.): 0. float/double: 0.0. char: \\u0000 (null char). boolean: false. Object references: null. Note: local variables have NO default — must be initialized before use (compiler error).' },
+  { id: 15, difficulty: 'medium', q: 'What is short-circuit evaluation in logical operators?', a: '`&&` (AND): if left is false, right is NOT evaluated. `||` (OR): if left is true, right is NOT evaluated. This is short-circuit evaluation. `&` and `|` always evaluate both sides (no short-circuit). Use `&&/||` for safety: `if (obj != null && obj.method())` prevents NPE.' },
+  { id: 16, difficulty: 'hard', q: 'What is the string pool and how does `new String("hello")` differ from `"hello"`?', a: '`"hello"` is a literal — stored in the pool, shared. `new String("hello")` creates a new heap object (plus the pool entry for the literal). Always different references. `new String("hello").intern()` returns the pool reference. Use literals always; never `new String(...)` unless you explicitly need a non-interned copy.' },
+  { id: 17, difficulty: 'medium', q: 'What are the bitwise operators in Java?', a: '`&` (AND), `|` (OR), `^` (XOR), `~` (NOT/complement), `<<` (left shift), `>>` (arithmetic right shift), `>>>` (logical right shift). Common uses: flags (bitmask), low-level protocol parsing, fast multiply/divide by powers of 2. `n << 1` = n*2, `n >> 1` = n/2.' },
+  { id: 18, difficulty: 'easy', q: 'What is the `char` type in Java?', a: 'char is a 16-bit unsigned integer representing a Unicode code unit (not always a full character). Range: 0 to 65535 (\\u0000 to \\uFFFF). Can be used in arithmetic: `char c = \'A\'; int n = c + 1;` → 66. Surrogate pairs needed for characters outside BMP (emojis etc.).' },
+  { id: 19, difficulty: 'medium', q: 'What is the difference between Math.round(), Math.floor(), and Math.ceil()?', a: 'Math.floor(): rounds toward negative infinity (always down). Math.ceil(): rounds toward positive infinity (always up). Math.round(): rounds to nearest integer (adds 0.5, then floors) — bankers\' rounding NOT used. Returns long for double, int for float.' },
+  { id: 20, difficulty: 'hard', q: 'What is the `strictfp` keyword?', a: 'strictfp enforces strict IEEE 754 floating-point semantics across platforms — prevents FPUs from using extended precision. Applied to classes, interfaces, or methods. Ensures consistent floating-point results on all platforms. Since Java 17, JVMs are required to use strict semantics by default, making strictfp obsolete.' },
+]
+
+export const quiz = [
+  { id: 1, q: 'What is the size of an int in Java?', options: ['16-bit', '32-bit', '64-bit', 'Platform-dependent'], answer: 1, explanation: 'int is always 32-bit in Java (unlike C/C++ where it is platform-dependent). Range: -2^31 to 2^31-1.' },
+  { id: 2, q: 'What is the output of: `Integer a = 200; Integer b = 200; System.out.println(a == b);`', options: ['true', 'false', 'Depends on JVM', 'Compile error'], answer: 1, explanation: 'Integer caches -128 to 127. 200 is outside this range, so two different objects are created. == compares references, not values.' },
+  { id: 3, q: 'Which of these is NOT a primitive type?', options: ['int', 'boolean', 'String', 'char'], answer: 2, explanation: 'String is a class (object), not a primitive. The 8 primitives are: byte, short, int, long, float, double, char, boolean.' },
+  { id: 4, q: 'What is the result of `5 / 2` in Java?', options: ['2.5', '2', '3', '2.0'], answer: 1, explanation: 'Integer division truncates: 5 / 2 = 2. For decimal result, use 5.0 / 2 or (double)5 / 2.' },
+  { id: 5, q: 'What happens when you assign null to an int and unbox it?', options: ['Returns 0', 'Returns -1', 'NullPointerException', 'Compiler error'], answer: 2, explanation: 'You cannot assign null to an int primitive. If you assign null to Integer and unbox it, NullPointerException is thrown.' },
+  { id: 6, q: 'What is `var` in Java?', options: ['A dynamic type like JavaScript', 'Local variable type inference (compile-time fixed type)', 'A keyword for nullable variables', 'A variant data type'], answer: 1, explanation: 'var uses type inference — the compiler infers the static type from the initializer. The type is fixed at compile time.' },
+  { id: 7, q: 'What is the default value of a boolean instance variable?', options: ['true', 'false', 'null', 'Undefined'], answer: 1, explanation: 'Instance variables default to false for boolean, 0 for numerics, null for references. Local variables have no default.' },
+  { id: 8, q: 'Which operator should you use for safe null-checking?', options: ['& (bitwise AND)', '| (bitwise OR)', '&& (logical AND with short-circuit)', '== (equality)'], answer: 2, explanation: 'Use && for null checks: `if (obj != null && obj.getValue() > 0)`. Short-circuit prevents evaluating the right side if left is false.' },
+  { id: 9, q: 'What is the result of `10 >> 1`?', options: ['20', '5', '1', '-10'], answer: 1, explanation: 'Right shift by 1 divides by 2: 10 >> 1 = 5. For positive numbers, >> and >>> are equivalent.' },
+  { id: 10, q: 'Which type should be used for precise monetary calculations?', options: ['double', 'float', 'BigDecimal', 'long'], answer: 2, explanation: 'BigDecimal provides exact decimal arithmetic. float/double use binary representation and cannot represent values like 0.1 exactly.' },
+  { id: 11, q: 'What is the result of `(int) 3.99`?', options: ['4', '3', '3.99', 'Compile error'], answer: 1, explanation: 'Narrowing cast truncates (does not round): (int)3.99 = 3. Use Math.round() for rounding behavior.' },
+  { id: 12, q: 'Which is the widening conversion path for int?', options: ['int → short → byte', 'int → long → float → double', 'int → char → boolean', 'int → float → long'], answer: 1, explanation: 'Widening: int can be widened to long, float, or double automatically. Note: int → float may lose precision for very large ints.' },
+  { id: 13, q: 'What is the range of a byte?', options: ['0 to 255', '-128 to 127', '-256 to 255', '0 to 127'], answer: 1, explanation: 'byte is 8-bit signed: -2^7 to 2^7-1 = -128 to 127.' },
+  { id: 14, q: 'What does `i++` return in the expression `int b = i++;` when i=5?', options: ['6', '5', 'Depends', '0'], answer: 1, explanation: 'Postfix i++ returns the current value (5), then increments. So b=5, i=6.' },
+  { id: 15, q: 'What is String concatenation with + internally optimized to?', options: ['String.concat()', 'StringBuilder.append()', 'StringBuffer.append()', 'Arrays.join()'], answer: 1, explanation: 'The compiler optimizes + concatenation to StringBuilder.append() calls. But in loops, explicitly use StringBuilder to avoid O(n²) behavior.' },
+]
+
+export const shortNotes = {
+  title: 'Data Types & Operators — Quick Reference',
+  color: 'blue',
+  keyPoints: [
+    { icon: '🔢', title: '8 Primitive Types', text: 'byte(8) short(16) int(32) long(64) float(32) double(64) char(16) boolean. All signed except char.' },
+    { icon: '📦', title: 'Wrapper Classes', text: 'Integer, Double, etc. Enable use in generics. Autoboxing/unboxing automatic but watch NPE on null.' },
+    { icon: '💰', title: 'Use BigDecimal for Money', text: '0.1 + 0.2 ≠ 0.3 with double. Binary FP is inexact. BigDecimal for financial calculations.' },
+    { icon: '🔗', title: 'String Equality', text: 'Always use .equals() for content. == compares references. String pool: literals are shared.' },
+    { icon: '🔄', title: 'Type Casting', text: 'Widening (int→long) automatic. Narrowing (long→int) explicit cast required, may lose data.' },
+    { icon: '⚡', title: 'Short-Circuit Logic', text: '&& stops if left is false. || stops if left is true. Use && for safe null checks.' },
+    { icon: '🔁', title: 'Integer Cache', text: 'Integer caches -128 to 127. Outside this range, == between Integer objects is false.' },
+    { icon: '📐', title: 'Bit Shifting', text: '>> arithmetic (preserves sign), >>> logical (fills 0). << n = ×2ⁿ, >> n = ÷2ⁿ.' },
+  ],
+  quickFacts: [
+    'int is always 32-bit in Java (unlike C where it\'s platform-dependent)',
+    'char is 16-bit unsigned Unicode — not the same as a C char (8-bit)',
+    'Integer.MAX_VALUE = 2,147,483,647 (2³¹ - 1)',
+    'Long.MAX_VALUE = 9,223,372,036,854,775,807 (2⁶³ - 1)',
+    'var was added in Java 10 (JEP 286)',
+    'String is NOT a primitive — it\'s a class in java.lang',
+    '`new String("hello")` creates a new heap object; avoid it',
+  ],
+  rememberThis: [
+    'Unboxing null → NullPointerException at runtime',
+    'Integer == Integer is unreliable outside [-128, 127]',
+    'int / int = int (truncated, not rounded)',
+    'Local variables have NO default value — initialize before use',
+  ],
+}

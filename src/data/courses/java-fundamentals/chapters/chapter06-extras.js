@@ -1,0 +1,72 @@
+// Chapter 6: Collections & Core APIs — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'medium', q: 'What is the Java Collections Framework hierarchy?', a: 'Iterable → Collection → {List, Set, Queue}. Map is separate (not a Collection). Main implementations: ArrayList/LinkedList (List), HashSet/TreeSet/LinkedHashSet (Set), ArrayDeque/PriorityQueue (Queue), HashMap/TreeMap/LinkedHashMap (Map).' },
+  { id: 2, difficulty: 'medium', q: 'What is the difference between ArrayList and LinkedList?', a: 'ArrayList: array-backed, O(1) random access, O(n) insert/remove middle, good cache locality. LinkedList: doubly-linked, O(n) access, O(1) insert/remove at known node, implements Deque. Use ArrayList almost always; LinkedList only for many insertions at head/tail.' },
+  { id: 3, difficulty: 'medium', q: 'What is the difference between HashMap, LinkedHashMap, and TreeMap?', a: 'HashMap: O(1) avg, no ordering. LinkedHashMap: maintains insertion (or access) order. TreeMap: sorted by key, O(log n). Use HashMap for performance; LinkedHashMap for predictable iteration; TreeMap for sorted key access or range queries (headMap, tailMap, subMap).' },
+  { id: 4, difficulty: 'hard', q: 'How does HashMap work internally?', a: 'Array of buckets. hashCode() % capacity → bucket index. Collisions → linked list (Java 8+: tree if ≥8 entries). Default capacity: 16, load factor: 0.75. Rehash doubles capacity when size > capacity × loadFactor. hashCode determines bucket; equals() resolves within bucket.' },
+  { id: 5, difficulty: 'medium', q: 'What is the difference between HashSet, LinkedHashSet, and TreeSet?', a: 'HashSet: O(1) ops, no order. LinkedHashSet: insertion order. TreeSet: sorted (NavigableSet), O(log n). All use equals/hashCode (Hash) or compareTo/Comparator (Tree). No duplicates. TreeSet provides: floor, ceiling, headSet, tailSet.' },
+  { id: 6, difficulty: 'medium', q: 'What is Comparable vs Comparator?', a: 'Comparable: class implements compareTo (natural ordering) — built into the class. Comparator: external compare(a,b) — can have multiple ordering strategies, can sort classes you don\'t control. Java 8: `Comparator.comparing(Person::getAge).thenComparing(Person::getName).reversed()`.' },
+  { id: 7, difficulty: 'hard', q: 'What is generics type erasure?', a: 'Generic types are erased at compile time to their bounds. `List<String>` → `List` at runtime. Cannot: create `new T[]`, use instanceof with parameterized type (`list instanceof List<String>`), or use primitives as type params. Compiler inserts casts. Bridge methods maintain polymorphism.' },
+  { id: 8, difficulty: 'hard', q: 'What is PECS (Producer Extends, Consumer Super)?', a: '`List<? extends T>` (upper bound): can read T, cannot add — use when producing items. `List<? super T>` (lower bound): can add T, can only read Object — use when consuming items. `Collections.copy(dest<? super T>, src<? extends T>)` demonstrates both.' },
+  { id: 9, difficulty: 'medium', q: 'What is the difference between Iterator and ListIterator?', a: 'Iterator: forward-only, supports remove(). ListIterator: bidirectional, supports add/set/remove, nextIndex/previousIndex. Both throw ConcurrentModificationException if collection structurally modified outside iterator. Use iterator.remove() for safe remove during iteration.' },
+  { id: 10, difficulty: 'medium', q: 'What is the difference between Queue and Deque?', a: 'Queue: FIFO — offer/add (tail), poll/remove (head), peek/element (head). Deque: double-ended — first/last operations. ArrayDeque is best for both stack and queue. PriorityQueue is heap-based, ordered by priority (not insertion order).' },
+  { id: 11, difficulty: 'medium', q: 'What is the Collections utility class?', a: 'Collections.sort/binarySearch/reverse/shuffle/min/max/frequency/disjoint/unmodifiableList/synchronizedList/nCopies/singletonList/emptyList. Static methods for operating on collections. Note: Collections.sort is merge sort (stable); Collections.shuffle is Fisher-Yates.' },
+  { id: 12, difficulty: 'medium', q: 'What is the difference between fail-fast and fail-safe iterators?', a: 'Fail-fast (ArrayList, HashMap): throws ConcurrentModificationException if structurally modified during iteration (via modCount). Fail-safe (CopyOnWriteArrayList, ConcurrentHashMap): iterate over snapshot/uses internal mechanisms — no exception, may see stale data.' },
+  { id: 13, difficulty: 'medium', q: 'What is the Map.Entry API?', a: 'Map.Entry<K,V> represents a key-value pair in a Map. `map.entrySet()` returns Set<Map.Entry<K,V>>. Methods: getKey(), getValue(), setValue(). Most efficient way to iterate both key and value: `for(var e : map.entrySet()) { e.getKey(); e.getValue(); }`. Java 9+: Map.entry(k, v).' },
+  { id: 14, difficulty: 'medium', q: 'What are immutable collections in Java 9+?', a: '`List.of(1,2,3)`, `Set.of("a","b")`, `Map.of("k",v)` create immutable collections. No add/remove/set — UnsupportedOperationException. No nulls allowed. More memory-efficient than ArrayList wrappers. Use `List.copyOf(collection)` for immutable copy of existing collection.' },
+  { id: 15, difficulty: 'medium', q: 'What is StringBuilder vs StringBuffer vs String?', a: 'String: immutable, thread-safe by nature. StringBuilder: mutable, NOT thread-safe, fast (use in single-threaded code). StringBuffer: mutable, thread-safe (synchronized), slower. Always use StringBuilder for string building in loops. Compiler auto-uses StringBuilder for simple + concatenation.' },
+  { id: 16, difficulty: 'hard', q: 'What is EnumSet and EnumMap?', a: 'EnumSet: Set backed by bit vector — O(1) ops, extremely compact. EnumMap: Map backed by array indexed by enum ordinal — faster than HashMap. Always prefer over generic Set/Map with enum keys. EnumSet.of(), EnumSet.allOf(), EnumSet.range() are common factory methods.' },
+  { id: 17, difficulty: 'medium', q: 'What are the main String methods to know?', a: 'length(), charAt(i), substring(start,end), indexOf/lastIndexOf, contains, startsWith/endsWith, toLowerCase/toUpperCase, trim()/strip(), replace(old,new), split(regex), join(delim, items), String.valueOf(x), toCharArray(), isEmpty/isBlank (Java 11), repeat (Java 11), formatted (Java 15).' },
+  { id: 18, difficulty: 'hard', q: 'What is ConcurrentHashMap and how is it different from synchronized Map?', a: 'ConcurrentHashMap: uses CAS + node-level locking (Java 8+) for highly concurrent reads/writes. No single lock on whole map. Null keys/values not allowed. Weakly consistent iterators (no ConcurrentModificationException). `Collections.synchronizedMap()` locks entire map per operation — one thread at a time.' },
+  { id: 19, difficulty: 'medium', q: 'What is the Stack class? Should you use it?', a: 'java.util.Stack extends Vector — all methods synchronized, poor design (extends random-access list). Use ArrayDeque as a stack instead: `deque.push()`, `deque.pop()`, `deque.peek()`. The Stack class is legacy — Java documentation recommends Deque over Stack.' },
+  { id: 20, difficulty: 'hard', q: 'What are sequenced collections (Java 21)?', a: 'New interfaces: SequencedCollection (getFirst/getLast/addFirst/addLast/removeFirst/removeLast/reversed()), SequencedSet, SequencedMap. Implemented by: List, Deque, LinkedHashSet, LinkedHashMap, SortedSet, SortedMap. Provides uniform API for accessing both ends of an ordered collection.' },
+]
+
+export const quiz = [
+  { id: 1, q: 'What is the default initial capacity of a HashMap?', options: ['8', '10', '16', '32'], answer: 2, explanation: 'HashMap default initial capacity is 16 with load factor 0.75. Resizes when size > 16 × 0.75 = 12 entries.' },
+  { id: 2, q: 'Which collection maintains insertion order?', options: ['HashSet', 'TreeSet', 'LinkedHashSet', 'PriorityQueue'], answer: 2, explanation: 'LinkedHashSet maintains insertion order. HashSet has no guaranteed order. TreeSet maintains sorted order.' },
+  { id: 3, q: 'What exception does a fail-fast iterator throw on concurrent modification?', options: ['IllegalStateException', 'ConcurrentModificationException', 'UnsupportedOperationException', 'ModificationException'], answer: 1, explanation: 'Fail-fast iterators throw ConcurrentModificationException if the collection is structurally modified during iteration.' },
+  { id: 4, q: 'Which interface provides natural ordering?', options: ['Comparator', 'Comparable', 'Ordered', 'Sortable'], answer: 1, explanation: 'Comparable with compareTo() defines natural ordering built into the class. Comparator is external and ad-hoc.' },
+  { id: 5, q: 'What does List.of() return in Java 9+?', options: ['An ArrayList', 'A mutable fixed-size list', 'An immutable list', 'A synchronized list'], answer: 2, explanation: 'List.of() returns an immutable list. UnsupportedOperationException on add/remove/set. Nulls not allowed.' },
+  { id: 6, q: 'Which Map.get() is O(log n)?', options: ['HashMap', 'LinkedHashMap', 'TreeMap', 'IdentityHashMap'], answer: 2, explanation: 'TreeMap is backed by a Red-Black tree, giving O(log n) for get/put/remove. HashMap is O(1) average.' },
+  { id: 7, q: 'What is the difference between `offer()` and `add()` in a Queue?', options: ['offer() throws on failure, add() returns false', 'add() throws on failure, offer() returns false', 'They are identical', 'offer() is for Deque only'], answer: 1, explanation: 'add() throws IllegalStateException if capacity exceeded. offer() returns false. Prefer offer() for capacity-bounded queues.' },
+  { id: 8, q: 'Can HashMap have a null key?', options: ['No', 'Yes, one null key allowed', 'Yes, multiple null keys', 'Only if value is also null'], answer: 1, explanation: 'HashMap allows one null key (stored in bucket 0) and multiple null values. ConcurrentHashMap and Hashtable do not allow null keys.' },
+  { id: 9, q: 'What is the time complexity of HashSet.contains()?', options: ['O(n)', 'O(log n)', 'O(1) average', 'O(1) always'], answer: 2, explanation: 'HashSet.contains() is O(1) average case (uses hashCode + equals). Worst case O(n) with many collisions, O(log n) with tree bins.' },
+  { id: 10, q: 'Which is recommended over java.util.Stack?', options: ['Vector', 'ArrayList', 'ArrayDeque', 'LinkedList'], answer: 2, explanation: 'ArrayDeque is recommended for stack/queue use. Stack extends Vector (legacy, synchronized). ArrayDeque is faster and unsynchronized.' },
+  { id: 11, q: 'What does PECS stand for?', options: ['Producer Extends Consumer Super', 'Protected Encapsulated Class System', 'Primitives Extend Collections Safely', 'Package Export Consumer Service'], answer: 0, explanation: 'PECS: Producer Extends, Consumer Super. Use ? extends T when reading, ? super T when writing.' },
+  { id: 12, q: 'What is the result of `new ArrayList<>(Arrays.asList(1,2,3)); list.add(4);`', options: ['UnsupportedOperationException', 'Works fine', 'ConcurrentModificationException', 'ClassCastException'], answer: 1, explanation: 'new ArrayList<>(Arrays.asList(...)) creates a mutable ArrayList. add() works fine. Note: Arrays.asList() alone returns a fixed-size list.' },
+  { id: 13, q: 'Which collection orders elements by priority?', options: ['LinkedList', 'ArrayDeque', 'PriorityQueue', 'Stack'], answer: 2, explanation: 'PriorityQueue orders by natural ordering or Comparator. Smallest element (by default) is always at the head.' },
+  { id: 14, q: 'What happens if two objects are equal per equals() but have different hashCodes?', options: ['Works fine in HashMap', 'They can never be equal', 'HashMap/HashSet breaks — can\'t find the object', 'An exception is thrown'], answer: 2, explanation: 'Violating the hashCode contract: HashMap uses hashCode to find bucket. Different hashCode → different bucket → object not found even if equals is true.' },
+  { id: 15, q: 'What does String.intern() do?', options: ['Creates a new String', 'Trims whitespace', 'Adds to string pool and returns pooled reference', 'Converts to lowercase'], answer: 2, explanation: 'intern() checks if an equal string exists in the pool; returns it if found, adds and returns it if not. Useful for memory optimization.' },
+]
+
+export const shortNotes = {
+  title: 'Collections & Core APIs — Quick Reference',
+  color: 'indigo',
+  keyPoints: [
+    { icon: '📊', title: 'Collection Hierarchy', text: 'Iterable→Collection→{List,Set,Queue}. Map is separate. Key: ArrayList, HashSet, HashMap, ArrayDeque.' },
+    { icon: '🗺️', title: 'Map Variants', text: 'HashMap: O(1), no order. LinkedHashMap: insertion order. TreeMap: sorted O(log n). ConcurrentHashMap: thread-safe.' },
+    { icon: '⚡', title: 'HashMap Internals', text: 'Buckets + linked list/tree. hashCode→bucket, equals→within bucket. Load factor 0.75, default cap 16.' },
+    { icon: '🔄', title: 'Comparable vs Comparator', text: 'Comparable: natural ordering (compareTo in class). Comparator: external, multiple strategies, Comparator.comparing().' },
+    { icon: '🛡️', title: 'Immutable Collections', text: 'List.of(), Set.of(), Map.of() (Java 9+). Null not allowed. UnsupportedOperationException on mutation.' },
+    { icon: '🚦', title: 'Fail-fast vs Fail-safe', text: 'ArrayList/HashMap iterators: fail-fast (ConcurrentModificationException). ConcurrentHashMap: fail-safe (no exception).' },
+    { icon: '🎯', title: 'Use EnumSet/EnumMap', text: 'EnumSet (bit vector) and EnumMap (array) are fastest for enum keys/values. Always prefer over HashMap<Enum,V>.' },
+    { icon: '📝', title: 'String Building', text: 'StringBuilder for single-thread. StringBuffer for multi-thread (rare). + in loops is O(n²) — use StringBuilder.' },
+  ],
+  quickFacts: [
+    'HashMap allows one null key, multiple null values',
+    'ConcurrentHashMap does NOT allow null keys or values',
+    'TreeMap is sorted by key — Red-Black tree internally',
+    'HashSet is backed by HashMap (value is a dummy PRESENT object)',
+    'PriorityQueue is a min-heap by default (smallest element first)',
+    'Java 21 added SequencedCollection interface for ordered access',
+    'Arrays.asList() returns fixed-size list (can set, cannot add/remove)',
+  ],
+  rememberThis: [
+    'Always override hashCode when you override equals',
+    'TreeMap/TreeSet require keys to be Comparable or use Comparator',
+    'iterator.remove() is safe; collection.remove() during iteration is not',
+    'ArrayList get() = O(1), add/remove at middle = O(n)',
+  ],
+}

@@ -1,0 +1,72 @@
+// Chapter 3: Control Flow — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'easy', q: 'What is the difference between if-else and switch?', a: 'if-else: works with any boolean expression, any type, sequential checking. switch: tests a single value against multiple cases — cleaner for multi-way branches. Switch types: byte, short, int, char, String (Java 7+), enums, Integer wrapper, and in Java 14+ switch expressions. switch is NOT faster than if-else for small cases.' },
+  { id: 2, difficulty: 'easy', q: 'What is fall-through in switch and how do you prevent it?', a: 'In traditional switch, execution falls through to the next case unless there is a `break`. This allows multiple cases to share code but is a common bug. Prevent with `break` (or `return`). Switch expressions with `->` syntax have no fall-through at all.' },
+  { id: 3, difficulty: 'medium', q: 'What is the enhanced switch expression (Java 14+)?', a: 'Uses `->` for arrow cases (no fall-through), can return values, supports `yield` for multi-statement cases. `int days = switch(month) { case FEBRUARY -> 28; case APRIL, JUNE -> 30; default -> 31; };`. Must be exhaustive when used as expression.' },
+  { id: 4, difficulty: 'easy', q: 'What is the difference between while and do-while loops?', a: 'while: checks condition BEFORE first iteration — body may never execute. do-while: executes body ONCE, THEN checks condition — body executes at least once. Use do-while for: user input validation, menu loops where you must execute at least once.' },
+  { id: 5, difficulty: 'medium', q: 'What does `continue` do in a loop? What about labeled continue?', a: '`continue` skips the rest of the current iteration and moves to the next. Labeled `continue outerLabel;` skips to the next iteration of a named outer loop. Usually a sign of complex nested logic — prefer refactoring to methods instead.' },
+  { id: 6, difficulty: 'easy', q: 'What is the enhanced for loop (for-each)?', a: '`for (Type item : collection)` iterates over any Iterable or array. Cannot access index, cannot modify collection during iteration (ConcurrentModificationException), cannot use `remove()` on the collection. Use Iterator if you need to remove elements while iterating.' },
+  { id: 7, difficulty: 'medium', q: 'What is the difference between break and return?', a: '`break`: exits the innermost loop or switch statement, continues after it. `return`: exits the entire current method, optionally returning a value. Labeled `break label;` exits a specific outer loop. `return` is more decisive — use it when loop result is the method\'s purpose.' },
+  { id: 8, difficulty: 'hard', q: 'What is pattern matching in switch (Java 21)?', a: 'Switch cases can match type patterns: `case Integer i -> i * 2`. Guarded patterns: `case String s when s.length() > 5 -> ...`. Null handling: `case null -> ...`. Sealed class hierarchy enables exhaustive matching without default. Order matters — more specific patterns before general ones.' },
+  { id: 9, difficulty: 'medium', q: 'Can you have a switch on a String?', a: 'Yes, since Java 7. String switch uses hashCode() then equals() internally — handles nulls with a NullPointerException if switched value is null. Switch on String is compiled to efficient bytecode.' },
+  { id: 10, difficulty: 'easy', q: 'What is an infinite loop and when is it intentional?', a: '`while(true)` or `for(;;)` creates an infinite loop. Intentional uses: server event loops, game loops, polling services. Must have a `break` or `return` exit condition. Without one, causes the thread to hang indefinitely.' },
+  { id: 11, difficulty: 'medium', q: 'How does Java evaluate the condition in a for loop?', a: 'For loop: init → condition check → body → update → condition check → ... If condition is false initially, body never executes. Init runs once. Update runs after each body execution. All three parts are optional: `for(;;)` is valid (infinite loop).' },
+  { id: 12, difficulty: 'hard', q: 'What are labeled breaks and when should they be used?', a: 'Labeled break exits a named outer loop: `outer: for(...) { for(...) { break outer; } }`. Valid but a code smell — indicates overly complex nesting. Better alternatives: extract inner logic to a method, use boolean flag, redesign algorithm.' },
+  { id: 13, difficulty: 'medium', q: 'What is the `yield` keyword in switch expressions?', a: '`yield` returns a value from a block-case in a switch expression. `case 0 -> { int r = compute(); yield r * 2; }`. Only used inside switch expressions, not switch statements. Return-like but scoped to the switch expression.' },
+  { id: 14, difficulty: 'easy', q: 'Can a switch case value be a variable?', a: 'No. Case values must be compile-time constants: literals, enum constants, or `static final` fields. Variables, even final ones that are not constant expressions, cannot be used as case values. This is a compiler requirement for type safety.' },
+  { id: 15, difficulty: 'medium', q: 'What is the difference between `==` comparison and using `equals()` in switch expressions?', a: 'switch uses `==` for primitives and enums, `equals()` for Strings (internally). You cannot override this behavior. For Object type switching (Java 21), the switch uses instanceof-like matching, not equals(). Always be aware of what semantics the switch type uses.' },
+  { id: 16, difficulty: 'hard', q: 'What is a guarded pattern in switch (Java 21)?', a: '`case String s when s.isEmpty()` — the `when` clause adds a boolean guard. Only matches if both the type pattern matches AND the guard is true. If guard fails, falls through to next case. Multiple guards can narrow a type to specific values.' },
+  { id: 17, difficulty: 'easy', q: 'What is a ternary operator and when should you avoid it?', a: '`condition ? trueVal : falseVal`. Good for: simple, readable one-liners. Avoid: nested ternaries (readability nightmare), side effects, complex expressions. Always prefer if-else when the branches have side effects or span multiple lines.' },
+  { id: 18, difficulty: 'medium', q: 'What happens if no `default` case in a switch statement?', a: 'If no case matches and there is no default, execution falls out of the switch with no action taken. In a switch expression (Java 14+), missing default causes a compile error unless the switch is exhaustive (e.g., all enum values covered). Always add default for robustness.' },
+  { id: 19, difficulty: 'medium', q: 'How would you iterate over a map in Java?', a: '`for (Map.Entry<K,V> entry : map.entrySet())` to get both keys and values. `for (K key : map.keySet())` for keys only. `map.forEach((k, v) -> ...)` with Java 8 lambda. For modification during iteration, use `iterator.remove()` or collect keys to remove in a separate list.' },
+  { id: 20, difficulty: 'hard', q: 'What is exhaustiveness checking in switch expressions?', a: 'Switch expressions must handle all possible values. For enums, all constants must be covered or have a default. For sealed class hierarchies, all permitted subtypes must be covered. The compiler enforces this. If at runtime an uncovered case is encountered (e.g., via raw types), MatchException is thrown (Java 21).' },
+]
+
+export const quiz = [
+  { id: 1, q: 'What is the output if no break in a switch case?', options: ['Only that case executes', 'Fall-through to next case(s)', 'Compile error', 'Nothing executes'], answer: 1, explanation: 'Fall-through: without break, execution continues to the next case. This is often a bug but sometimes intentional.' },
+  { id: 2, q: 'Which loop guarantees at least one execution?', options: ['for loop', 'while loop', 'do-while loop', 'for-each loop'], answer: 2, explanation: 'do-while executes the body first, then checks the condition. The body always runs at least once.' },
+  { id: 3, q: 'What does `continue` do inside a for loop?', options: ['Exits the loop', 'Skips to next iteration', 'Restarts the loop', 'Returns from method'], answer: 1, explanation: 'continue skips the rest of the current iteration and moves to the update expression, then the next condition check.' },
+  { id: 4, q: 'What Java version enabled String in switch?', options: ['Java 5', 'Java 7', 'Java 8', 'Java 14'], answer: 1, explanation: 'String in switch statements was introduced in Java 7.' },
+  { id: 5, q: 'Which is valid as a switch case value?', options: ['A local variable', 'A static final int constant', 'The result of a method call', 'A non-final field'], answer: 1, explanation: 'Case values must be compile-time constants. static final fields initialized with a literal qualify.' },
+  { id: 6, q: 'What keyword returns a value from a block-case in a switch expression?', options: ['return', 'break', 'yield', 'exit'], answer: 2, explanation: 'yield returns a value from a multi-statement block in a switch expression. return exits the method; break exits a switch.' },
+  { id: 7, q: 'What is `for(;;)` equivalent to?', options: ['for(int i=0; i<0; i++)', 'while(false)', 'while(true)', 'do {} while(false)'], answer: 2, explanation: 'for(;;) — all three parts empty — creates an infinite loop, equivalent to while(true).' },
+  { id: 8, q: 'Can a for-each loop iterate over a custom class?', options: ['No, only arrays and List', 'Yes, if it implements Iterable<T>', 'Yes, if it extends Collection', 'Only with Java 8+ streams'], answer: 1, explanation: 'Any class implementing Iterable<T> (providing iterator()) can be used in a for-each loop.' },
+  { id: 9, q: 'What is a labeled break used for?', options: ['Breaking from a method', 'Breaking from a specific outer loop', 'Breaking with a value', 'Breaking all loops in the program'], answer: 1, explanation: 'Labeled break (`break outerLabel;`) exits a specific named outer loop, not just the innermost one.' },
+  { id: 10, q: 'Which switch form has no fall-through by default?', options: ['switch statement with break', 'switch expression with ->', 'switch statement with return', 'switch with default'], answer: 1, explanation: 'Switch expressions using -> (arrow cases) have no fall-through. Each case is independent.' },
+  { id: 11, q: 'When is a switch expression exhaustive by default?', options: ['When it has a default case', 'When all enum constants are covered', 'When using switch on sealed classes with all subtypes covered', 'Both B and C'], answer: 3, explanation: 'Switch expressions are exhaustive when all cases are covered: either all enum values or all sealed class subtypes (without needing default).' },
+  { id: 12, q: 'What does `when` do in a switch pattern case (Java 21)?', options: ['Defines a new variable', 'Adds a boolean guard condition', 'Imports a class', 'Creates a fallback'], answer: 1, explanation: '`case String s when s.isEmpty()` — when adds a boolean guard. The case only matches if both the type pattern AND the guard are true.' },
+  { id: 13, q: 'What is the result of this loop? `for(int i=0; i<3; i++) { System.out.print(i); continue; System.out.print("x"); }`', options: ['0x1x2x', '012', 'Compile error', '0x1x2'], answer: 1, explanation: '`continue` skips the rest of the loop body. `System.out.print("x")` is unreachable code (though in some compilers it compiles with a warning). Output: 012.' },
+  { id: 14, q: 'How many times does this execute? `int i=0; do { i++; } while(i < 0);`', options: ['0 times', '1 time', 'Infinite', 'Compile error'], answer: 1, explanation: 'do-while always executes at least once. i becomes 1, then 1 < 0 is false, loop exits. Total: 1 execution.' },
+  { id: 15, q: 'What happens with an unhandled case in a Java 21 switch expression over a sealed type at runtime?', options: ['Returns null', 'Throws MatchException', 'Falls to default silently', 'Throws SwitchException'], answer: 1, explanation: 'If no case matches in a switch expression (which should not happen with exhaustive sealed types, but can via raw/reflection), Java 21 throws MatchException.' },
+]
+
+export const shortNotes = {
+  title: 'Control Flow — Quick Reference',
+  color: 'emerald',
+  keyPoints: [
+    { icon: '🔀', title: 'if-else vs switch', text: 'if-else: any boolean expression. switch: single value, multiple cases. switch expression (Java 14+) returns a value.' },
+    { icon: '⚡', title: 'Switch Expressions (Java 14+)', text: 'Use -> (no fall-through), yield for block cases, must be exhaustive. Cleaner than traditional switch.' },
+    { icon: '🔄', title: 'Loop Types', text: 'for (known count), while (unknown count, pre-check), do-while (post-check, always runs once), for-each (iterables).' },
+    { icon: '⏭️', title: 'break vs continue', text: 'break: exits loop/switch. continue: skips current iteration. Labeled versions target specific outer loops.' },
+    { icon: '🛑', title: 'Fall-Through', text: 'Traditional switch falls through without break. Arrow switch (->): no fall-through. Classic source of bugs.' },
+    { icon: '🎯', title: 'Pattern Matching Switch (Java 21)', text: 'Type patterns in switch: `case String s ->`. Guarded with `when`. Null-safe. Replaces instanceof+cast chains.' },
+    { icon: '⚙️', title: 'yield Keyword', text: 'Returns value from multi-statement switch expression block. Only valid inside switch expressions.' },
+    { icon: '✅', title: 'Exhaustiveness', text: 'Switch expressions must be exhaustive. Compiler enforces for enums and sealed class hierarchies.' },
+  ],
+  quickFacts: [
+    'String in switch supported since Java 7',
+    'Switch expressions (returning a value) added in Java 14',
+    'Pattern matching in switch added in Java 21',
+    'for-each loop requires implementing Iterable<T>',
+    'do-while is the only loop that always executes at least once',
+    '`yield` keyword was added in Java 13 (preview), stable in Java 14',
+    'case null in switch available in Java 21+',
+  ],
+  rememberThis: [
+    'Missing break in switch = fall-through (common bug)',
+    'Case values must be compile-time constants',
+    'for-each cannot remove elements from the collection',
+    'Switch expressions must handle all cases (exhaustive)',
+  ],
+}

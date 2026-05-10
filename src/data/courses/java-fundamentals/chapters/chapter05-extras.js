@@ -1,0 +1,72 @@
+// Chapter 5: Object-Oriented Programming — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'easy', q: 'What are the four pillars of OOP?', a: 'Encapsulation (bundle data + behavior, control access via modifiers), Abstraction (expose interface, hide implementation), Inheritance (extend behavior via extends), Polymorphism (one interface, many forms — overriding, dynamic dispatch).' },
+  { id: 2, difficulty: 'medium', q: 'What is the difference between method overriding and overloading?', a: 'Overloading: same name, different signature, compile-time resolution. Overriding: same signature in subclass, runtime resolution via dynamic dispatch. @Override annotation verifies at compile time. Cannot override final, static, or private methods.' },
+  { id: 3, difficulty: 'medium', q: 'What is the difference between abstract class and interface?', a: 'Abstract class: can have state, constructors, concrete methods, single inheritance. Interface: no instance state, no constructors, abstract methods by default (Java 8+ default/static, Java 9+ private), multiple implementation. Use abstract for "is-a" with shared state; interface for "can-do" contracts.' },
+  { id: 4, difficulty: 'medium', q: 'Explain the SOLID principles.', a: 'S: Single Responsibility (one reason to change). O: Open/Closed (open for extension, closed for modification). L: Liskov Substitution (subtype must be substitutable for parent). I: Interface Segregation (small focused interfaces). D: Dependency Inversion (depend on abstractions).' },
+  { id: 5, difficulty: 'hard', q: 'What is the diamond problem and how does Java handle it?', a: 'Diamond problem: if two interfaces have conflicting default methods, which does the implementing class inherit? Java requires the class to explicitly override the method to resolve. Most-specific class rule: class implementation beats interface default. Explicitly call: `InterfaceA.super.method()`.' },
+  { id: 6, difficulty: 'medium', q: 'What is composition vs inheritance?', a: 'Inheritance ("is-a"): subclass inherits all members, tight coupling. Composition ("has-a"): class holds a reference, delegates — loose coupling. Prefer composition over inheritance (Effective Java). Use inheritance only when subtype truly IS the parent type and you want polymorphism.' },
+  { id: 7, difficulty: 'medium', q: 'What is a static nested class vs inner class?', a: 'Static nested: declared with static, no implicit outer reference, can be instantiated independently. Inner (non-static): implicit reference to outer instance — can access outer fields, prevents outer object GC (memory leak risk). Anonymous and local classes are inner classes.' },
+  { id: 8, difficulty: 'easy', q: 'What are Java access modifiers?', a: 'private (class only), package-private/default (class + package), protected (class + package + subclasses), public (everywhere). Outer classes: only public or package-private. Always use most restrictive access that works.' },
+  { id: 9, difficulty: 'medium', q: 'What is dynamic dispatch?', a: 'At runtime, JVM calls the actual overriding method based on the object\'s type, not the reference type. `Animal a = new Dog(); a.speak()` calls Dog\'s speak. Implemented via vtable. static, private, final methods are NOT dynamically dispatched.' },
+  { id: 10, difficulty: 'medium', q: 'What are the rules for hashCode() and equals()?', a: 'Contract: (1) a.equals(b) → a.hashCode() == b.hashCode(). (2) reflexive (a.equals(a)). (3) symmetric. (4) transitive. (5) consistent. (6) a.equals(null) is false. Always override both together. Violating contract breaks HashMap/HashSet.' },
+  { id: 11, difficulty: 'medium', q: 'What is an immutable class? How do you create one?', a: '(1) final class (no subclassing). (2) All fields private final. (3) No setters. (4) Initialize in constructor. (5) Defensive copies for mutable fields. Benefits: thread-safe, safe to cache, can be a HashMap key. Examples: String, Integer, all wrappers, LocalDate.' },
+  { id: 12, difficulty: 'medium', q: 'What is the `final` keyword?', a: 'final variable: assign once only (reference constant, not value for objects). final method: cannot be overridden. final class: cannot be subclassed (String, Integer). Not applicable to constructors. Enables optimization and signals design intent.' },
+  { id: 13, difficulty: 'easy', q: 'What is the `this` keyword?', a: 'Reference to current instance. Uses: (1) disambiguate field from local var `this.name = name`. (2) call another constructor `this(args)` — must be first. (3) pass current object as argument. Cannot use this in static context.' },
+  { id: 14, difficulty: 'easy', q: 'What is the `super` keyword?', a: 'Reference to parent class. Uses: (1) `super.method()` — call overridden parent method. (2) `super(args)` — call parent constructor (must be first in constructor). Compiler inserts `super()` automatically if no explicit call. Cannot skip grandparent.' },
+  { id: 15, difficulty: 'medium', q: 'What are records (Java 16+)?', a: '`record Point(int x, int y) {}` auto-generates: constructor, accessors x() y(), equals(), hashCode(), toString(). Fields are private final. Records are implicitly final (no subclassing). Can add methods, implement interfaces. Cannot extend other classes. Ideal for DTOs.' },
+  { id: 16, difficulty: 'medium', q: 'What are sealed classes (Java 17+)?', a: '`sealed class Shape permits Circle, Rectangle {}`. Permitted subclasses must be final, sealed, or non-sealed. Same package/module required. Enables exhaustive pattern matching — compiler verifies all subtypes handled. Models closed hierarchies.' },
+  { id: 17, difficulty: 'hard', q: 'What is covariant return type?', a: 'Overriding method can return a subtype of the parent method\'s return type. `Animal get()` in parent, `Dog get()` in child — valid. Enables fluent builder patterns. JVM uses bridge methods to maintain bytecode compatibility with erasure.' },
+  { id: 18, difficulty: 'medium', q: 'What is constructor chaining?', a: '`this(args)` — calls another constructor in same class (must be first statement). `super(args)` — calls parent constructor. Prevents duplicate initialization logic. If no explicit super() call, compiler inserts default `super()` automatically.' },
+  { id: 19, difficulty: 'hard', q: 'What is early vs late binding?', a: 'Early/static binding: compile-time resolution — overloaded, static, final, private methods. Late/dynamic binding: runtime resolution — overridden instance methods (vtable lookup). Fields are early-bound (no field polymorphism — only hiding, not overriding).' },
+  { id: 20, difficulty: 'medium', q: 'What is pattern matching instanceof (Java 16+)?', a: '`if (obj instanceof String s && s.length() > 0)` — s is automatically cast and scoped. No explicit cast needed. Java 21: in switch patterns. Eliminates verbose `instanceof` + cast + use pattern. The pattern variable is scoped to where it\'s definitely assigned.' },
+]
+
+export const quiz = [
+  { id: 1, q: 'Which OOP pillar is demonstrated by private fields with public getters?', options: ['Abstraction', 'Encapsulation', 'Inheritance', 'Polymorphism'], answer: 1, explanation: 'Encapsulation bundles data + behavior and controls access through modifiers. Private fields with public methods is classic encapsulation.' },
+  { id: 2, q: 'Can an abstract class have a constructor?', options: ['No, abstract classes cannot have constructors', 'Yes, called via super() from subclass', 'Yes, but only private constructors', 'Only if it has no abstract methods'], answer: 1, explanation: 'Abstract classes can have constructors — they are called via super() in the concrete subclass constructor.' },
+  { id: 3, q: 'A class implements two interfaces both having a default method `greet()`. What happens?', options: ['Uses first interface\'s method', 'Compile error unless overridden', 'Runtime exception', 'Uses alphabetically first interface'], answer: 1, explanation: 'The class must override greet() to resolve the ambiguity. Compiler error if not resolved.' },
+  { id: 4, q: 'What annotation verifies you are correctly overriding a parent method?', options: ['@Overload', '@Super', '@Override', '@Implements'], answer: 2, explanation: '@Override causes a compile error if the method does NOT actually override a parent method. Always use it.' },
+  { id: 5, q: 'Which of these CANNOT be overridden?', options: ['public method', 'protected method', 'private method', 'package-private method'], answer: 2, explanation: 'private methods are not visible to subclasses and cannot be overridden. They can be "hidden" but that\'s a separate method.' },
+  { id: 6, q: 'What does a record automatically generate?', options: ['Only getters', 'Only equals and hashCode', 'Constructor, accessors, equals, hashCode, toString', 'Constructor and toString only'], answer: 2, explanation: 'Records auto-generate: canonical constructor, component accessors (x(), y()), equals(), hashCode(), toString().' },
+  { id: 7, q: 'What is the relationship between composition and "has-a"?', options: ['Composition represents "is-a"', 'Composition represents "has-a"', 'Inheritance represents "has-a"', 'No relationship'], answer: 1, explanation: 'Composition = "has-a" relationship. A Car HAS-A Engine. Inheritance = "is-a". A Car IS-A Vehicle.' },
+  { id: 8, q: 'Which access modifier allows access from subclasses in different packages?', options: ['private', 'package-private', 'protected', 'All of the above'], answer: 2, explanation: 'protected allows access from the same package AND from subclasses regardless of package.' },
+  { id: 9, q: 'What does `sealed` keyword do?', options: ['Makes a class immutable', 'Restricts which classes can extend it', 'Prevents instantiation', 'Encrypts the class bytecode'], answer: 1, explanation: 'sealed class limits inheritance to explicitly listed permitted subclasses. Enables exhaustive pattern matching.' },
+  { id: 10, q: 'What is runtime polymorphism based on?', options: ['The reference type', 'The actual object type', 'The method signature', 'The class name'], answer: 1, explanation: 'Runtime polymorphism (dynamic dispatch) is based on the actual type of the object, not the declared reference type.' },
+  { id: 11, q: 'If a.equals(b) is true, what must also be true?', options: ['a == b', 'a.hashCode() == b.hashCode()', 'b.equals(a) only', 'a and b are same type'], answer: 1, explanation: 'The equals/hashCode contract: if a.equals(b) then a.hashCode() must equal b.hashCode(). Violation breaks HashMap/HashSet.' },
+  { id: 12, q: 'What is an inner class\'s main pitfall?', options: ['Cannot access outer class', 'Holds implicit reference to outer — prevents GC (memory leak)', 'Cannot be instantiated', 'Cannot implement interfaces'], answer: 1, explanation: 'Non-static inner classes hold an implicit reference to the outer class instance, preventing GC — a classic memory leak.' },
+  { id: 13, q: 'Where must `this(args)` or `super(args)` appear in a constructor?', options: ['Last statement', 'Anywhere', 'First statement', 'After super'], answer: 2, explanation: 'this() or super() constructor call must be the FIRST statement in a constructor. Only one can be used.' },
+  { id: 14, q: 'What makes a class immutable?', options: ['Only final fields', 'final class + private final fields + no setters + defensive copies', 'Using synchronized on all methods', 'No constructors'], answer: 1, explanation: 'True immutability requires: final class, all private final fields, no setters, initialize in constructor, defensive copies for mutable fields.' },
+  { id: 15, q: 'What is the purpose of @FunctionalInterface on an interface?', options: ['Makes methods static', 'Ensures exactly one abstract method (compile error if more/less)', 'Enables lambda capture', 'Makes the interface sealed'], answer: 1, explanation: '@FunctionalInterface verifies that the interface has exactly one abstract method — enabling lambda assignment. It\'s a documentation + compile-time check.' },
+]
+
+export const shortNotes = {
+  title: 'OOP Mastery — Quick Reference',
+  color: 'rose',
+  keyPoints: [
+    { icon: '🏛️', title: '4 OOP Pillars', text: 'Encapsulation (access control), Abstraction (hide impl), Inheritance (extend), Polymorphism (one interface, many forms).' },
+    { icon: '🎭', title: 'Polymorphism', text: 'Overloading: compile-time. Overriding: runtime (vtable). Animal ref → Dog object → Dog\'s method called.' },
+    { icon: '🔗', title: 'Abstract vs Interface', text: 'Abstract: state + constructors + single inherit. Interface: no state, multiple implement, default/static methods (Java 8+).' },
+    { icon: '💎', title: 'Records (Java 16+)', text: 'Immutable data classes. Auto: constructor, accessors (no get prefix), equals, hashCode, toString. Implicitly final.' },
+    { icon: '🔒', title: 'Sealed Classes (Java 17+)', text: 'Restricts inheritance to `permits` list. Enables exhaustive switch. Subtypes must be final/sealed/non-sealed.' },
+    { icon: '📐', title: 'SOLID Principles', text: 'Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion.' },
+    { icon: '⚡', title: 'Composition > Inheritance', text: 'Inheritance creates tight coupling. Composition is flexible. Prefer "has-a" over "is-a" when in doubt.' },
+    { icon: '🔑', title: 'equals() + hashCode()', text: 'Always override both together. Contract: equals → same hashCode. Violation breaks HashMap and HashSet.' },
+  ],
+  quickFacts: [
+    'Records were added in Java 16 (JEP 395)',
+    'Sealed classes were added in Java 17 (JEP 409)',
+    'Interfaces can have private methods since Java 9',
+    'Default methods in interfaces added in Java 8',
+    'Pattern matching instanceof added in Java 16',
+    'final class cannot be subclassed (e.g., String, Integer)',
+    '@Override causes compile error if method does not actually override',
+  ],
+  rememberThis: [
+    'a.equals(b) true → a.hashCode() == b.hashCode() (not vice versa)',
+    'static methods are not overridden — they are hidden',
+    'Constructors are not inherited',
+    'super() must be first statement in constructor',
+  ],
+}

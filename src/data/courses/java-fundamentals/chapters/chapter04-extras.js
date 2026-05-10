@@ -1,0 +1,72 @@
+// Chapter 4: Methods & Arrays — Top Questions, Quiz, Short Notes
+
+export const topQuestions = [
+  { id: 1, difficulty: 'easy', q: 'What is method overloading?', a: 'Multiple methods with the same name but different parameter lists (number, types, or order). Resolved at compile time based on static type of arguments. Return type alone does NOT distinguish overloads. `void print(int)` and `void print(String)` are valid overloads.' },
+  { id: 2, difficulty: 'medium', q: 'Is Java pass-by-value or pass-by-reference?', a: 'Java is strictly pass-by-value. Primitives: the value is copied. Objects: the reference is copied (not the object). You can mutate the object through the copied reference, but you cannot make the caller\'s variable point to a different object.' },
+  { id: 3, difficulty: 'medium', q: 'What are varargs and what are the rules?', a: '`Type... name` allows zero or more arguments. Compiled to an array. Rules: (1) only one varargs per method, (2) must be the last parameter, (3) can pass an array directly. Overload resolution: specific overloads win over varargs overloads.' },
+  { id: 4, difficulty: 'medium', q: 'What is the difference between Array and ArrayList?', a: 'Array: fixed size at creation, can hold primitives, O(1) access. ArrayList: dynamic resizing (1.5x growth), objects only, O(1) amortized add, O(n) insert/remove at middle. Use array for fixed-size, performance-critical collections; ArrayList otherwise.' },
+  { id: 5, difficulty: 'hard', q: 'How does recursion work in Java? What causes StackOverflowError?', a: 'Each call creates a stack frame (locals, params, return addr). StackOverflowError when stack is exhausted — typically infinite recursion or very deep recursion. Java lacks tail-call optimization. Fix: add base case, use iterative approach, increase -Xss, or use trampolining.' },
+  { id: 6, difficulty: 'medium', q: 'What is Arrays.sort() time complexity and algorithm?', a: 'Objects: TimSort (O(n log n) worst case, stable, O(n) for nearly-sorted). Primitives: Dual-Pivot Quicksort (O(n log n) average, not stable). Use Arrays.sort(arr, comparator) for objects. Collections.sort() also uses TimSort.' },
+  { id: 7, difficulty: 'medium', q: 'What is the difference between Arrays.copyOf() and System.arraycopy()?', a: '`Arrays.copyOf(arr, newLength)`: creates new array with specified length, pads with defaults or truncates. `System.arraycopy(src, srcPos, dest, destPos, len)`: copies between existing arrays — more efficient, no new array created. Both are shallow copies.' },
+  { id: 8, difficulty: 'easy', q: 'How do you declare and initialize a multi-dimensional array?', a: '`int[][] matrix = new int[3][4];` — 3 rows, 4 columns. Jagged: `int[][] jagged = new int[3][];` then `jagged[0] = new int[2]; jagged[1] = new int[5];`. Multi-dim arrays in Java are arrays of arrays — not contiguous memory.' },
+  { id: 9, difficulty: 'medium', q: 'What is the Arrays utility class? Name 5 key methods.', a: '`Arrays.sort(arr)`, `Arrays.binarySearch(arr, key)`, `Arrays.copyOf(arr, len)`, `Arrays.copyOfRange(arr, from, to)`, `Arrays.fill(arr, value)`, `Arrays.equals(arr1, arr2)`, `Arrays.toString(arr)`, `Arrays.deepToString(2dArr)`, `Arrays.stream(arr)`.' },
+  { id: 10, difficulty: 'medium', q: 'What is binary search? When can you use Arrays.binarySearch()?', a: 'Binary search requires a sorted array. Splits search space in half each step: O(log n). `Arrays.binarySearch(arr, key)` returns index if found, or `-(insertion point)-1` if not found. MUST sort the array first. Not thread-safe during modification.' },
+  { id: 11, difficulty: 'hard', q: 'What is a recursive method? How do you identify the base case?', a: 'A method that calls itself. Must have: (1) Base case — condition that stops recursion (e.g., n==0). (2) Recursive case — problem reduced toward base case. Rule: each call must progress toward base case. For tree/graph problems, recursion is natural; for linear problems, iteration is usually more efficient.' },
+  { id: 12, difficulty: 'medium', q: 'What is method hiding vs method overriding?', a: 'Overriding: non-static instance methods — resolved at runtime via dynamic dispatch. Method hiding: static methods — redefining in subclass "hides" parent\'s. `Animal a = new Dog(); a.staticMethod()` calls Animal\'s version (static binding). `@Override` works only for overriding, not hiding.' },
+  { id: 13, difficulty: 'easy', q: 'What is the return type of a method that returns nothing?', a: '`void`. A void method can still have `return;` (no value) to exit early. You cannot use the result of a void method in an expression. void is not a type you can store — unlike languages with a Unit type.' },
+  { id: 14, difficulty: 'medium', q: 'What is a static method? When should you use one?', a: 'Static methods belong to the class, not instances — no `this`. Use for: utility functions (Math.abs), factory methods, operations not needing object state. Cannot access instance fields/methods directly. Called via ClassName.method() (or instance — but that\'s misleading).' },
+  { id: 15, difficulty: 'hard', q: 'What is tail recursion and why doesn\'t Java optimize it?', a: 'Tail recursion: the recursive call is the last operation in the method. In tail-recursive form, the current frame could be reused instead of stacked. Java intentionally does NOT optimize tail calls to preserve stack traces for debugging. Use explicit iteration (loop) instead of deep recursion in Java.' },
+  { id: 16, difficulty: 'medium', q: 'What is the difference between shallow copy and deep copy of an array?', a: 'Shallow copy: copies references to objects — inner objects are shared. Deep copy: copies the objects themselves — changes to copy don\'t affect original. Arrays.copyOf, clone(), System.arraycopy are all shallow. For deep copy: manual loop + new copies of each element.' },
+  { id: 17, difficulty: 'easy', q: 'How do you find the length of an array?', a: '`arr.length` — it is a public final field, not a method (no parentheses). For String length: `str.length()` (method). For ArrayList: `list.size()` (method). `arr.length` is set at creation and never changes.' },
+  { id: 18, difficulty: 'medium', q: 'What is the Arrays.stream() method?', a: '`Arrays.stream(arr)` converts an array to a Stream for functional processing. `IntStream`, `LongStream`, `DoubleStream` for primitive arrays. `Arrays.stream(intArr).sum()`, `Arrays.stream(arr).filter(...).collect(...)`. Enables all Stream operations on array data.' },
+  { id: 19, difficulty: 'hard', q: 'What is an anonymous method or lambda as a method argument?', a: 'Methods accepting functional interfaces can receive lambdas: `Arrays.sort(arr, (a, b) -> b - a)` for reverse sort. This is method reference or lambda passed where a Comparator is expected. Methods that accept lambdas/functional interfaces are called higher-order functions.' },
+  { id: 20, difficulty: 'medium', q: 'What is the significance of the `final` keyword on a method parameter?', a: '`final` on parameter means it cannot be reassigned within the method. Does NOT affect the caller — Java is pass-by-value. Cannot do `final int x` and then `x = 5`. Useful for (1) preventing accidental reassignment, (2) enabling use in anonymous classes/lambdas (must be effectively final).' },
+]
+
+export const quiz = [
+  { id: 1, q: 'What distinguishes overloaded methods?', options: ['Return type', 'Method name', 'Parameter list (type/number/order)', 'Access modifier'], answer: 2, explanation: 'Overloaded methods have the same name but different parameter lists. Return type alone does not distinguish overloads.' },
+  { id: 2, q: 'Java is pass-by-?', options: ['Reference', 'Value', 'Pointer', 'Depends on type'], answer: 1, explanation: 'Java is always pass-by-value. For objects, the value passed is the reference (address), not the object itself.' },
+  { id: 3, q: 'What is the length of `new int[5]`?', options: ['0', '4', '5', '6'], answer: 2, explanation: 'new int[5] creates an array with 5 elements (indices 0-4). arr.length returns 5.' },
+  { id: 4, q: 'What exception is thrown when recursion goes too deep?', options: ['OutOfMemoryError', 'RuntimeException', 'StackOverflowError', 'RecursionException'], answer: 2, explanation: 'StackOverflowError is thrown when the call stack is exhausted due to deep/infinite recursion.' },
+  { id: 5, q: 'Which sort algorithm does Arrays.sort() use for object arrays?', options: ['QuickSort', 'MergeSort', 'TimSort', 'HeapSort'], answer: 2, explanation: 'Arrays.sort() uses TimSort for objects (stable, O(n log n) worst case). Dual-Pivot QuickSort for primitives.' },
+  { id: 6, q: 'Where must varargs be positioned in a parameter list?', options: ['First parameter', 'Any position', 'Last parameter', 'Middle parameter'], answer: 2, explanation: 'Varargs (Type... name) must be the last parameter. Only one varargs per method is allowed.' },
+  { id: 7, q: 'What does Arrays.binarySearch() return if element is not found?', options: ['null', '-1', '-(insertion point) - 1', '0'], answer: 2, explanation: 'Returns -(insertion point) - 1 where insertion point is where the value would be inserted to maintain sorted order.' },
+  { id: 8, q: 'What is the default value of elements in `new int[3]`?', options: ['null', 'undefined', '0', 'random'], answer: 2, explanation: 'Arrays are initialized to default values: 0 for int, 0.0 for double, false for boolean, null for objects.' },
+  { id: 9, q: 'Can you change an array\'s length after creation?', options: ['Yes, using resize()', 'No, arrays have fixed size', 'Yes, using Arrays.resize()', 'Yes, by reassigning to a new array'], answer: 1, explanation: 'Arrays are fixed-size once created. You can reassign the variable to a new, larger array, but the original is unchanged.' },
+  { id: 10, q: 'What is the time complexity of Arrays.binarySearch() on a sorted array?', options: ['O(n)', 'O(log n)', 'O(1)', 'O(n log n)'], answer: 1, explanation: 'Binary search is O(log n) — it halves the search space with each comparison.' },
+  { id: 11, q: 'What does `arr.clone()` return for an object array?', options: ['Deep copy', 'Shallow copy', 'Null', 'Same reference'], answer: 1, explanation: 'clone() returns a shallow copy — a new array with the same element references. Objects inside are shared.' },
+  { id: 12, q: 'Which method converts an array to a formatted string?', options: ['arr.toString()', 'Arrays.print(arr)', 'Arrays.toString(arr)', 'String.valueOf(arr)'], answer: 2, explanation: 'Arrays.toString(arr) returns "[1, 2, 3]". arr.toString() gives the default Object.toString() — not human-readable.' },
+  { id: 13, q: 'What happens if you call a method with wrong number of arguments?', options: ['Returns null', 'Runtime error', 'Compile error', 'Uses default values'], answer: 2, explanation: 'Wrong number of arguments is a compile-time error. Java does not have default parameter values (unlike Python/C++).' },
+  { id: 14, q: 'What is a static method?', options: ['A method that cannot be called', 'A method belonging to the class, not instances', 'A method that never changes', 'A method with final modifier'], answer: 1, explanation: 'Static methods belong to the class. No implicit `this`. Called via ClassName.method(). Cannot access instance members directly.' },
+  { id: 15, q: 'What is the precondition for using Arrays.binarySearch()?', options: ['Array must contain unique elements', 'Array must be sorted', 'Array must be of primitives', 'Array must have even length'], answer: 1, explanation: 'The array must be sorted (in ascending order for default, or matching Comparator order). Unsorted array gives undefined results.' },
+]
+
+export const shortNotes = {
+  title: 'Methods & Arrays — Quick Reference',
+  color: 'amber',
+  keyPoints: [
+    { icon: '🔄', title: 'Pass-by-Value', text: 'Always pass-by-value. Objects pass a copy of the reference — can mutate state, cannot change the caller\'s pointer.' },
+    { icon: '📚', title: 'Method Overloading', text: 'Same name, different params. Resolved at compile time. Return type does NOT differentiate overloads.' },
+    { icon: '📏', title: 'Array Basics', text: 'Fixed size, 0-indexed, `arr.length` (field). Default values on creation (0, false, null). new int[5] → 5 zeros.' },
+    { icon: '🔁', title: 'Recursion Rules', text: 'Always needs: (1) base case, (2) progress toward base case. No TCO in Java — deep recursion → StackOverflowError.' },
+    { icon: '📦', title: 'Arrays Utility', text: 'Arrays.sort(), Arrays.binarySearch() (sorted!), Arrays.copyOf(), Arrays.toString(), Arrays.fill(), Arrays.stream().' },
+    { icon: '⚡', title: 'Sort Algorithms', text: 'Objects: TimSort (stable, O(n log n)). Primitives: Dual-Pivot QuickSort. Always sort before binarySearch.' },
+    { icon: '🔢', title: 'Varargs', text: 'Type... name — zero or more args. Last param only. One per method. Compiled to array internally.' },
+    { icon: '📋', title: 'Copy Semantics', text: 'Arrays.copyOf / clone / arraycopy are all shallow. Deep copy requires manual element-by-element copying.' },
+  ],
+  quickFacts: [
+    'Array length is `arr.length` (field, no parentheses)',
+    'String length is `str.length()` (method, with parentheses)',
+    'ArrayList size is `list.size()` (method)',
+    'Arrays.binarySearch returns -(insertion point)-1 when not found',
+    'Java arrays are objects — stored on the heap',
+    'Jagged arrays (array of arrays) have rows of different lengths',
+    'Arrays.asList() returns a fixed-size list (no add/remove)',
+  ],
+  rememberThis: [
+    'Java is always pass-by-value',
+    'Array size is fixed at creation',
+    'Sort before binarySearch — results undefined otherwise',
+    'clone() and copyOf() are shallow — inner objects are shared',
+  ],
+}
