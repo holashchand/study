@@ -347,7 +347,8 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 0.95rem;
 }
-.section-footer button {
+.section-footer button,
+.section-footer .sec-next-chapter {
   background: var(--nav-bg);
   color: #74b9ff;
   border: none;
@@ -355,10 +356,19 @@ hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.95rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
   transition: background 0.2s;
 }
-.section-footer button:hover { background: #3d566e; }
+.section-footer button:hover,
+.section-footer .sec-next-chapter:hover { background: #3d566e; }
 .section-footer button:disabled { opacity: 0.3; cursor: default; }
+.section-footer .sec-next-chapter {
+  background: var(--accent);   /* red — visually distinct from section Next */
+  color: #fff;
+}
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {

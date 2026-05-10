@@ -2960,6 +2960,174 @@ final int criticalCalculation(int x) {
 
     <hr>
 
+    <!-- 21. ANNOTATIONS -->
+    <section id="sec-21">
+      <h2>21. Annotations</h2>
+
+      <h3>Built-in Annotations</h3>
+      <pre><code class="language-java">@Override          // compiler checks you're actually overriding
+@Deprecated        // marks API as obsolete — triggers warning on use
+@SuppressWarnings("unchecked")  // suppress specific compiler warnings
+@FunctionalInterface   // verifies interface has exactly 1 abstract method
+@SafeVarargs       // suppresses heap pollution warning on varargs methods
+
+// @Deprecated with since and forRemoval:
+@Deprecated(since = "11", forRemoval = true)
+public void oldMethod() { }</code></pre>
+
+      <h3>Custom Annotation Definition</h3>
+      <pre><code class="language-java">// Basic annotation:
+public @interface MyAnnotation { }
+
+// With elements:
+public @interface Route {
+    String value();          // element named "value" is special — no name needed at use
+    String method() default "GET";
+    int timeout() default 30;
+}
+
+// Meta-annotations:
+@Retention(RetentionPolicy.RUNTIME)  // available at runtime via reflection
+@Target(ElementType.METHOD)          // only on methods
+@Documented                          // include in Javadoc
+@Inherited                           // subclasses inherit this annotation
+public @interface Route {
+    String value();
+    String method() default "GET";
+}
+
+// Usage:
+@Route("/users")
+@Route(value = "/users", method = "POST")
+public void handleRequest() { }</code></pre>
+
+      <h3>Retention Policies</h3>
+      <ul class="bullet-list">
+        <li><strong>SOURCE:</strong> discarded by compiler (e.g., @Override)</li>
+        <li><strong>CLASS:</strong> in .class file, not runtime (default)</li>
+        <li><strong>RUNTIME:</strong> available via reflection (e.g., @Deprecated)</li>
+      </ul>
+
+      <h3>Target Types (ElementType)</h3>
+      <ul class="bullet-list">
+        <li>TYPE (class, interface, enum), METHOD, FIELD, PARAMETER, CONSTRUCTOR</li>
+        <li>LOCAL_VARIABLE, ANNOTATION_TYPE, PACKAGE</li>
+      </ul>
+
+      <h3>Repeatable Annotations (Java 8+)</h3>
+      <pre><code class="language-java">@Repeatable(Schedules.class)
+public @interface Schedule { String cron(); }
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Schedules { Schedule[] value(); }
+
+// Usage:
+@Schedule(cron = "0 0 * * *")
+@Schedule(cron = "0 12 * * *")
+public void backup() { }</code></pre>
+    </section>
+
+    <hr>
+
+    <!-- 22. REFLECTION API -->
+    <section id="sec-22">
+      <h2>22. Reflection API</h2>
+
+      <h3>Getting Class Objects</h3>
+      <pre><code class="language-java">// Three ways to get Class object:
+Class<String> c1 = String.class;           // class literal
+Class<?> c2 = "hello".getClass();          // from instance
+Class<?> c3 = Class.forName("java.lang.String"); // by name (throws ClassNotFoundException)
+
+// Class info:
+c1.getName()           // "java.lang.String"
+c1.getSimpleName()     // "String"
+c1.getPackageName()    // "java.lang"
+c1.getSuperclass()     // class java.lang.Object
+c1.getInterfaces()     // [Serializable, Comparable, CharSequence]
+c1.isInterface()       // false
+c1.isEnum()            // false
+c1.isRecord()          // false</code></pre>
+
+      <h3>Inspecting Fields</h3>
+      <pre><code class="language-java">class Person {
+    private String name;
+    public int age;
+    Person(String name, int age) { this.name = name; this.age = age; }
+}
+
+Class<?> cls = Person.class;
+
+// getDeclaredFields() = all fields in THIS class (including private)
+// getFields() = only public fields (including inherited)
+for (Field field : cls.getDeclaredFields()) {
+    System.out.println(field.getName() + " : " + field.getType());
+}
+
+// Read/write field value:
+Person p = new Person("Alice", 30);
+Field nameField = cls.getDeclaredField("name");
+nameField.setAccessible(true);      // bypass private
+String name = (String) nameField.get(p);  // "Alice"
+nameField.set(p, "Bob");                  // modify private field</code></pre>
+
+      <h3>Inspecting and Invoking Methods</h3>
+      <pre><code class="language-java">// getDeclaredMethods() = all methods in this class
+// getMethods() = public methods including inherited
+Method[] methods = cls.getDeclaredMethods();
+for (Method m : methods) {
+    System.out.println(m.getName() + " params=" + m.getParameterCount());
+}
+
+// Invoke a method:
+Method greet = String.class.getMethod("toUpperCase");
+String result = (String) greet.invoke("hello");  // "HELLO"
+
+// Invoke with parameters:
+Method sub = String.class.getMethod("substring", int.class, int.class);
+String s = (String) sub.invoke("hello world", 6, 11);  // "world"</code></pre>
+
+      <h3>Constructors via Reflection</h3>
+      <pre><code class="language-java">// Create instance via reflection:
+Constructor<Person> ctor = Person.class.getDeclaredConstructor(String.class, int.class);
+ctor.setAccessible(true);
+Person p = ctor.newInstance("Alice", 30);
+
+// No-arg constructor:
+Object obj = String.class.getDeclaredConstructor().newInstance();</code></pre>
+
+      <h3>Reading Annotations at Runtime</h3>
+      <pre><code class="language-java">@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@interface Route { String value(); }
+
+class Controller {
+    @Route("/users")
+    public void getUsers() { }
+}
+
+// Read the annotation:
+Method method = Controller.class.getMethod("getUsers");
+if (method.isAnnotationPresent(Route.class)) {
+    Route route = method.getAnnotation(Route.class);
+    System.out.println("Path: " + route.value());  // "Path: /users"
+}
+
+// Scan all methods for @Route:
+for (Method m : Controller.class.getDeclaredMethods()) {
+    Route r = m.getAnnotation(Route.class);
+    if (r != null) System.out.println(m.getName() + " → " + r.value());
+}</code></pre>
+
+      <ul class="bullet-list">
+        <li><strong>Reflection is powerful but slow</strong> and breaks encapsulation — use sparingly</li>
+        <li><strong>Frameworks like Spring</strong> use reflection heavily for dependency injection and proxies</li>
+        <li><strong>Application code</strong> rarely needs reflection — prefer compile-time solutions</li>
+      </ul>
+    </section>
+
+    <hr>
+
     <section class="summary">
       <h2>Key Takeaways</h2>
       <ul>

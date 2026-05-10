@@ -4,9 +4,10 @@
     var article = document.querySelector('article');
     if (!article) return;
 
-    // Hide the inline TOC nav (if any) — sidebar replaces it
-    var inlineToc = article.querySelector('nav.toc');
-    if (inlineToc) inlineToc.style.display = 'none';
+    // Hide any inline TOC — sidebar replaces it
+    article.querySelectorAll('.toc, .chapter-toc, .table-of-contents').forEach(function (el) {
+      el.style.display = 'none';
+    });
 
     // Use the existing <section> or <div class="section"> direct children of article
     var sections = Array.from(
@@ -78,6 +79,22 @@
         (idx + 1) + ' / ' + sections.length;
     }
 
+    // ── Grab next-chapter URL from bottom-nav, then remove it ──
+    var bottomNav = document.querySelector('.bottom-nav');
+    var nextChapterHref = null;
+    var nextChapterLabel = 'Next Chapter →';
+    if (bottomNav) {
+      var bottomLinks = bottomNav.querySelectorAll('a');
+      bottomLinks.forEach(function (a) {
+        // The last anchor that isn't the TOC link is the next-chapter link
+        if (!a.classList.contains('nav-toc') && a.textContent.indexOf('→') !== -1) {
+          nextChapterHref  = a.href;
+          nextChapterLabel = a.textContent.trim();
+        }
+      });
+      bottomNav.style.display = 'none';
+    }
+
     // ── Prev / Next buttons inside each section ───────────
     sections.forEach(function (sec, idx) {
       var footer = document.createElement('div');
@@ -92,14 +109,28 @@
       counter.className = 'sec-counter';
       counter.textContent = (idx + 1) + ' / ' + sections.length;
 
+      var right = document.createElement('div');
+      right.style.display = 'flex';
+      right.style.gap = '0.5rem';
+
       var next = document.createElement('button');
       next.className = 'sec-next';
       next.textContent = 'Next →';
       next.addEventListener('click', function () { showSection(idx + 1); });
+      right.appendChild(next);
+
+      // On the very last section, also show a Next Chapter button
+      if (idx === sections.length - 1 && nextChapterHref) {
+        var nextChap = document.createElement('a');
+        nextChap.href = nextChapterHref;
+        nextChap.className = 'sec-next-chapter';
+        nextChap.textContent = nextChapterLabel;
+        right.appendChild(nextChap);
+      }
 
       footer.appendChild(prev);
       footer.appendChild(counter);
-      footer.appendChild(next);
+      footer.appendChild(right);
       sec.appendChild(footer);
     });
 
