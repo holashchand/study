@@ -78,6 +78,8 @@ Semantic color tokens (use these, never hardcoded colors):
 - `text-foreground`, `text-muted-foreground`, `text-primary`
 - `border-border`
 
+Theme must use bright and constrating colors for visibility. it should not be too contrasting or dark/white as for blind
+
 ## How to Add a New Course
 
 1. Create a new folder: `src/data/courses/<slug>/`
@@ -146,4 +148,4 @@ See **`src/components/CLAUDE.md`** for detailed component architecture, BlockRen
 
 ## AI Instructions
 
-After completion of any change test building the application and update this file to be up to date
+After completion of any change test building the application and update this file and other CLAUDE.md files to be up to date
